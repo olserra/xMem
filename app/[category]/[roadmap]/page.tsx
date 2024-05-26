@@ -38,7 +38,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({ params }) => {
     return (
         <div className="flex flex-col justify-center text-center gap-6 mx-8 md:mx-0">
             <h1 className="mt-10 text-2xl">{roadmapData.title}</h1>
-            <SearchBar videos={roadmapData.videos} onFilter={setFilteredVideos} />
+            <SearchBar videos={roadmapData.videos} onFilterVideos={setFilteredVideos} />
             <div className="video-container">
                 {videoRows.map((videoRow, rowIndex) => (
                     <div key={rowIndex} className="video-container">

@@ -1,16 +1,3 @@
-# NextJS Landing Page Template 
-
-This is a Landing Page template for [Next.js](https://nextjs.org/) 14 App Router. 
-
-## Built Using and Initialised with ⚒️
-- Tailwind CSS
-- [Shadcn](https://ui.shadcn.com/) Components + Themes
-- Custom Components and Layouts that are fully responsive in both Mobile and Desktop View
-- Vercel's [Geist Font](https://vercel.com/font)
-
-## Preview
-![Preview](https://github.com/moinbukhari/NextJS-landing-page-template/blob/main/landing_page_preview.jpg)
-
 ## Getting Started
 
 First, run the development server:

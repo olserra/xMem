@@ -25,7 +25,7 @@ export default function Home() {
         </h1>
 
         <p className="mt-5 max-w-prose text-lg text-zinc-700 sm:text-2xl">
-          OpenSkill is a platform that analyzes YouTube videos to curate the skills in demand and provide you with the best resources to learn them.
+          We analyze in-demand skills to curate the best content.
         </p>
 
         <Link

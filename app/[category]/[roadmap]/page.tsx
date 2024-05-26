@@ -1,6 +1,6 @@
 'use client'
 
-import { Video, Roadmap, data } from "@/app/data/YouTubeData";
+import { Video, Roadmap, data } from "@/app/data/youtube";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
 
@@ -25,35 +25,21 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({ params }) => {
         setFilteredVideos(fetchedData.videos);
     }, [category, roadmap]);
 
-    const chunkArray = (array: Video[], size: number) => {
-        const result = [];
-        for (let i = 0; i < array.length; i += size) {
-            result.push(array.slice(i, i + size));
-        }
-        return result;
-    };
-
-    const videoRows = chunkArray(filteredVideos, 3);
-
     return (
-        <div className="flex flex-col justify-center text-center gap-6 mx-8 md:mx-0">
+        <div className="flex flex-col justify-center text-center gap-6 mx-8 md:mx-40">
             <h1 className="mt-10 text-2xl">{roadmapData.title}</h1>
             <SearchBar videos={roadmapData.videos} onFilterVideos={setFilteredVideos} />
-            <div className="video-container">
-                {videoRows.map((videoRow, rowIndex) => (
-                    <div key={rowIndex} className="video-container">
-                        {videoRow.map((video) => (
-                            <div key={video.id} className="video-item flex flex-col items-center mb-6">
-                                <h2 className="text-lg">{video.title}</h2>
-                                <iframe
-                                    width="100%"
-                                    height="215"
-                                    src={video.url}
-                                    allowFullScreen
-                                    className="mx-8 rounded-lg shadow-lg"
-                                ></iframe>
-                            </div>
-                        ))}
+            <div className="video-container grid grid-cols-1 md:grid-cols-3 gap-6">
+                {filteredVideos.map((video) => (
+                    <div key={video.id} className="video-item flex flex-col items-center mb-6 border border-1 border-gray-400 rounded-lg gap-5">
+                        <iframe
+                            width="100%"
+                            height="215"
+                            src={video.url}
+                            allowFullScreen
+                            className="mx-8 rounded-t-lg shadow-lg"
+                        ></iframe>
+                        <h2 className="text-base pb-4">{video.title}</h2>
                     </div>
                 ))}
             </div>

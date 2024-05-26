@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 interface SkillsProps {
@@ -6,18 +7,33 @@ interface SkillsProps {
 }
 
 const Skills = ({ skills }: SkillsProps) => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleSkillClick = (category: string) => {
+    if (session) {
+      router.push(`/${category}/basic`);
+    } else {
+      signIn();
+    }
+  };
+
   return (
     <>
       <div className="flex items-center justify-center py-12 md:px-12 ">
         <div className="flex flex-col gap-6 md:flex-row flex-wrap justify-center">
           {skills.map((skill) => (
-            <Link key={skill.title} href={`/${skill.category}/basic`}>
+            <div
+              key={skill.title}
+              onClick={() => handleSkillClick(skill.category)}
+              className="cursor-pointer"
+            >
               <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
                 <CardTitle>{skill.title}</CardTitle>
                 <CardDescription className="mb-3 text-center">{skill.description}</CardDescription>
                 {skill.icon}
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

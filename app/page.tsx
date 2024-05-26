@@ -6,7 +6,7 @@ import Image from "next/image";
 import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
-import { Video, data } from "@/app/data/YouTubeData";
+import { Video, data } from "@/app/data/youtube";
 import { skills } from "./data/skills";
 
 export default function Home() {

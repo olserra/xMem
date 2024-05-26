@@ -17,7 +17,7 @@ export default function Footer() {
             href="https://tryconvo.vercel.app/"
             className="hover:underline"
           >
-            OpenSkill
+            OpenSkills
           </a>
           . All Rights Reserved.
         </span>

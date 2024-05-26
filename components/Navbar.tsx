@@ -17,7 +17,7 @@ const Navbar = () => {
   const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signIn("google", {
-      callbackUrl: "https://www.openskill.org/api/auth/callback/google",
+      callbackUrl: "https://www.openskills.online/api/auth/callback/google",
     });
   };
 

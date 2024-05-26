@@ -6,8 +6,10 @@ import Image from "next/image";
 import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
-import { Video, data } from "@/app/data/youtube";
+import { TbBrandNextjs } from "react-icons/tb";
 import { skills } from "./data/skills";
+import { RiOpenaiFill } from "react-icons/ri";
+import { RxVercelLogo } from "react-icons/rx";
 
 export default function Home() {
   const [filteredSkills, setFilteredSkills] = useState(skills);
@@ -144,47 +146,26 @@ export default function Home() {
             <div className="flex items-center justify-center">
               <div className="flex flex-col gap-6 md:flex-row">
                 <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
-                  <CardTitle>Whisper AI</CardTitle>
+                  <CardTitle>NextJS</CardTitle>
                   <CardDescription className="mb-3 text-center">
-                    Speech to text
+                    14.2.3
                   </CardDescription>
-                  <Image
-                    src="/mic.webp"
-                    alt="cafe scenario"
-                    width={128}
-                    height={128}
-                    quality={100}
-                    className="rounded-xl"
-                  />
+                  <TbBrandNextjs size={40} />
                 </Card>
                 <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
-                  <CardTitle>GPT 4</CardTitle>
+                  <CardTitle>OpenAI</CardTitle>
                   <CardDescription className="mb-3 text-center">
-                    Comprehensive prompts and responses
+                    OpenAI API
                   </CardDescription>
-                  <Image
-                    src="/openai.webp"
-                    alt="cafe scenario"
-                    width={128}
-                    height={128}
-                    quality={100}
-                    className="rounded-xl"
-                  />
+                  <RiOpenaiFill size={40} />
                 </Card>
 
                 <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
-                  <CardTitle>WebSpeech</CardTitle>
+                  <CardTitle>Vercel</CardTitle>
                   <CardDescription className="mb-3 text-center">
-                    Text to speech
+                    33.5.5
                   </CardDescription>
-                  <Image
-                    src="/speaker.webp"
-                    alt="cafe scenario"
-                    width={128}
-                    height={128}
-                    quality={100}
-                    className="rounded-xl"
-                  />
+                  <RxVercelLogo size={40} />
                 </Card>
               </div>
             </div>

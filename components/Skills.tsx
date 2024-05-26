@@ -1,21 +1,23 @@
 import Link from 'next/link';
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { MdEngineering, MdPeople, MdLeaderboard, MdManageAccounts, MdAnalytics, MdCreate, MdGroup, MdSelfImprovement, MdAutorenew, MdGavel, MdSupportAgent } from "react-icons/md";
-import { TiSocialFlickr } from "react-icons/ti";
+import { MdEngineering, MdLeaderboard, MdOutlineSell, MdAnalytics, MdCreate, MdGroup, MdGavel } from "react-icons/md";
+import { SiWeb3Dotjs } from "react-icons/si";
+import { TbChartScatter } from "react-icons/tb";
+import { FaMagic } from "react-icons/fa";
+import { SiFreelancer } from "react-icons/si";
 
 const skills = [
-    { title: "Technical", description: "Develop technical skills.", icon: <MdEngineering size={30} />, category: "technical" },
-    { title: "Social", description: "Improve your social skills.", icon: <MdPeople size={30} />, category: "social" },
+    { title: "Software Engineering", description: "Develop technical skills.", icon: <MdEngineering size={30} />, category: "software-engineering" },
     { title: "Leadership", description: "Learn to lead effectively.", icon: <MdLeaderboard size={30} />, category: "leadership" },
-    { title: "Communication", description: "Enhance your communication.", icon: <TiSocialFlickr size={30} />, category: "communication" },
-    { title: "Management", description: "Master management skills.", icon: <MdManageAccounts size={30} />, category: "management" },
     { title: "Analytical", description: "Develop analytical thinking.", icon: <MdAnalytics size={30} />, category: "analytical" },
     { title: "Creative", description: "Boost your creativity.", icon: <MdCreate size={30} />, category: "creative" },
     { title: "Interpersonal", description: "Improve interpersonal skills.", icon: <MdGroup size={30} />, category: "interpersonal" },
-    { title: "Self-Management", description: "Manage yourself effectively.", icon: <MdSelfImprovement size={30} />, category: "self-management" },
-    { title: "Adaptive", description: "Learn to adapt quickly.", icon: <MdAutorenew size={30} />, category: "adaptive" },
+    { title: "Artificial Intelligence", description: "Develop your AI skills.", icon: <FaMagic size={30} />, category: "artificial-intelligence" },
+    { title: "Data Science", description: "Learn or improve your DS skills", icon: <TbChartScatter size={30} />, category: "data-science" },
     { title: "Negotiation", description: "Negotiate successfully.", icon: <MdGavel size={30} />, category: "negotiation" },
-    { title: "Customer Service", description: "Excel in customer service.", icon: <MdSupportAgent size={30} />, category: "customer-service" },
+    { title: "Artistic", description: "Improve your artistic skills.", icon: <SiFreelancer size={30} />, category: "artistic" },
+    { title: "Marketing", description: "Master the marketing skills", icon: <MdOutlineSell size={30} />, category: "marketing" },
+    { title: "Web3", description: "Learn about Web3 technologies.", icon: <SiWeb3Dotjs size={30} />, category: "web3" },
 ];
 
 const Skills = () => {

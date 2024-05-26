@@ -39,7 +39,7 @@ const Navbar = () => {
             className="flex z-40 justify-center items-center gap-2"
           >
             <SiFuturelearn size={20} />
-            <span className="text-2xl font-semibold">OpenSkill</span>
+            <span className="text-2xl font-semibold">OpenSkills</span>
           </Link>
           <div className="flex gap-1 sm:gap-4 items-center">
             {!session ? (

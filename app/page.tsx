@@ -5,8 +5,6 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import Skills from "@/components/Skills";
 
 export default function Home() {

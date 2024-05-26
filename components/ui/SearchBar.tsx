@@ -45,7 +45,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ videos = [], skills = [], onFilte
 	};
 
 	return (
-		<div className="w-full max-w-md mx-auto my-4">
+		<div className="w-full max-w-md mx-auto mt-4">
 			<input
 				type="text"
 				value={searchQuery}

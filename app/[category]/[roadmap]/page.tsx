@@ -36,21 +36,21 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({ params }) => {
     const videoRows = chunkArray(filteredVideos, 3);
 
     return (
-        <div className="flex flex-col justify-center text-center gap-6">
+        <div className="flex flex-col justify-center text-center gap-6 mx-8 md:mx-0">
             <h1 className="mt-10 text-2xl">{roadmapData.title}</h1>
             <SearchBar videos={roadmapData.videos} onFilter={setFilteredVideos} />
-            <div className="flex flex-col justify-center gap-6">
+            <div className="video-container">
                 {videoRows.map((videoRow, rowIndex) => (
-                    <div key={rowIndex} className="flex justify-center gap-6">
+                    <div key={rowIndex} className="video-container">
                         {videoRow.map((video) => (
-                            <div key={video.id} className="flex flex-col items-center">
+                            <div key={video.id} className="video-item flex flex-col items-center mb-6">
                                 <h2 className="text-lg">{video.title}</h2>
                                 <iframe
-                                    width="360"
+                                    width="100%"
                                     height="215"
                                     src={video.url}
                                     allowFullScreen
-                                    className="rounded-lg shadow-lg"
+                                    className="mx-8 rounded-lg shadow-lg"
                                 ></iframe>
                             </div>
                         ))}

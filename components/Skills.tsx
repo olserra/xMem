@@ -21,8 +21,8 @@ const skills = [
 const Skills = () => {
     return (
         <>
-            <div className="flex items-center justify-center py-12">
-                <div className="flex flex-col gap-6 md:flex-row flex-wrap">
+            <div className="flex items-center justify-center py-12 md:px-12 ">
+                <div className="flex flex-col gap-6 md:flex-row flex-wrap justify-center">
                     {skills.map((skill) => (
                         <Link key={skill.title} href={`/${skill.category}/basic`}>
                             <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">

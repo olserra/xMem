@@ -1,24 +1,20 @@
-
 'use client';
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 import Skills from "@/components/Skills";
-import { signIn, useSession } from "next-auth/react";
+import SearchBar from "@/components/ui/SearchBar";
+import { useEffect, useState } from "react";
+import { Video, data } from "@/app/data/YouTubeData";
+import { skills } from "./data/skills";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const [filteredSkills, setFilteredSkills] = useState(skills);
 
-  const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    signIn("google", {
-      callbackUrl: "https://www.openskill.org/api/auth/callback/google",
-    });
-  };
+  useEffect(() => {
+    // This is where you'd fetch or update the initial video data if needed
+  }, []);
 
   return (
     <>
@@ -37,35 +33,10 @@ export default function Home() {
         <p className="mt-5 max-w-prose text-lg text-zinc-700 sm:text-2xl">
           We analyze in-demand skills to curate the best content.
         </p>
-        {!session ? (
-
-          <button
-            className={cn(
-              buttonVariants({
-                size: "lg",
-                className: "mt-5",
-              }),
-              "text-lg",
-            )}
-            onClick={handleClickSignIn}
-          >
-            Start Learning Now
-          </button>
-        ) : (
-          <div>
-            <a
-              className={cn(
-                buttonVariants({
-                  size: "lg",
-                  className: "mt-5",
-                }),
-                "text-lg",
-              )}
-            >
-              Start learning now ↓
-            </a>
-          </div>
-        )}
+        <SearchBar
+          skills={skills}
+          onFilterSkills={setFilteredSkills}
+        />
       </MaxWidthWrapper>
 
       {/* Value Prop */}
@@ -84,7 +55,7 @@ export default function Home() {
             />
           </div>
 
-          <Skills />
+          <Skills skills={filteredSkills} />
 
           <div
             aria-hidden="true"

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import SessionWrapper from '../components/SessionWrapper';
 
 export const metadata: Metadata = {
   title: "OpenSkill | Learn the skills in demand",
@@ -24,9 +25,11 @@ export default function RootLayout({
           GeistSans.className,
         )}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <SessionWrapper>
+          <Navbar />
+          {children}
+          <Footer />
+        </SessionWrapper>
       </body>
     </html>
   );

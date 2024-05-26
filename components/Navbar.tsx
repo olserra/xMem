@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { SiFuturelearn } from "react-icons/si";
 
@@ -6,10 +8,23 @@ import { cn } from "@/lib/utils";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
 import { MobileNav } from "@/components/MobileNav";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
   // Replace with your auth of choice, e.g. Clerk: const { userId } = auth();
-  const isUserSignedIn = false;
+  const { data: session } = useSession();
+
+  const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    signIn("google", {
+      callbackUrl: "https://www.openskill.org/api/auth/callback/google",
+    });
+  };
+
+  const handleClickSignOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    signOut();
+  };
 
   return (
     <nav
@@ -27,59 +42,54 @@ const Navbar = () => {
             <span className="text-2xl font-semibold">OpenSkill</span>
           </Link>
           <div className="flex gap-1 sm:gap-4 items-center">
-            {!isUserSignedIn ? (
+            {!session ? (
               <MobileNav />
             ) : (
-              <Link
+              <button
                 className={buttonVariants({
                   size: "sm",
                   className: "sm:hidden mr-3",
                 })}
-                href="/dashboard"
+                onClick={handleClickSignOut}
               >
-                Dashboard
-              </Link>
+                SignOut
+              </button>
             )}
 
             <div className="hidden items-center space-x-4 sm:flex">
-              {!isUserSignedIn ? (
+              {!session ? (
                 <>
-                  <Link
+                  <button
                     className={buttonVariants({
                       variant: "ghost",
                       size: "sm",
                     })}
-                    href="/sign-in"
+                    onClick={handleClickSignIn}
                   >
                     Sign in
-                  </Link>
-                  <Link
+                  </button>
+                  <button
                     className={buttonVariants({
                       size: "sm",
                     })}
-                    href="/sign-up"
+                    onClick={handleClickSignIn}
                   >
                     Get started
-                  </Link>
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link
+                  <button
                     className={buttonVariants({
                       size: "sm",
                     })}
-                    href="/dashboard"
+                    onClick={handleClickSignOut}
                   >
-                    Dashboard
-                  </Link>
+                    SignOut
+                  </button>
                 </>
               )}
             </div>
-
-            {/* User profile mockup below, e.g using Clerk: <UserButton afterSignOutUrl="/" /> */}
-            {isUserSignedIn && (
-              <div className="bg-emerald-600 border-2 border-black shadow-lg rounded-full w-10 h-10"></div>
-            )}
           </div>
         </div>
       </MaxWidthWrapper>

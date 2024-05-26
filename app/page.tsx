@@ -1,13 +1,25 @@
+
+'use client';
+
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
-import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import Skills from "@/components/Skills";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
+
+  const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    signIn("google", {
+      callbackUrl: "https://www.openskill.org/api/auth/callback/google",
+    });
+  };
+
   return (
     <>
       {/* Hero */}
@@ -25,19 +37,35 @@ export default function Home() {
         <p className="mt-5 max-w-prose text-lg text-zinc-700 sm:text-2xl">
           We analyze in-demand skills to curate the best content.
         </p>
+        {!session ? (
 
-        <Link
-          className={cn(
-            buttonVariants({
-              size: "lg",
-              className: "mt-5",
-            }),
-            "text-lg",
-          )}
-          href={"/dashboard"}
-        >
-          Start Learning Now
-        </Link>
+          <button
+            className={cn(
+              buttonVariants({
+                size: "lg",
+                className: "mt-5",
+              }),
+              "text-lg",
+            )}
+            onClick={handleClickSignIn}
+          >
+            Start Learning Now
+          </button>
+        ) : (
+          <div>
+            <a
+              className={cn(
+                buttonVariants({
+                  size: "lg",
+                  className: "mt-5",
+                }),
+                "text-lg",
+              )}
+            >
+              Start learning now ↓
+            </a>
+          </div>
+        )}
       </MaxWidthWrapper>
 
       {/* Value Prop */}

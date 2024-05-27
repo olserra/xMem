@@ -29,7 +29,7 @@ export default function Home() {
         </div>
 
         <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
-          <span className="text-blue-600">YouTube</span>{" "} curation for skills in demand
+          <span className="text-blue-600">YouTube</span>{" "} curation for in-demand skills
         </h1>
 
         <p className="mt-5 max-w-prose text-lg text-zinc-700 sm:text-2xl">

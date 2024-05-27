@@ -8,8 +8,8 @@ import Navbar from "@/components/Navbar";
 import SessionWrapper from '../components/SessionWrapper';
 
 export const metadata: Metadata = {
-  title: "OpenSkills | Learn the skills in demand",
-  description: "Learn the skills in demand",
+  title: "OpenSkills | Learn the in-demand skills",
+  description: "Learn the in-demand skills",
 };
 
 export default function RootLayout({

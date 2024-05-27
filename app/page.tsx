@@ -24,7 +24,7 @@ export default function Home() {
       <MaxWidthWrapper className="mt-10 flex flex-col items-center justify-center text-center sm:mt-12">
         <div className="mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
           <p className="text-sm font-semibold text-gray-700">
-            Try OpenSkill for Free
+            Try OpenSkills for Free
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
                 </h2>
                 <p className="mt-4 text-lg text-gray-600">
                   Improving your skillset has never been easier than with
-                  OpenSkill.
+                  OpenSkills.
                 </p>
               </div>
             </div>

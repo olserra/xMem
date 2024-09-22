@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { data } from "@/app/data/youtube";
-import { useSession } from 'next-auth/react';
+import { useUser } from "../Context";
 
 interface Skill {
     id: string;
@@ -14,34 +14,9 @@ interface Skill {
     slug: string;
 }
 
-const fetchUserId = async (email: string) => {
-    const response = await fetch(`/api/user?email=${email}`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch user ID');
-    }
-    const data = await response.json();
-    return data.id;
-};
-
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
-    const { data: session } = useSession();
-    const [userId, setUserId] = useState<string | null>(null);
-
-    useEffect(() => {
-        const getUserId = async () => {
-            if (session?.user?.email) {
-                try {
-                    const id = await fetchUserId(session.user.email);
-                    setUserId(id);
-                } catch (error) {
-                    console.error('Error fetching user ID:', error);
-                }
-            }
-        };
-
-        getUserId();
-    }, [session]);
+    const { userId } = useUser();
 
     useEffect(() => {
         const fetchUserSkills = async () => {

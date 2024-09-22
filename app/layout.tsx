@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import SessionWrapper from '../components/SessionWrapper';
+import { NextAuthProvider } from "./NextAuthProvider";
 
 export const metadata: Metadata = {
   title: "OpenSkills | Learn the in-demand skills",
@@ -25,11 +25,13 @@ export default function RootLayout({
           GeistSans.className,
         )}
       >
-        <SessionWrapper>
-          <Navbar />
-          {children}
-          <Footer />
-        </SessionWrapper>
+        <NextAuthProvider>
+          <SessionWrapper>
+            <Navbar />
+            {children}
+            <Footer />
+          </SessionWrapper>
+        </NextAuthProvider>
       </body>
     </html>
   );

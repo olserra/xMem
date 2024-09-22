@@ -1,4 +1,5 @@
-// components/UserContext.tsx
+'use client'; // Ensure this is a Client Component
+
 import { createContext, useContext, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 
@@ -11,8 +12,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const { data: session } = useSession();
 
-    // Access the user ID directly from the session object
-    const userId = session?.user?.email ? session.user.email : null; // Use email as a fallback or any other identifier
+    const userId = session?.user?.email || null;
 
     return (
         <UserContext.Provider value={{ userId }}>

@@ -14,6 +14,11 @@ const Navbar = () => {
   // Replace with your auth of choice, e.g. Clerk: const { userId } = auth();
   const { data: session } = useSession();
 
+  const menuItems = [
+    { label: 'Track progress', href: '/track-progress' },
+    { label: 'In-demand', href: '/in-demand' }
+  ];
+
   const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signIn("google", {
@@ -42,6 +47,13 @@ const Navbar = () => {
             <span className="text-2xl font-semibold">OpenSkills</span>
           </Link>
           <div className="flex gap-1 sm:gap-4 items-center">
+            <div className="hidden items-center space-x-4 sm:flex uppercase pr-8">
+              {menuItems.map((item) => (
+                <Link key={item.label} href={item.href} className="text-sm">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
             {!session ? (
               <MobileNav />
             ) : (
@@ -79,6 +91,10 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  <div className="text-[10px]">
+                    <p>Welcome,</p>
+                    <p className="font-bold underline">{session.user?.name}</p>
+                  </div>
                   <button
                     className={buttonVariants({
                       size: "sm",

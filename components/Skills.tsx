@@ -1,3 +1,5 @@
+'use-client'
+
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";

@@ -7,15 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model FormSubmission {
+  id        String   @id @default(cuid())
+  email     String
+  name      String
+  company   String
+  employees String
+  createdAt DateTime @default(now())
+}
+
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role      @default(USER)
+  role          Role       @default(USER)
+  goals         Goal[]     @relation("UserGoals")
+  progress      Progress[] @relation("UserProgress")
+}
+
+model Goal {
+  id        String   @id @default(cuid())
+  goal      String
+  deadline  DateTime
+  steps     String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation("UserGoals", fields: [userId], references: [id])
+}
+
+model Progress {
+  id              String   @id @default(cuid())
+  skillId         String // Reference to the skill (e.g., HTML, CSS, etc.)
+  userId          String
+  currentProgress Int // Change to Int for percentage progress
+  status          String // Status can be "To be learned" or "In-progress"
+  createdAt       DateTime @default(now())
+  user            User     @relation("UserProgress", fields: [userId], references: [id])
+  skill           Skill    @relation(fields: [skillId], references: [id]) // Assuming you have a Skill model
+}
+
+model Skill {
+  id        String     @id @default(cuid())
+  name      String     @unique // Unique name for the skill
+  progress  Progress[] // Relation to Progress model
+  createdAt DateTime   @default(now())
 }
 
 model Account {

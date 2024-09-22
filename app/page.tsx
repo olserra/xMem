@@ -10,6 +10,7 @@ import { TbBrandNextjs } from "react-icons/tb";
 import { skills } from "./data/skills";
 import { RiOpenaiFill } from "react-icons/ri";
 import { RxVercelLogo } from "react-icons/rx";
+import Link from "next/link";
 
 export default function Home() {
   const [filteredSkills, setFilteredSkills] = useState(skills);
@@ -23,9 +24,13 @@ export default function Home() {
       {/* Hero */}
       <MaxWidthWrapper className="mt-10 flex flex-col items-center justify-center text-center sm:mt-12">
         <div className="mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
-          <p className="text-sm font-semibold text-gray-700">
-            Try OpenSkills for Free
-          </p>
+          <Link href='https://chatgpt.com/g/g-kqRCHmM5H-openskills-online' passHref>
+            <a target="_blank" rel="noopener noreferrer">
+              <p className="cursor-pointer text-sm font-semibold text-gray-700">
+                Chat with our AI Coach
+              </p>
+            </a>
+          </Link>
         </div>
 
         <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">

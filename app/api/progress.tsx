@@ -1,56 +1,81 @@
+// pages/api/progress.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/prisma/prisma';
 
-const prisma = new PrismaClient();
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const progressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method } = req;
-    const { user_id } = req.query; // Get the user_id from the URL
 
     switch (method) {
         case 'POST':
-            // Create a new Progress entry for a specific user
-            const { skillId, currentProgress, status } = req.body;
+            // Create a new progress entry
+            const { skillId, currentProgress, status, user_id } = req.body;
             try {
-                const progress = await prisma.progress.create({
-                    data: { skillId, userId: user_id as string, currentProgress, status },
+                const newProgress = await prisma.progress.create({
+                    data: {
+                        skillId,
+                        currentProgress,
+                        status,
+                        userId: user_id,
+                    },
                 });
-                res.status(201).json(progress);
+                console.log('New progress entry created:', newProgress);
+                res.status(201).json(newProgress);
             } catch (error) {
-                res.status(400).json({ error: 'Error creating progress entry' });
+                console.error('Error creating progress:', error);
+                res.status(500).json({ error: 'Failed to create progress' });
             }
             break;
 
         case 'GET':
-            // Get all Progress entries for a specific User from the URL
+            // Fetch all progress entries for a specific user
+            const { userId } = req.query;
+            if (!userId) {
+                res.status(400).json({ error: 'User ID is required' });
+                return;
+            }
+
             try {
-                const progress = await prisma.progress.findMany({
-                    where: { userId: user_id as string },
+                const progressEntries = await prisma.progress.findMany({
+                    where: { userId: userId as string },
                 });
-                res.status(200).json(progress);
+                res.status(200).json(progressEntries);
             } catch (error) {
-                res.status(400).json({ error: 'Error fetching progress entries' });
+                res.status(500).json({ error: 'Failed to fetch progress' });
             }
             break;
 
         case 'PUT':
-            // Update a Progress entry
-            const { id } = req.query;
-            const { currentProgress: updatedProgress, status: updatedStatus } = req.body;
+            // Update an existing progress entry
+            const { id, updatedProgress } = req.body;
             try {
                 const updatedEntry = await prisma.progress.update({
-                    where: { id: id as string },
-                    data: { currentProgress: updatedProgress, status: updatedStatus },
+                    where: { id },
+                    data: updatedProgress,
                 });
                 res.status(200).json(updatedEntry);
             } catch (error) {
-                res.status(400).json({ error: 'Error updating progress entry' });
+                res.status(500).json({ error: 'Failed to update progress' });
+            }
+            break;
+
+        case 'DELETE':
+            // Delete a progress entry
+            const { progressId } = req.body;
+            try {
+                await prisma.progress.delete({
+                    where: { id: progressId },
+                });
+                res.status(204).end(); // No content to send back
+            } catch (error) {
+                res.status(500).json({ error: 'Failed to delete progress' });
             }
             break;
 
         default:
-            res.setHeader('Allow', ['POST', 'GET', 'PUT']);
+            res.setHeader('Allow', ['POST', 'GET', 'PUT', 'DELETE']);
             res.status(405).end(`Method ${method} Not Allowed`);
             break;
     }
-}
+};
+
+export default progressHandler;

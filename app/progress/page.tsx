@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from 'next/link';
-import { data } from "@/app/data/youtube"
+import { data } from "@/app/data/youtube";
+import { useSession } from 'next-auth/react';
 
 interface Skill {
     id: string;
@@ -13,12 +14,38 @@ interface Skill {
     slug: string;
 }
 
+const fetchUserId = async (email: string) => {
+    const response = await fetch(`/api/user?email=${email}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch user ID');
+    }
+    const data = await response.json();
+    return data.id;
+};
+
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
-    const userId = "exampleUserId";
+    const { data: session } = useSession();
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const getUserId = async () => {
+            if (session?.user?.email) {
+                try {
+                    const id = await fetchUserId(session.user.email);
+                    setUserId(id);
+                } catch (error) {
+                    console.error('Error fetching user ID:', error);
+                }
+            }
+        };
+
+        getUserId();
+    }, [session]);
 
     useEffect(() => {
         const fetchUserSkills = async () => {
+            if (!userId) return;
             try {
                 const response = await fetch(`/api/track-progress?userId=${userId}`);
                 if (!response.ok) {
@@ -34,7 +61,7 @@ const ProgressPage: React.FC = () => {
         fetchUserSkills();
     }, [userId]);
 
-    const handleSkillClick = (skillName: string) => {
+    const handleSkillClick = async (skillName: string) => {
         const existingSkill = skills.find(skill => skill.name === skillName);
 
         if (existingSkill) {
@@ -50,7 +77,31 @@ const ProgressPage: React.FC = () => {
             slug: skillName.toLowerCase().replace(/\s+/g, '-'),
         };
 
-        setSkills((prev) => [...prev, newSkill]);
+        try {
+            console.log('User ID:', userId); // Log userId
+
+            const response = await fetch('/api/progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    skillId: newSkill.id,
+                    currentProgress: newSkill.progress,
+                    status: newSkill.status,
+                    user_id: userId,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to save skill: ${response.status} ${errorText}`);
+            }
+
+            setSkills((prev) => [...prev, newSkill]); // Update local state with the new skill
+        } catch (error) {
+            console.error('Error saving skill:', error);
+        }
     };
 
     return (
@@ -97,7 +148,7 @@ const ProgressPage: React.FC = () => {
 
             {/* Clickable labels for adding skills */}
             <div className="flex flex-wrap gap-2 mt-4">
-                {Object.entries(data).map(([skillKey, roadmap]) => ( // Removed the slice method
+                {Object.entries(data).map(([skillKey, roadmap]) => (
                     <button
                         key={skillKey}
                         className="border border-gray-400 rounded-lg p-2"

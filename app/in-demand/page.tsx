@@ -85,9 +85,6 @@ const HighIncomeSkillsPage: React.FC = () => {
                             <p>{skill.description}</p>
                             <p className="text-gray-600">Salary Range: {skill.salaryRange}</p>
                         </div>
-                        <Link href={`/${skill.category}/details`}>
-                            <button className="ml-4 bg-blue-500 text-white rounded-lg px-4 py-2">Learn More</button>
-                        </Link>
                     </div>
                 ))}
             </div>

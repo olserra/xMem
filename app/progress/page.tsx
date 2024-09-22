@@ -17,6 +17,8 @@ interface Skill {
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const { userId } = useUser();
+    console.log('User ID:', userId); // Log userId
+
 
     useEffect(() => {
         const fetchUserSkills = async () => {
@@ -53,8 +55,6 @@ const ProgressPage: React.FC = () => {
         };
 
         try {
-            console.log('User ID:', userId); // Log userId
-
             const response = await fetch('/api/progress', {
                 method: 'POST',
                 headers: {

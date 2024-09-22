@@ -4,16 +4,16 @@ import { createContext, useContext, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface UserContextType {
-    userId: string | null;
+    userId: any | null;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const { data: session } = useSession();
-    console.log(session, "data")
 
-    const userId = session?.user?.email || null;
+    // @ts-ignore
+    const userId = session?.user?.id || null;
 
     return (
         <UserContext.Provider value={{ userId }}>

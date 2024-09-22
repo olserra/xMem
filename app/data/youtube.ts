@@ -19,7 +19,7 @@ export interface RoadmapData {
 export const data: RoadmapData = {
     'software-engineering': {
         basic: {
-            title: 'Top Software Engineering Skills',
+            title: 'Software Engineering Skills',
             videos: [
                 { id: 1, title: 'Next.js in 100 Seconds', url: 'https://www.youtube.com/embed/Sklc_fQBmcs' },
                 { id: 2, title: '10 Design Patterns Explained', url: 'https://www.youtube.com/embed/tv-_1er1mWI' },
@@ -30,12 +30,12 @@ export const data: RoadmapData = {
                 { id: 7, title: 'DevOps Concepts (CI/CD)', url: 'https://www.youtube.com/embed/scEDHsr3APg' },
                 { id: 8, title: 'Version Control with Git', url: 'https://www.youtube.com/embed/hwP7WQkmECE' },
                 { id: 9, title: 'Introduction to DevOps', url: 'https://www.youtube.com/embed/Me3ea4nUt0U' },
-            ]            
+            ]
         },
     },
     'leadership': {
         basic: {
-            title: 'Top Leadership Skills',
+            title: 'Leadership Skills',
             videos: [
                 { id: 1, title: 'Intro to Leadership Skills', url: 'https://www.youtube.com/embed/lti-4-QZmQc' },
                 { id: 2, title: 'Leadership Presence', url: 'https://www.youtube.com/embed/2RBt2KVrRuY' },
@@ -46,12 +46,12 @@ export const data: RoadmapData = {
                 { id: 7, title: 'Conflict Resolution', url: 'https://www.youtube.com/embed/2l-AOBz69KU' },
                 { id: 8, title: 'Strategic Thinking', url: 'https://www.youtube.com/embed/AkgsYA-LYxo' },
                 { id: 9, title: 'Leading Change', url: 'https://www.youtube.com/embed/pUmTQ-86-YI' },
-            ],            
+            ],
         },
     },
     'analytical': {
         basic: {
-            title: 'Top Analytical Skills',
+            title: 'Analytical Skills',
             videos: [
                 { id: 1, title: 'Intro to Analytical Skills', url: 'https://www.youtube.com/embed/1unUKmmM3WE' },
                 { id: 2, title: 'Critical Thinking Skills', url: 'https://www.youtube.com/embed/dItUGF8GdTw' },
@@ -62,12 +62,12 @@ export const data: RoadmapData = {
                 { id: 7, title: 'Effective Research Methods', url: 'https://www.youtube.com/embed/YOppeXzFkBs' },
                 { id: 8, title: 'Trends and Patterns', url: 'https://www.youtube.com/embed/ca0rDWo7IpI' },
                 { id: 9, title: 'Hypotheses and Testing', url: 'https://www.youtube.com/embed/0oc49DyA3hU' },
-            ],            
+            ],
         },
     },
     'creative': {
         basic: {
-            title: 'Top Creative Skills',
+            title: 'Creative Skills',
             videos: [
                 { id: 1, title: 'Intro to Creative Skills', url: 'https://www.youtube.com/embed/bEusrD8g-dM' },
                 { id: 2, title: 'Boosting Creativity', url: 'https://www.youtube.com/embed/36L9cYkHyZM' },
@@ -78,12 +78,12 @@ export const data: RoadmapData = {
                 { id: 7, title: 'Brainstorming Effectively', url: 'https://www.youtube.com/embed/LuHx6KdQPHQ' },
                 { id: 8, title: 'Generating New Ideas', url: 'https://www.youtube.com/embed/QRZ_l7cVzzU&t=4s' },
                 { id: 9, title: 'Overcoming Creative Blocks', url: 'https://www.youtube.com/embed/Z057AO8CNRg' },
-            ],            
+            ],
         },
     },
     'interpersonal': {
         basic: {
-            title: 'Top Interpersonal Skills',
+            title: 'Interpersonal Skills',
             videos: [
                 { id: 1, title: 'Interpersonal Skills', url: 'https://www.youtube.com/embed/h5GB2GgDobbU' },
                 { id: 2, title: 'Effective Communication', url: 'https://www.youtube.com/embed/I2i1Jikn1ws' },
@@ -99,7 +99,7 @@ export const data: RoadmapData = {
     },
     'artificial-intelligence': {
         basic: {
-            title: 'Top Artificial Intelligence Skills',
+            title: 'Artificial Intelligence Skills',
             videos: [
                 { id: 1, title: 'Intro to AI', url: 'https://www.youtube.com/embed/2ePf9rue1Ao' },
                 { id: 2, title: 'Machine Learning Basics', url: 'https://www.youtube.com/embed/Gv9_4yMHFhI' },
@@ -115,7 +115,7 @@ export const data: RoadmapData = {
     },
     'data-science': {
         basic: {
-            title: 'Top Data Science Skills',
+            title: 'Data Science Skills',
             videos: [
                 { id: 1, title: 'Intro to Data Science', url: 'https://www.youtube.com/embed/ua-CiDNNj30' },
                 { id: 2, title: 'Data Science Methodology', url: 'https://www.youtube.com/embed/d8jj9Qy-7TQ' },
@@ -131,7 +131,7 @@ export const data: RoadmapData = {
     },
     'negotiation': {
         basic: {
-            title: 'Top Negotiation Skills',
+            title: 'Negotiation Skills',
             videos: [
                 { id: 1, title: 'Intro to Negotiation Skills', url: 'https://www.youtube.com/embed/9dU5bZtcP28' },
                 { id: 2, title: 'Effective Negotiation Techniques', url: 'https://www.youtube.com/embed/x6m8D0hPpQw' },
@@ -147,7 +147,7 @@ export const data: RoadmapData = {
     },
     'artistic': {
         basic: {
-            title: 'Top Artistic Skills',
+            title: 'Artistic Skills',
             videos: [
                 { id: 1, title: 'Intro to Artistic Skills', url: 'https://www.youtube.com/embed/Nz5QsqAiE5Q' },
                 { id: 2, title: 'Drawing Basics', url: 'https://www.youtube.com/embed/Rr3tV9IxtVk' },
@@ -163,7 +163,7 @@ export const data: RoadmapData = {
     },
     'marketing': {
         basic: {
-            title: 'Top Marketing Skills',
+            title: 'Marketing Skills',
             videos: [
                 { id: 1, title: 'Intro to Marketing Skills', url: 'https://www.youtube.com/embed/QOXsPKeIhWY' },
                 { id: 2, title: 'Digital Marketing Basics', url: 'https://www.youtube.com/embed/OYCUtNEYU4A' },
@@ -179,7 +179,7 @@ export const data: RoadmapData = {
     },
     'web3': {
         basic: {
-            title: 'Top Web3 Skills',
+            title: 'Web3 Skills',
             videos: [
                 { id: 1, title: 'Intro to Web3 Technologies', url: 'https://www.youtube.com/embed/fWkxk5W1Rno' },
                 { id: 2, title: 'Blockchain Basics', url: 'https://www.youtube.com/embed/SSo_EIwHSd4' },

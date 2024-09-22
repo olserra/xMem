@@ -5,14 +5,15 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method } = req;
+    const { user_id } = req.query; // Get the user_id from the URL
 
     switch (method) {
         case 'POST':
-            // Create a new Progress entry
-            const { skillId, userId, currentProgress, status } = req.body;
+            // Create a new Progress entry for a specific user
+            const { skillId, currentProgress, status } = req.body;
             try {
                 const progress = await prisma.progress.create({
-                    data: { skillId, userId, currentProgress, status },
+                    data: { skillId, userId: user_id as string, currentProgress, status },
                 });
                 res.status(201).json(progress);
             } catch (error) {
@@ -21,13 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             break;
 
         case 'GET':
-            // Get all Progress entries for a specific User
-            const { userId: queryUserId } = req.query;
+            // Get all Progress entries for a specific User from the URL
             try {
                 const progress = await prisma.progress.findMany({
-                    where: { userId: queryUserId as string },
+                    where: { userId: user_id as string },
                 });
-                res.json(progress);
+                res.status(200).json(progress);
             } catch (error) {
                 res.status(400).json({ error: 'Error fetching progress entries' });
             }
@@ -42,10 +42,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     where: { id: id as string },
                     data: { currentProgress: updatedProgress, status: updatedStatus },
                 });
-                res.json(updatedEntry);
+                res.status(200).json(updatedEntry);
             } catch (error) {
                 res.status(400).json({ error: 'Error updating progress entry' });
             }
+            break;
+
+        default:
+            res.setHeader('Allow', ['POST', 'GET', 'PUT']);
+            res.status(405).end(`Method ${method} Not Allowed`);
             break;
     }
 }

@@ -25,18 +25,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role       @default(USER)
-  goals         Goal[]     @relation("UserGoals")
   progress      Progress[] @relation("UserProgress")
-}
-
-model Goal {
-  id        String   @id @default(cuid())
-  goal      String
-  deadline  DateTime
-  steps     String
-  createdAt DateTime @default(now())
-  userId    String
-  user      User     @relation("UserGoals", fields: [userId], references: [id])
 }
 
 model Progress {

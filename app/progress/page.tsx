@@ -13,7 +13,7 @@ interface Skill {
     slug: string;
 }
 
-const TrackProgressPage: React.FC = () => {
+const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const [showAllSkills, setShowAllSkills] = useState(false);
     const userId = "exampleUserId";
@@ -112,4 +112,4 @@ const TrackProgressPage: React.FC = () => {
     );
 };
 
-export default TrackProgressPage;
+export default ProgressPage;

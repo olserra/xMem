@@ -15,7 +15,6 @@ interface Skill {
 
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
-    const [showAllSkills, setShowAllSkills] = useState(false);
     const userId = "exampleUserId";
 
     useEffect(() => {

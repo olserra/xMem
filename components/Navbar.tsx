@@ -15,7 +15,7 @@ const Navbar = () => {
   const { data: session } = useSession();
 
   const menuItems = [
-    { label: 'Track progress', href: '/progress' },
+    { label: 'Dashboard', href: '/progress' },
     { label: 'In-demand', href: '/in-demand' }
   ];
 

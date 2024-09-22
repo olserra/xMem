@@ -11,6 +11,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const { data: session } = useSession();
+    console.log(session, "data")
 
     const userId = session?.user?.email || null;
 

@@ -8,6 +8,9 @@ export default function Footer() {
           <Link href="/">
             <span className="text-2xl font-semibold">OpenSkills</span>
           </Link>
+          <Link href='/privacy-policy'>
+            <span className="cursor-pointer underline">Privacy Policy</span>
+          </Link>
         </div>
         <hr className="my-2 text-muted-foreground sm:mx-auto " />
         <span className="block text-sm text-muted-foreground sm:text-center">

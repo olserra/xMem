@@ -22,15 +22,23 @@ const options = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.JWT_SECRET,
   callbacks: {
-    session: ({ session, token }: { session: any, token: any }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.sub,
-      },
-    }),
+    jwt: async ({ token, user }: any) => {
+      // If user exists, add user id to token
+      if (user) {
+        token.sub = user.id; // or however you retrieve the user ID
+      }
+      return token;
+    },
+    session: ({ session, token }: any) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
+      };
+    },
   },
-
 };
 
 const handler = NextAuth(options);

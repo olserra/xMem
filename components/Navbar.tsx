@@ -67,7 +67,7 @@ const Navbar = () => {
               ))}
             </div>
             {!session ? (
-              <MobileNav />
+              <MobileNav menuItems={menuItems} />
             ) : (
               <button
                 className={buttonVariants({

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { SideNav } from "@/components/SideNav";
 
-export const MobileNav = () => {
+export const MobileNav = ({ menuItems }: any) => {
   return (
     <Sheet>
       <SheetTrigger className="sm:hidden pr-4">
@@ -17,7 +17,7 @@ export const MobileNav = () => {
 
       <SheetContent side="right" className="p-0 bg-secondary pt-5 w-32">
         <SheetClose />
-        <SideNav />
+        <SideNav menuItems={menuItems} />
       </SheetContent>
     </Sheet>
   );

@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-export const SideNav = () => {
+export const SideNav = ({ menuItems }: any) => {
   const router = useRouter();
   const routes = [
     {
@@ -38,6 +39,17 @@ export const SideNav = () => {
               </div>
             </div>
           ))}
+          <div className="flex flex-col">
+            {menuItems.map((item: any) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="uppercase text-black text-sm p-2 hover:bg-gray-200 rounded"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -22,21 +22,12 @@ const options = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.JWT_SECRET,
   callbacks: {
-    jwt: async ({ token, user }: any) => {
-      // If user exists, add user id to token
-      if (user) {
-        token.sub = user.id; // or however you retrieve the user ID
-      }
-      return token;
+    async redirect() {
+      return "/";
     },
-    session: ({ session, token }: any) => {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.sub,
-        },
-      };
+    session: async ({ session, token, user }: any) => {
+      session.user.id = user.id as string;
+      return session;
     },
   },
 };

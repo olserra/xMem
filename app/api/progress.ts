@@ -5,8 +5,7 @@ import { prisma } from '@/prisma/prisma';
 interface ProgressData {
     skillId: string;
     currentProgress: number;
-    status: string;
-    user_id: string;
+    userId: string;  // Changed from user_id to userId for consistency
 }
 
 const sendErrorResponse = (res: NextApiResponse, message: string, statusCode: number) => {
@@ -18,14 +17,16 @@ const progressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     switch (req.method) {
         case 'POST':
-            const { skillId, currentProgress, status, user_id } = req.body as ProgressData;
+            const { skillId, currentProgress, userId } = req.body as ProgressData;
+            if (!skillId || typeof currentProgress !== 'number' || !userId) {
+                return sendErrorResponse(res, 'skillId, currentProgress, and userId are required', 400);
+            }
             try {
                 const newProgress = await prisma.progress.create({
                     data: {
                         skillId,
                         currentProgress,
-                        status,
-                        userId: user_id,
+                        userId,
                     },
                 });
                 console.log('New progress entry created:', newProgress);
@@ -37,13 +38,14 @@ const progressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             break;
 
         case 'GET':
-            const { userId } = req.query;
-            if (!userId) {
+            const { userId: queryUserId } = req.query;
+            if (!queryUserId) {
                 return sendErrorResponse(res, 'User ID is required', 400);
             }
             try {
                 const progressEntries = await prisma.progress.findMany({
-                    where: { userId: userId as string },
+                    where: { userId: queryUserId as string },
+                    include: { skill: true },  // Optionally include related skill data
                 });
                 res.status(200).json(progressEntries);
             } catch (error) {
@@ -53,6 +55,9 @@ const progressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         case 'PUT':
             const { id, updatedProgress } = req.body;
+            if (!id || !updatedProgress) {
+                return sendErrorResponse(res, 'ID and updatedProgress are required', 400);
+            }
             try {
                 const updatedEntry = await prisma.progress.update({
                     where: { id },
@@ -66,6 +71,9 @@ const progressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         case 'DELETE':
             const { progressId } = req.body;
+            if (!progressId) {
+                return sendErrorResponse(res, 'Progress ID is required', 400);
+            }
             try {
                 await prisma.progress.delete({
                     where: { id: progressId },

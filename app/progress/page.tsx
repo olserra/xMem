@@ -85,7 +85,7 @@ const ProgressPage: React.FC = () => {
                         <div className="flex-1">
                             <h2 className="text-lg">{skill.name}</h2>
                             <div className="progress-bar bg-gray-200 rounded-full h-2">
-                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '0%' }}></div> {/* 0% progress */}
+                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${skill.progress}%` }}></div>
                             </div>
                         </div>
                         {skill.progress === 0 ? (

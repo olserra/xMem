@@ -21,19 +21,18 @@ model User {
 
 model Progress {
   id              String   @id @default(cuid())
-  skillId         String // Reference to the skill (e.g., HTML, CSS, etc.)
+  skillId         String
   userId          String
-  currentProgress Int // Change to Int for percentage progress
-  status          String // Status can be "To be learned" or "In-progress"
+  currentProgress Int
   createdAt       DateTime @default(now())
   user            User     @relation("UserProgress", fields: [userId], references: [id])
-  skill           Skill    @relation(fields: [skillId], references: [id]) // Assuming you have a Skill model
+  skill           Skill    @relation(fields: [skillId], references: [id])
 }
 
 model Skill {
   id        String     @id @default(cuid())
-  name      String     @unique // Unique name for the skill
-  progress  Progress[] // Relation to Progress model
+  name      String     @unique
+  progress  Progress[]
   createdAt DateTime   @default(now())
 }
 

@@ -57,9 +57,9 @@ const ProgressPage: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    skillId: newSkill.id,
+                    skillId: newSkill.id,  // Correct field name
                     currentProgress: newSkill.progress,
-                    user_id: userId,
+                    userId: userId,  // Change from user_id to userId
                 }),
             });
 
@@ -73,6 +73,7 @@ const ProgressPage: React.FC = () => {
             console.error('Error saving skill:', error);
         }
     };
+
 
     return (
         <div className="flex flex-col justify-center text-center gap-6 mx-8 md:mx-40">

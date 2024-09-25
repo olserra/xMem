@@ -19,7 +19,7 @@ const Navbar = () => {
     { label: 'In-demand', href: '/in-demand' }
   ];
 
-  const handleClickSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     signIn("google", {
       callbackUrl: "https://www.openskills.online/api/auth/callback/google",
@@ -29,6 +29,14 @@ const Navbar = () => {
   const handleClickSignOut = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signOut();
+  };
+
+  const handleMenuItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!session) {
+      handleClickSignIn(e);
+    } else {
+      window.location.href = href;
+    }
   };
 
   return (
@@ -49,9 +57,13 @@ const Navbar = () => {
           <div className="flex gap-1 sm:gap-4 items-center">
             <div className="hidden items-center space-x-4 sm:flex uppercase pr-8">
               {menuItems.map((item) => (
-                <Link key={item.label} href={item.href} className="text-sm">
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={(e) => handleMenuItemClick(e, item.href)}
+                >
                   {item.label}
-                </Link>
+                </a>
               ))}
             </div>
             {!session ? (

@@ -32,12 +32,11 @@ export default function Home() {
             </a>
           </Link>
         </div>
-
-        <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
-          <span className="text-blue-600">Unlock Your Potential</span>{" "} Master Essential Skills for Success
+        <h1 className="max-w-4xl text-4xl font-bold md:text-6xl lg:text-7xl">
+          <span className="text-blue-600">Ignite your Growth</span>{" "} Master the Skills of the Future
         </h1>
 
-        <p className="mt-5 max-w-prose text-lg text-zinc-700 sm:text-2xl">
+        <p className="mt-5 max-w-prose text-base text-zinc-700 sm:text-xl">
           Learn In-Demand Skills for a Brighter Future
         </p>
         <SearchBar
@@ -149,31 +148,26 @@ export default function Home() {
             </div>
 
             <div className="flex items-center justify-center">
-              <div className="flex flex-col gap-6 md:flex-row">
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
+              <div className="flex flex-row gap-6 flex-wrap">
+                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
                   <CardTitle>NextJS</CardTitle>
-                  <CardDescription className="mb-3 text-center">
-                    14.2.3
-                  </CardDescription>
+                  <CardDescription className="mb-3 text-center">14.2.3</CardDescription>
                   <TbBrandNextjs size={40} />
                 </Card>
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
+                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
                   <CardTitle>OpenAI</CardTitle>
-                  <CardDescription className="mb-3 text-center">
-                    OpenAI API
-                  </CardDescription>
+                  <CardDescription className="mb-3 text-center">OpenAI API</CardDescription>
                   <RiOpenaiFill size={40} />
                 </Card>
 
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
+                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
                   <CardTitle>Vercel</CardTitle>
-                  <CardDescription className="mb-3 text-center">
-                    33.5.5
-                  </CardDescription>
+                  <CardDescription className="mb-3 text-center">33.5.5</CardDescription>
                   <RxVercelLogo size={40} />
                 </Card>
               </div>
             </div>
+
           </div>
 
           {/* Feedback */}

@@ -17,14 +17,12 @@ interface Skill {
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const { userId } = useUser();
-    console.log('User ID:', userId); // Log userId
-
 
     useEffect(() => {
         const fetchUserSkills = async () => {
             if (!userId) return;
             try {
-                const response = await fetch(`/api/track-progress?userId=${userId}`);
+                const response = await fetch(`/api/progress?userId=${userId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch skills');
                 }

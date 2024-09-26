@@ -1,20 +1,41 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
 interface ProgressData {
     skillId: string;
     currentProgress: number;
-    userId: string;  // Changed from user_id to userId for consistency
+    userId: string;
 }
 
-const sendErrorResponse = (res: NextApiResponse, message: string, statusCode: number) => {
-    res.status(statusCode).json({ error: message });
+// Handle GET requests
+export const GET = async (req: Request) => {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+
+    try {
+        if (userId) {
+            // If userId is provided, fetch user's progress entries
+            const progressEntries = await prisma.progress.findMany({
+                where: { userId },
+                include: { skill: true },  // Include related skill data
+            });
+            return NextResponse.json(progressEntries); // Return user's skills with progress
+        } else {
+            // If no userId, fetch all available skills
+            const skills = await prisma.skill.findMany();
+            return NextResponse.json(skills); // Return all available skills
+        }
+    } catch (error) {
+        console.error('Error fetching skills or progress:', error);
+        return NextResponse.json({ error: 'Failed to fetch skills or progress' }, { status: 500 });
+    }
 };
 
-// Handle POST requests
+// Handle POST requests for user progress
 export const POST = async (req: Request) => {
     const { skillId, currentProgress, userId } = await req.json() as ProgressData;
-    console.log('Received POST data:', { skillId, currentProgress, userId });
+
+    console.log(`Received request: skillId: ${skillId}, currentProgress: ${currentProgress}, userId: ${userId}`);
 
     // Validate required fields
     if (!skillId || typeof currentProgress !== 'number' || !userId) {
@@ -22,6 +43,16 @@ export const POST = async (req: Request) => {
     }
 
     try {
+        // Check if the skill exists
+        const skill = await prisma.skill.findUnique({
+            where: { id: skillId },
+        });
+
+        if (!skill) {
+            return new Response(JSON.stringify({ error: 'Skill not found' }), { status: 404 });
+        }
+
+        // Create the progress entry
         const newProgress = await prisma.progress.create({
             data: {
                 skillId,
@@ -36,41 +67,22 @@ export const POST = async (req: Request) => {
     }
 };
 
-// Handle GET requests
-export const GET = async (req: Request) => {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-        return new Response(JSON.stringify({ error: 'User ID is required' }), { status: 400 });
-    }
-
-    try {
-        const progressEntries = await prisma.progress.findMany({
-            where: { userId },
-            include: { skill: true },  // Optionally include related skill data
-        });
-        return new Response(JSON.stringify(progressEntries), { status: 200 });
-    } catch (error) {
-        return new Response(JSON.stringify({ error: 'Failed to fetch progress' }), { status: 500 });
-    }
-};
-
-// Handle PUT requests
+// Handle PUT requests for updating progress
 export const PUT = async (req: Request) => {
-    const { id, updatedProgress } = await req.json();
+    const { id, currentProgress } = await req.json();
 
-    if (!id || !updatedProgress) {
-        return new Response(JSON.stringify({ error: 'ID and updatedProgress are required' }), { status: 400 });
+    if (!id || typeof currentProgress !== 'number') {
+        return new Response(JSON.stringify({ error: 'ID and currentProgress are required' }), { status: 400 });
     }
 
     try {
         const updatedEntry = await prisma.progress.update({
             where: { id },
-            data: updatedProgress,
+            data: { currentProgress },
         });
         return new Response(JSON.stringify(updatedEntry), { status: 200 });
     } catch (error) {
+        console.error('Error updating progress:', error);
         return new Response(JSON.stringify({ error: 'Failed to update progress' }), { status: 500 });
     }
 };
@@ -89,6 +101,7 @@ export const DELETE = async (req: Request) => {
         });
         return new Response(null, { status: 204 }); // No content to send back
     } catch (error) {
+        console.error('Error deleting progress:', error);
         return new Response(JSON.stringify({ error: 'Failed to delete progress' }), { status: 500 });
     }
 };

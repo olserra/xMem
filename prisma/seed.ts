@@ -1,64 +1,40 @@
+// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const skillsData = [
+  { name: "Software Engineering" },
+  { name: "Leadership" },
+  { name: "Analytical" },
+  { name: "Creative" },
+  { name: "Interpersonal" },
+  { name: "Artificial Intelligence" },
+  { name: "Data Science" },
+  { name: "Negotiation" },
+  { name: "Artistic" },
+  { name: "Marketing" },
+  { name: "Web3" },
+];
+
 async function main() {
-  // Create the user if it doesn't exist
-  const userEmail = 'olserra@gmail.com';
-  const user = await prisma.user.upsert({
-    where: { email: userEmail },
-    update: {},
-    create: {
-      name: 'Olserra',
-      email: userEmail,
-      role: 'USER',
-    },
-  });
+  // Drop existing progress and skills to avoid unique constraint violations
+  await prisma.progress.deleteMany({});
+  await prisma.skill.deleteMany({});
 
-  // Define hard and soft skills
-  const skills = [
-    { name: 'JavaScript' },
-    { name: 'Python' },
-    { name: 'Java' },
-    { name: 'C++' },
-    { name: 'HTML' },
-    { name: 'CSS' },
-    { name: 'React' },
-    { name: 'Node.js' },
-    { name: 'SQL' },
-    { name: 'Git' },
-    { name: 'Communication' },
-    { name: 'Teamwork' },
-    { name: 'Problem Solving' },
-    { name: 'Time Management' },
-    { name: 'Adaptability' },
-    { name: 'Critical Thinking' },
-  ];
-
-  // Create skills in the database
-  for (const skill of skills) {
-    await prisma.skill.upsert({
-      where: { name: skill.name },
-      update: {},
-      create: skill,
-    });
-
-    // Create progress for each skill for the user
-    await prisma.progress.create({
-      data: {
-        skillId: skill.name, // Assuming skill name is used as ID
-        userId: user.id,
-        currentProgress: 0, // Initial progress
-        status: 'To be learned', // Initial status
-      },
+  // Seed skills
+  for (const skill of skillsData) {
+    await prisma.skill.create({
+      data: skill,
     });
   }
+
+  console.log('Seeding skills completed successfully!');
 }
 
 main()
   .catch(e => {
-    console.error(e);
-    process.exit(1);
+    console.error('Error during seeding:', e);
   })
   .finally(async () => {
     await prisma.$disconnect();

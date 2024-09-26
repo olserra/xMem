@@ -150,9 +150,13 @@ const ProgressPage: React.FC = () => {
                         </div>
                         <p className="text-base text-center w-1/4">{skill.progress}%</p> {/* Display progress percentage directly */}
                         <div className="flex items-center">
-                            <Link href={"https://chatgpt.com/g/g-kqRCHmM5H-openskills-online"}>
+                            <a
+                                href={"https://chatgpt.com/g/g-kqRCHmM5H-openskills-online"}
+                                target="_blank"
+                                rel="noopener noreferrer" // Important for security reasons
+                            >
                                 <button className="ml-4 bg-blue-500 text-white rounded-lg px-4 py-2">Start</button>
-                            </Link>
+                            </a>
                             <button
                                 className="ml-2 text-grey-500"
                                 onClick={() => handleDeleteSkill(skill.id)} // Function to handle skill deletion

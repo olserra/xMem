@@ -12,11 +12,19 @@ import { RiOpenaiFill } from "react-icons/ri";
 import { RxVercelLogo } from "react-icons/rx";
 import Link from "next/link";
 
+interface Skill {
+  title: string;
+  description: string;
+  category?: string; // Make category optional
+  labels: string[];
+  children?: Skill[];
+}
+
 export default function Home() {
-  const [filteredSkills, setFilteredSkills] = useState(skills);
+  const [filteredSkills, setFilteredSkills] = useState<Skill[]>(skills);
 
   useEffect(() => {
-    // This is where you'd fetch or update the initial video data if needed
+    // This is where you'd fetch or update the initial skill data if needed
   }, []);
 
   return (
@@ -125,9 +133,6 @@ export default function Home() {
                   <span className="text-xl font-semibold">
                     Start Your Learning Session
                   </span>
-                  {/* <span className="mt-2 text-zinc-700">
-                
-              </span> */}
                 </div>
               </li>
             </ol>

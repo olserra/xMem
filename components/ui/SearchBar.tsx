@@ -1,44 +1,44 @@
 import React, { useState } from 'react';
 
-interface Video {
-	id: number;
-	title: string;
-	url: string;
-}
-
+// Define the Skill interface as before
 interface Skill {
 	title: string;
 	description: string;
-	icon: JSX.Element;
-	category: string;
+	category?: string; // Optional if you decide not to include it
+	labels: string[];
+	children?: Skill[];
 }
 
 interface SearchBarProps {
-	videos?: Video[];
-	skills?: Skill[];
-	onFilterVideos?: (filteredVideos: Video[]) => void;
-	onFilterSkills?: (filteredSkills: Skill[]) => void;
+	skills: Skill[];
+	onFilterSkills: (skills: Skill[]) => void; // Type for the function prop
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ videos = [], skills = [], onFilterVideos, onFilterSkills }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ skills = [], onFilterSkills }) => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const query = event.target.value;
 		setSearchQuery(query);
 
-		// Filter videos based on the search query
-		const filteredVideos = videos.filter(video =>
-			video.title.toLowerCase().includes(query.toLowerCase())
-		);
-		if (onFilterVideos) {
-			onFilterVideos(filteredVideos);
-		}
-
 		// Filter skills based on the search query
-		const filteredSkills = skills.filter(skill =>
-			skill.title.toLowerCase().includes(query.toLowerCase())
-		);
+		const filterSkillsRecursive = (skillList: Skill[]): Skill[] => {
+			return skillList
+				.map((skill) => {
+					const matches = skill.title.toLowerCase().includes(query.toLowerCase());
+					const filteredChildren = skill.children ? filterSkillsRecursive(skill.children) : [];
+					const hasMatchingChildren = filteredChildren.length > 0;
+
+					// Return the skill if it matches or if it has matching children
+					if (matches || hasMatchingChildren) {
+						return { ...skill, children: filteredChildren };
+					}
+					return null;
+				})
+				.filter(Boolean) as Skill[]; // Filter out null values
+		};
+
+		const filteredSkills = filterSkillsRecursive(skills);
 		if (onFilterSkills) {
 			onFilterSkills(filteredSkills);
 		}
@@ -50,7 +50,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ videos = [], skills = [], onFilte
 				type="text"
 				value={searchQuery}
 				onChange={handleSearchChange}
-				placeholder="Search..."
+				placeholder="Search skills..."
 				className="w-full p-2 pl-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500"
 			/>
 		</div>

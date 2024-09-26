@@ -3,14 +3,7 @@
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // Import the useRouter hook for navigation
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-
-interface Skill {
-  title: string;
-  description: string;
-  icon: JSX.Element;
-  category: string;
-  labels?: string[];
-}
+import { Skill } from '@/app/page';
 
 const Skills = ({ skills }: { skills: Skill[] }) => {
   const { data: session } = useSession();
@@ -55,7 +48,6 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
               <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
                 <CardTitle>{skill.title}</CardTitle>
                 <CardDescription className="mb-3 text-center">{skill.description}</CardDescription>
-                {skill.icon}
                 {skill.labels && (
                   <div className="flex gap-2 mt-2">
                     {skill.labels.map((label: string) => (

@@ -12,7 +12,7 @@ import { RiOpenaiFill } from "react-icons/ri";
 import { RxVercelLogo } from "react-icons/rx";
 import Link from "next/link";
 
-interface Skill {
+export interface Skill {
   title: string;
   description: string;
   category?: string; // Make category optional

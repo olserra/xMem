@@ -63,9 +63,6 @@ const Navbar = () => {
             <div className="hidden items-center space-x-4 sm:flex">
               {!session ? (
                 <>
-                  <button className={buttonVariants({ variant: "ghost", size: "sm" })} onClick={handleClickSignIn}>
-                    Sign in
-                  </button>
                   <button className={buttonVariants({ size: "sm" })} onClick={handleClickSignIn}>
                     Get started
                   </button>

@@ -2,17 +2,16 @@
 
 import Link from "next/link";
 import { SiFuturelearn } from "react-icons/si";
-
+import { useState } from "react"; // Import useState
 import { cn } from "@/lib/utils";
-
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { buttonVariants } from "@/components/ui/button";
 import { MobileNav } from "@/components/MobileNav";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
-  // Replace with your auth of choice, e.g. Clerk: const { userId } = auth();
   const { data: session } = useSession();
+  const [isOpen, setIsOpen] = useState(false); // State to manage sidebar visibility
 
   const menuItems = [
     { label: 'Dashboard', href: '/progress' },
@@ -40,17 +39,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav
-      className={cn(
-        "sticky h-14 inset-x-0 top-0 z-30 border-b border-gray-200  bg-white/40 backdrop-blur-lg transition-all"
-      )}
-    >
+    <nav className={cn("sticky h-14 inset-x-0 top-0 z-30 border-b border-gray-200  bg-white/40 backdrop-blur-lg transition-all")}>
       <MaxWidthWrapper>
         <div className="flex h-14 items-center justify-between border-b border-zinc-200">
-          <Link
-            href="/"
-            className="flex z-40 justify-center items-center gap-2"
-          >
+          <Link href="/" className="flex z-40 justify-center items-center gap-2">
             <SiFuturelearn size={20} />
             <span className="text-2xl font-semibold">OpenSkills</span>
           </Link>
@@ -66,38 +58,15 @@ const Navbar = () => {
                 </a>
               ))}
             </div>
-            {!session ? (
-              <MobileNav menuItems={menuItems} />
-            ) : (
-              <button
-                className={buttonVariants({
-                  size: "sm",
-                  className: "sm:hidden mr-3",
-                })}
-                onClick={handleClickSignOut}
-              >
-                SignOut
-              </button>
-            )}
+            <MobileNav menuItems={menuItems} setIsOpen={setIsOpen} /> {/* Pass setIsOpen to MobileNav */}
 
             <div className="hidden items-center space-x-4 sm:flex">
               {!session ? (
                 <>
-                  <button
-                    className={buttonVariants({
-                      variant: "ghost",
-                      size: "sm",
-                    })}
-                    onClick={handleClickSignIn}
-                  >
+                  <button className={buttonVariants({ variant: "ghost", size: "sm" })} onClick={handleClickSignIn}>
                     Sign in
                   </button>
-                  <button
-                    className={buttonVariants({
-                      size: "sm",
-                    })}
-                    onClick={handleClickSignIn}
-                  >
+                  <button className={buttonVariants({ size: "sm" })} onClick={handleClickSignIn}>
                     Get started
                   </button>
                 </>
@@ -107,12 +76,7 @@ const Navbar = () => {
                     <p>Welcome,</p>
                     <p className="font-bold underline">{session.user?.name}</p>
                   </div>
-                  <button
-                    className={buttonVariants({
-                      size: "sm",
-                    })}
-                    onClick={handleClickSignOut}
-                  >
+                  <button className={buttonVariants({ size: "sm" })} onClick={handleClickSignOut}>
                     SignOut
                   </button>
                 </>

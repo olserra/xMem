@@ -1,53 +1,69 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { signOut, signIn, useSession } from "next-auth/react";
 
-export const SideNav = ({ menuItems }: any) => {
+export const SideNav = ({ menuItems, setIsOpen }: any) => {
+  const { data: session } = useSession();
   const router = useRouter();
-  const routes = [
-    {
-      href: "/sign-in",
-      label: "Sign In",
-    },
-    {
-      href: "/sign-up",
-      label: "Sign Up",
-    },
-  ];
 
-  const onNavigate = (url: string) => {
-    return router.push(url);
+  const handleClickSignOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    signOut();
+  };
+
+  const handleMenuItemClick = (href: string) => {
+    if (!session) {
+      signIn("google", {
+        callbackUrl: "https://www.openskills.online/api/auth/callback/google",
+      });
+    } else {
+      router.push(href);
+      setIsOpen(false); // Close the sidebar when a menu item is clicked
+    }
+  };
+
+  const handleGetStartedClick = () => {
+    signIn("google", {
+      callbackUrl: "https://www.openskills.online/api/auth/callback/google",
+    });
+    setIsOpen(false); // Close the sidebar on "Get Started"
   };
 
   return (
-    <div className="space-y-4 flex flex-col h-full text-primary bg-secondary">
+    <div className="flex flex-col h-full text-primary bg-secondary">
       <div className="p-3 flex flex-1 justify-center">
         <div className="space-y-2">
-          {routes.map((route) => (
-            <div
-              onClick={() => onNavigate(route.href)}
-              key={route.href}
-              className={cn(
-                "border border-input text-foreground text-center text-base group flex p-2 w-full justify-start font-normal cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition",
-                route.href == "/sign-up" &&
-                "bg-primary/80 text-slate-100 hover:bg-primary hover:text-slate-100"
-              )}
+          {session ? (
+            <button
+              className={buttonVariants({
+                size: "sm",
+                className: "sm:hidden mr-3",
+              })}
+              onClick={handleClickSignOut}
             >
-              <div className="flex flex-col gap-y-2 items-center flex-1">
-                {route.label}
-              </div>
-            </div>
-          ))}
+              Sign Out
+            </button>
+          ) : (
+            <button
+              className={buttonVariants({
+                size: "sm",
+                className: "w-full text-center",
+              })}
+              onClick={handleGetStartedClick}
+            >
+              Get Started
+            </button>
+          )}
           <div className="flex flex-col">
             {menuItems.map((item: any) => (
-              <Link
+              <div
                 key={item.label}
-                href={item.href}
-                className="uppercase text-black text-sm p-2 hover:bg-gray-200 rounded"
+                onClick={() => handleMenuItemClick(item.href)}
+                className="uppercase text-black text-sm p-2 hover:bg-gray-200 rounded cursor-pointer"
               >
                 {item.label}
-              </Link>
+              </div>
             ))}
           </div>
         </div>

@@ -78,7 +78,7 @@ const ProgressPage: React.FC = () => {
         };
 
         fetchAvailableSkills();
-    }, [skills]);
+    }, [skills, userId]);
 
 
 

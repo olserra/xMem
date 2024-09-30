@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Drop existing progress, skills, users, accounts, and sessions
-  await prisma.progress.deleteMany({});
-  await prisma.skill.deleteMany({});
-  await prisma.user.deleteMany({});
-  await prisma.account.deleteMany({}); // Drop all accounts
-  await prisma.session.deleteMany({}); // Drop all sessions
+  // await prisma.progress.deleteMany({});
+  // await prisma.skill.deleteMany({});
+  // await prisma.user.deleteMany({});
+  // await prisma.account.deleteMany({}); 
+  // await prisma.session.deleteMany({}); 
 
   // Seed skills
   for (const skill of skills) {

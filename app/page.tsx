@@ -1,15 +1,11 @@
 'use client';
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
-import { TbBrandNextjs } from "react-icons/tb";
 import { skills } from "./data/skills";
-import { RiOpenaiFill } from "react-icons/ri";
-import { RxVercelLogo } from "react-icons/rx";
 import Link from "next/link";
 
 export interface Skill {
@@ -136,43 +132,6 @@ export default function Home() {
                 </div>
               </li>
             </ol>
-          </div>
-
-          {/* Powered By */}
-          <div>
-            <div className="mb-6 px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl sm:text-center">
-                <h2 className="mt-2 text-4xl font-bold text-gray-900 sm:text-5xl">
-                  Powered by
-                </h2>
-                <p className="mt-4 text-lg text-gray-600">
-                  These are the technologies behind the scene that make OpenSkill
-                  possible
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center">
-              <div className="flex flex-row gap-6 flex-wrap">
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
-                  <CardTitle>NextJS</CardTitle>
-                  <CardDescription className="mb-3 text-center">14.2.3</CardDescription>
-                  <TbBrandNextjs size={40} />
-                </Card>
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
-                  <CardTitle>OpenAI</CardTitle>
-                  <CardDescription className="mb-3 text-center">OpenAI API</CardDescription>
-                  <RiOpenaiFill size={40} />
-                </Card>
-
-                <Card className="flex flex-col items-center justify-center gap-2 p-6 flex-1">
-                  <CardTitle>Vercel</CardTitle>
-                  <CardDescription className="mb-3 text-center">33.5.5</CardDescription>
-                  <RxVercelLogo size={40} />
-                </Card>
-              </div>
-            </div>
-
           </div>
 
           {/* Feedback */}

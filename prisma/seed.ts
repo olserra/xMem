@@ -4,9 +4,12 @@ import { skills } from '@/app/data/skills'; // Adjust the import path as necessa
 const prisma = new PrismaClient();
 
 async function main() {
-  // Drop existing progress and skills to avoid unique constraint violations
+  // Drop existing progress, skills, users, accounts, and sessions
   await prisma.progress.deleteMany({});
-  await prisma.skill.deleteMany({}); // This line clears the existing skills
+  await prisma.skill.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.account.deleteMany({}); // Drop all accounts
+  await prisma.session.deleteMany({}); // Drop all sessions
 
   // Seed skills
   for (const skill of skills) {

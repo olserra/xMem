@@ -4,6 +4,12 @@ import { prisma } from '@/prisma/prisma';
 
 // Handle GET requests
 export const GET = async (req: Request) => {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+
+    // At this point, middleware has already validated the presence of userId
+    // Optionally, you can perform additional validation if needed
+
     try {
         // Fetch all available skills
         const skills = await prisma.skill.findMany({
@@ -20,18 +26,24 @@ export const GET = async (req: Request) => {
 
     } catch (error) {
         console.error('Error fetching skills:', error);
-        return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch skills.' }, { status: 500 });
     }
 };
 
-// Handle POST requests for creating a new skill
+// Handle POST requests
 export const POST = async (req: Request) => {
     const { name, description, category, labels } = await req.json(); // Extract skill data from the request body
+
+    // Extract userId from headers
+    const userId = req.headers.get('userId');
+
+    // Middleware has already validated the presence of userId
+    // You can perform additional checks if necessary
 
     // Validate required fields
     if (!name || !description || !category || !Array.isArray(labels)) {
         return NextResponse.json(
-            { error: 'name, description, category, and labels are required' },
+            { error: 'name, description, category, and labels are required.' },
             { status: 400 }
         );
     }
@@ -44,7 +56,7 @@ export const POST = async (req: Request) => {
 
         if (existingSkill) {
             return NextResponse.json(
-                { error: 'Skill already exists' },
+                { error: 'Skill already exists.' },
                 { status: 409 } // Conflict
             );
         }
@@ -63,7 +75,7 @@ export const POST = async (req: Request) => {
     } catch (error) {
         console.error('Error creating skill:', error);
         return NextResponse.json(
-            { error: 'Failed to create skill' },
+            { error: 'Failed to create skill.' },
             { status: 500 }
         );
     }

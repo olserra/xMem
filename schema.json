@@ -1,395 +1,205 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "OpenSkills AI Coach API",
-        "description": "API for managing user skills and progress in the OpenSkills application.",
-        "version": "v1.0.0",
-        "license": {
-            "name": "MIT"
-        }
+      "title": "OpenSkills API",
+      "version": "1.0.0",
+      "description": "API for managing user skills and progress."
     },
     "servers": [
-        {
-            "url": "https://openskills.online/api"
-        }
+      {
+        "url": "https://openskills.online/api",
+        "description": "Production server"
+      }
     ],
-    "components": {
-        "schemas": {
-            "Skill": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "name"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Unique identifier for the skill."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the skill."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Optional description of the skill."
-                    },
-                    "category": {
-                        "type": "string",
-                        "description": "Category of the skill."
-                    },
-                    "labels": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "description": "Labels associated with the skill."
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Timestamp when the skill was created."
-                    }
-                }
-            },
-            "Progress": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "skillId",
-                    "currentProgress",
-                    "userId"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Unique identifier for the progress entry."
-                    },
-                    "skillId": {
-                        "type": "string",
-                        "description": "Unique identifier for the skill."
-                    },
-                    "currentProgress": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 100,
-                        "description": "Progress percentage (0-100)."
-                    },
-                    "userId": {
-                        "type": "string",
-                        "description": "Unique identifier for the user."
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Timestamp when the progress was created."
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Timestamp when the progress was last updated."
-                    }
-                }
-            },
-            "Error": {
-                "type": "object",
-                "required": [
-                    "code",
-                    "message"
-                ],
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Error code."
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Error message."
-                    }
-                }
-            }
-        }
-    },
     "paths": {
-        "/progress": {
-            "get": {
-                "summary": "Get user's progress",
-                "operationId": "getUserProgress",
-                "tags": [
-                    "progress"
-                ],
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "query",
-                        "description": "The ID of the user to retrieve progress for",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "A list of user's progress entries",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Progress"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "summary": "Create user progress",
-                "operationId": "createUserProgress",
-                "tags": [
-                    "progress"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "skillId",
-                                    "currentProgress",
-                                    "userId"
-                                ],
-                                "properties": {
-                                    "skillId": {
-                                        "type": "string"
-                                    },
-                                    "currentProgress": {
-                                        "type": "integer",
-                                        "minimum": 0,
-                                        "maximum": 100
-                                    },
-                                    "userId": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Progress created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Progress"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "summary": "Update user progress",
-                "operationId": "updateUserProgress",
-                "tags": [
-                    "progress"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "id",
-                                    "currentProgress"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "string"
-                                    },
-                                    "currentProgress": {
-                                        "type": "integer",
-                                        "minimum": 0,
-                                        "maximum": 100
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Progress updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Progress"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Delete user progress",
-                "operationId": "deleteUserProgress",
-                "tags": [
-                    "progress"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "progressId"
-                                ],
-                                "properties": {
-                                    "progressId": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Progress entry deleted successfully"
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
-                        }
-                    }
-                }
+      "/progress": {
+        "get": {
+          "summary": "Retrieve progress entries for a specific user",
+          "description": "Fetches all progress entries associated with a given user ID.",
+          "operationId": "getUserProgress",
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "description": "The unique identifier of the user",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": "cm1p1p3qd0000k46jwkdhb2t5"
+              }
             }
-        },
-        "/skills": {
-            "get": {
-                "summary": "Get all skills",
-                "operationId": "getAllSkills",
-                "tags": [
-                    "skills"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "A list of all available skills",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Skill"
-                                    }
-                                }
-                            }
-                        }
+          ],
+          "responses": {
+            "200": {
+              "description": "A list of progress entries for the user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ProgressEntry"
                     },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
+                    "example": [
+                      {
+                        "id": "cm1p135ic0001cn3rqg9eihhj",
+                        "skillId": "cm1owzibl00027muqy53gn8bi",
+                        "userId": "cm1p1p3qd0000k46jwkdhb2t5",
+                        "currentProgress": 0,
+                        "createdAt": "2024-09-30T13:11:13.571Z",
+                        "updatedAt": "2024-09-30T13:11:13.571Z",
+                        "skill": {
+                          "id": "cm1owzibl00027muqy53gn8bi",
+                          "name": "Mobile Development",
+                          "description": "Develop mobile applications.",
+                          "category": null,
+                          "labels": ["Technical", "Hard"],
+                          "createdAt": "2024-09-30T11:16:25.090Z"
                         }
-                    }
+                      }
+                    ]
+                  }
                 }
+              }
             },
-            "post": {
-                "summary": "Create a new skill",
-                "operationId": "createSkill",
-                "tags": [
-                    "skills"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "name",
-                                    "description",
-                                    "category",
-                                    "labels"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "category": {
-                                        "type": "string"
-                                    },
-                                    "labels": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Skill created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Skill"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "$ref": "#/components/schemas/Error"
-                            }
-                        }
-                    }
+            "400": {
+              "description": "Bad Request - Invalid or missing parameters",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  },
+                  "example": {
+                    "error": "userId query parameter is required."
+                  }
                 }
+              }
+            },
+            "404": {
+              "description": "Not Found - No progress entries found for the user",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  },
+                  "example": {
+                    "error": "No progress entries found for the provided userId."
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  },
+                  "example": {
+                    "error": "Failed to fetch progress entries."
+                  }
+                }
+              }
             }
+          }
         }
+      }
+    },
+    "components": {
+      "schemas": {
+        "ProgressEntry": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "cm1p135ic0001cn3rqg9eihhj"
+            },
+            "skillId": {
+              "type": "string",
+              "example": "cm1owzibl00027muqy53gn8bi"
+            },
+            "userId": {
+              "type": "string",
+              "example": "cm1p1p3qd0000k46jwkdhb2t5"
+            },
+            "currentProgress": {
+              "type": "integer",
+              "example": 0
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-09-30T13:11:13.571Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-09-30T13:11:13.571Z"
+            },
+            "skill": {
+              "$ref": "#/components/schemas/Skill"
+            }
+          },
+          "required": [
+            "id",
+            "skillId",
+            "userId",
+            "currentProgress",
+            "createdAt",
+            "updatedAt",
+            "skill"
+          ]
+        },
+        "Skill": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "cm1owzibl00027muqy53gn8bi"
+            },
+            "name": {
+              "type": "string",
+              "example": "Mobile Development"
+            },
+            "description": {
+              "type": ["string", "null"],
+              "example": "Develop mobile applications."
+            },
+            "category": {
+              "type": ["string", "null"],
+              "example": null
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "Technical"
+              },
+              "example": ["Technical", "Hard"]
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-09-30T11:16:25.090Z"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "labels",
+            "createdAt"
+          ]
+        },
+        "ErrorResponse": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "string",
+              "example": "Error message describing what went wrong."
+            }
+          },
+          "required": ["error"]
+        }
+      }
     }
-}
+  }
+  

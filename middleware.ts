@@ -40,25 +40,17 @@ export function middleware(req: NextRequest) {
 
     // Additional Security: Require userId for /skills routes
     if (req.nextUrl.pathname.startsWith('/api/skills')) {
-      if (req.method === 'GET') {
-        const userId = req.nextUrl.searchParams.get('userId');
-        if (!userId) {
-          return NextResponse.json(
-            { error: 'userId query parameter is required.' },
-            { status: 400, headers: res.headers }
-          );
-        }
-        // Optional: Validate userId format or existence
-      } else if (req.method === 'POST') {
-        const userId = req.headers.get('userId');
-        if (!userId) {
-          return NextResponse.json(
-            { error: 'Middleware error: userId header is required.' },
-            { status: 400, headers: res.headers }
-          );
-        }
-        // Optional: Validate userId format or existence
+      let userId = req.headers.get('userId') || req.nextUrl.searchParams.get('userId');
+
+      // If userId is not provided, return an error
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Middleware error: userId header or query parameter is required.' },
+          { status: 400, headers: res.headers }
+        );
       }
+
+      // Optional: Validate userId format or existence
     }
   }
 

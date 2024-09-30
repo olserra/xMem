@@ -1,6 +1,7 @@
 // app/api/skills/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
+import { useUser } from '@/app/Context';
 
 // Handle GET requests
 // Handle GET requests
@@ -58,7 +59,7 @@ export const POST = async (req: Request) => {
     const { name, description, category, labels } = await req.json(); // Extract skill data from the request body
 
     // Extract userId from headers
-    const userId = req.headers.get('userId');
+    const { userId } = useUser();
 
     // Validate userId
     if (!userId) {

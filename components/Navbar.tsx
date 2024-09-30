@@ -73,7 +73,7 @@ const Navbar = () => {
                     <p>Welcome,</p>
                     <p className="font-bold underline">{session.user?.name}</p>
                   </div>
-                  <button className="bg-black text-white text-sm p-2 rounded focus:outline-none" onClick={handleClickSignOut}>
+                  <button className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none" onClick={handleClickSignOut}>
                     Sign Out
                   </button>
                 </>

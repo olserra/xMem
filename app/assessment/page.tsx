@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { useUser } from '../Context';
 
 interface Question {
     question: string;
@@ -27,7 +28,8 @@ const Assessment: React.FC = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [responses, setResponses] = useState<string[]>(Array(questions.length).fill(''));
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-    const router = useRouter()
+    const router = useRouter();
+    const { userId } = useUser(); // Access the userId from the context
 
     const handleOptionSelect = (option: string) => {
         if (currentQuestion === 0) {
@@ -49,23 +51,26 @@ const Assessment: React.FC = () => {
         } else {
             // Handle API submission here
             const finalResponses = {
-                interests: selectedOptions, // Store the selected options for the first question
+                interests: selectedOptions,
                 skillLevel: responses[1],
                 learningStyle: responses[2],
             };
 
-            // Call the API to send the assessment data
+            // Call the API to send the assessment data along with userId
             const response = await fetch('/api/assessment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(finalResponses),
+                body: JSON.stringify({
+                    userId, // Include userId in the body
+                    assessmentData: finalResponses,
+                }),
             });
 
             if (response.ok) {
                 console.log('Assessment submitted successfully');
-                router.push('/dashboard');
+                router.push('/progress'); // Redirect to dashboard
             } else {
                 console.error('Failed to submit assessment');
             }
@@ -82,18 +87,14 @@ const Assessment: React.FC = () => {
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
         } else {
-            // Handle skip action for the last question
             console.log('Final Responses (Skipped):', responses);
-            // Reset or redirect as needed
         }
     };
 
     return (
         <div className="flex flex-col items-center justify-start pt-12 h-screen px-4 bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center mb-4">
-                    Initial Assessment
-                </h2>
+                <h2 className="text-2xl font-bold text-center mb-4">Initial Assessment</h2>
                 <p className="text-center mb-4">{questions[currentQuestion].question}</p>
                 <div className="flex flex-col space-y-2">
                     {questions[currentQuestion].options.map((option, index) => (
@@ -109,23 +110,10 @@ const Assessment: React.FC = () => {
                     ))}
                 </div>
                 <div className="flex justify-between mt-4">
-                    <button
-                        className="text-gray-500 hover:text-gray-700"
-                        onClick={handleSkip}
-                    >
-                        Skip
-                    </button>
+                    <button className="text-gray-500 hover:text-gray-700" onClick={handleSkip}>Skip</button>
                     <div className='flex justify-between gap-3'>
-                        <button
-                            className="text-black border p-2 rounded"
-                            onClick={handleBack}
-                        >
-                            Back
-                        </button>
-                        <button
-                            className="bg-black text-white p-2 rounded focus:outline-none"
-                            onClick={handleNext}
-                        >
+                        <button className="text-black border p-2 rounded" onClick={handleBack}>Back</button>
+                        <button className="bg-black text-white p-2 rounded focus:outline-none" onClick={handleNext}>
                             {currentQuestion === questions.length - 1 ? 'Submit' : 'Next'}
                         </button>
                     </div>

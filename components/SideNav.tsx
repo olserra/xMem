@@ -36,7 +36,7 @@ export const SideNav = ({ menuItems, setIsOpen }: any) => {
         <div className="space-y-2">
           {session ? (
             <button
-              className="bg-black text-white text-sm p-2 rounded focus:outline-none"
+              className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none"
               onClick={handleClickSignOut}
             >
               Sign Out

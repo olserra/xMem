@@ -54,15 +54,13 @@ export const GET = async (req: Request) => {
 
 // Handle POST requests
 export const POST = async (req: Request) => {
-    const { name, description, category, labels } = await req.json(); // Extract skill data from the request body
-
-    // Extract userId from headers
-    const userId = req.headers.get('userId');
+    // Extract skill data and userId from the request body
+    const { name, description, category, labels, userId } = await req.json(); 
 
     // Validate userId
     if (!userId) {
         return NextResponse.json(
-            { error: 'API error: userId header is required.' },
+            { error: 'API error: userId is required.' },
             { status: 400 }
         );
     }

@@ -4,10 +4,12 @@ import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // Import the useRouter hook for navigation
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skill } from '@/app/page';
+import { useState } from 'react'; // Import useState
 
 const Skills = ({ skills }: { skills: Skill[] }) => {
   const { data: session } = useSession();
   const router = useRouter(); // Get the router instance
+  const [showAll, setShowAll] = useState(false); // State to manage visibility of additional skills
 
   // Define an array of possible label colors
   const labelColors = [
@@ -39,7 +41,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
     <>
       <div className="flex items-center justify-center py-6 md:px-12">
         <div className="flex flex-col gap-6 md:flex-row flex-wrap justify-center">
-          {skills.map((skill: Skill) => (
+          {skills.slice(0, showAll ? skills.length : 10).map((skill: Skill) => (
             <div
               key={skill.title}
               onClick={handleSkillClick} // Call handleSkillClick when clicked
@@ -62,11 +64,16 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
           ))}
         </div>
       </div>
-      <div className="mb-6 px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="mt-4 text-lg text-gray-600">and many more...</p>
+      {!showAll && skills.length > 10 && (
+        <div className="mb-6 px-6 lg:px-8 text-center">
+          <button
+            onClick={() => setShowAll(true)}
+            className="text-lg text-gray-500 hover:text-gray-900 underline"
+          >
+            and many more...
+          </button>
         </div>
-      </div>
+      )}
     </>
   );
 };

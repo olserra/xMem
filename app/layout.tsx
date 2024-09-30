@@ -29,7 +29,7 @@ export default function RootLayout({
         <SessionWrapper>
           <UserProvider>
             <Navbar />
-            {children}
+            <main className="flex-grow">{children}</main>
             <Footer />
           </UserProvider>
         </SessionWrapper>

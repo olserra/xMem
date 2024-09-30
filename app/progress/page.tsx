@@ -163,7 +163,12 @@ const ProgressPage: React.FC = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <button className="ml-4 text-black border border-gray-400 rounded-lg px-4 py-2">Start</button>
+                                    <button
+                                        className="ml-4 text-black border border-gray-400 rounded-lg px-4 py-2 w-24" // Set a fixed width
+                                    >
+                                        {skill.progress > 0 ? 'Resume' : 'Start'}
+                                    </button>
+
                                 </a>
                                 <button
                                     className="ml-2 text-grey-500"

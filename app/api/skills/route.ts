@@ -1,3 +1,4 @@
+// app/api/skills/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
@@ -29,7 +30,10 @@ export const POST = async (req: Request) => {
 
     // Validate required fields
     if (!name || !description || !category || !Array.isArray(labels)) {
-        return new Response(JSON.stringify({ error: 'name, description, category, and labels are required' }), { status: 400 });
+        return NextResponse.json(
+            { error: 'name, description, category, and labels are required' },
+            { status: 400 }
+        );
     }
 
     try {
@@ -39,7 +43,10 @@ export const POST = async (req: Request) => {
         });
 
         if (existingSkill) {
-            return new Response(JSON.stringify({ error: 'Skill already exists' }), { status: 409 }); // Conflict
+            return NextResponse.json(
+                { error: 'Skill already exists' },
+                { status: 409 } // Conflict
+            );
         }
 
         // Create the new skill
@@ -52,9 +59,12 @@ export const POST = async (req: Request) => {
             },
         });
 
-        return new Response(JSON.stringify(newSkill), { status: 201 }); // Created
+        return NextResponse.json(newSkill, { status: 201 }); // Created
     } catch (error) {
         console.error('Error creating skill:', error);
-        return new Response(JSON.stringify({ error: 'Failed to create skill' }), { status: 500 });
+        return NextResponse.json(
+            { error: 'Failed to create skill' },
+            { status: 500 }
+        );
     }
 };

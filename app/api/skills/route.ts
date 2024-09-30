@@ -49,6 +49,18 @@ export const POST = async (req: Request) => {
     }
 
     try {
+        // Optional: You might want to check if the user exists
+        const userExists = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExists) {
+            return NextResponse.json(
+                { error: 'User not found.' },
+                { status: 404 } // Not found
+            );
+        }
+
         // Check if the skill already exists
         const existingSkill = await prisma.skill.findUnique({
             where: { name },
@@ -70,6 +82,9 @@ export const POST = async (req: Request) => {
                 labels, // Assuming labels is an array of strings
             },
         });
+
+        // Optional: You can log the action or perform user-specific logic
+        console.log(`User ${userId} created a new skill: ${name}`);
 
         return NextResponse.json(newSkill, { status: 201 }); // Created
     } catch (error) {

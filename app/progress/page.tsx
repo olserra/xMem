@@ -48,10 +48,18 @@ const ProgressPage: React.FC = () => {
     useEffect(() => {
         const fetchAvailableSkills = async () => {
             try {
-                const response = await fetch(`/api/skills`);
+                const response = await fetch(`/api/skills`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'userId': 'cm1p1p3qd0000k46jwkdhb2t5' // Include the userId here
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch available skills');
                 }
+
                 const data = await response.json();
 
                 // Ensure each skill has the necessary properties
@@ -72,6 +80,7 @@ const ProgressPage: React.FC = () => {
 
         fetchAvailableSkills();
     }, [skills]);
+
 
 
     const handleSkillClick = async (skill: Skill) => {

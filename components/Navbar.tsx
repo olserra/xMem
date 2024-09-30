@@ -5,7 +5,6 @@ import { SiFuturelearn } from "react-icons/si";
 import { useState } from "react"; // Import useState
 import { cn } from "@/lib/utils";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { buttonVariants } from "@/components/ui/button";
 import { MobileNav } from "@/components/MobileNav";
 import { signIn, signOut, useSession } from "next-auth/react";
 
@@ -63,7 +62,7 @@ const Navbar = () => {
             <div className="hidden items-center space-x-4 sm:flex">
               {!session ? (
                 <>
-                  <button className={buttonVariants({ size: "sm" })} onClick={handleClickSignIn}>
+                  <button className="bg-black text-white text-sm py-2 px-3 rounded-lg focus:outline-none" onClick={handleClickSignIn}>
                     Get started
                   </button>
                 </>

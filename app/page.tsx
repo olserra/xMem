@@ -6,7 +6,7 @@ import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
 import { skills } from "./data/skills"; // Import from the new external skills file
-import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
 
 export interface Skill {
   title: string;
@@ -16,24 +16,34 @@ export interface Skill {
 }
 
 export default function Home() {
+  const { data: session } = useSession(); // Get session data
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>(skills);
 
   useEffect(() => {
     // This is where you'd fetch or update the initial skill data if needed
   }, []);
 
+  const handleChatClick = async () => {
+    if (!session) {
+      // If not signed in, trigger Google sign-in
+      await signIn("google", { callbackUrl: "https://chatgpt.com/g/g-kqRCHmM5H-openskills-online" });
+    } else {
+      // If signed in, redirect to the specified link
+      window.open("https://chatgpt.com/g/g-kqRCHmM5H-openskills-online", "_blank");
+    }
+  };
+
+
   return (
     <>
       {/* Hero */}
       <MaxWidthWrapper className="mt-10 flex flex-col items-center justify-center text-center sm:mt-12">
         <div className="mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
-          <Link legacyBehavior href='https://chatgpt.com/g/g-kqRCHmM5H-openskills-online' passHref>
-            <a target="_blank" rel="noopener noreferrer">
-              <p className="cursor-pointer text-sm font-semibold text-gray-700">
-                Chat with our AI Coach
-              </p>
-            </a>
-          </Link>
+          <button onClick={handleChatClick}>
+            <p className="cursor-pointer text-sm font-semibold text-gray-700">
+              Chat with our AI Coach
+            </p>
+          </button>
         </div>
         <h1 className="max-w-4xl text-4xl font-bold md:text-6xl lg:text-7xl">
           <span className="text-blue-600">Ignite your Growth</span>{" "} Master the Skills of the Future

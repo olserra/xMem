@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Link from 'next/link';
 import { useUser } from "../Context";
 import { AiFillDelete } from 'react-icons/ai';
 
@@ -52,7 +51,7 @@ const ProgressPage: React.FC = () => {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'userId': 'cm1p1p3qd0000k46jwkdhb2t5' // Include the userId here
+                        'userId': userId
                     }
                 });
 

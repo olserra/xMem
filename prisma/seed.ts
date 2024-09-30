@@ -1,32 +1,33 @@
-// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
+import { skills } from '@/app/data/skills'; // Adjust the import path as necessary
 
 const prisma = new PrismaClient();
-
-const skillsData = [
-  { name: "Software Engineering" },
-  { name: "Leadership" },
-  { name: "Analytical" },
-  { name: "Creative" },
-  { name: "Interpersonal" },
-  { name: "Artificial Intelligence" },
-  { name: "Data Science" },
-  { name: "Negotiation" },
-  { name: "Artistic" },
-  { name: "Marketing" },
-  { name: "Web3" },
-];
 
 async function main() {
   // Drop existing progress and skills to avoid unique constraint violations
   await prisma.progress.deleteMany({});
-  await prisma.skill.deleteMany({});
+  await prisma.skill.deleteMany({}); // This line clears the existing skills
 
   // Seed skills
-  for (const skill of skillsData) {
-    await prisma.skill.create({
-      data: skill,
+  for (const skill of skills) {
+    const existingSkill = await prisma.skill.findUnique({
+      where: { name: skill.title }, // Use skill.title from the imported data
     });
+
+    // Only create the skill if it does not already exist
+    if (!existingSkill) {
+      await prisma.skill.create({
+        data: {
+          name: skill.title,
+          description: skill.description || '', // Use skill.description if available
+          // Assuming skill has a category and labels
+          category: skill.category || '', // Adjust if category is not in your skills structure
+          labels: {
+            set: skill.labels || [], // Use skill.labels if available
+          },
+        },
+      });
+    }
   }
 
   console.log('Seeding skills completed successfully!');

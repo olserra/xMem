@@ -5,7 +5,7 @@ import Image from "next/image";
 import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
-import { skills } from "./data/skills";
+import { skills } from "./data/skills"; // Import from the new external skills file
 import Link from "next/link";
 
 export interface Skill {
@@ -13,7 +13,6 @@ export interface Skill {
   description: string;
   category?: string; // Make category optional
   labels: string[];
-  children?: Skill[];
 }
 
 export default function Home() {

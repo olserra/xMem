@@ -37,7 +37,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
 
   return (
     <>
-      <div className="flex items-center justify-center py-6 md:px-12 ">
+      <div className="flex items-center justify-center py-6 md:px-12">
         <div className="flex flex-col gap-6 md:flex-row flex-wrap justify-center">
           {skills.map((skill: Skill) => (
             <div
@@ -48,7 +48,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
               <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
                 <CardTitle>{skill.title}</CardTitle>
                 <CardDescription className="mb-3 text-center">{skill.description}</CardDescription>
-                {skill.labels && (
+                {skill.labels && skill.labels.length > 0 && (
                   <div className="flex gap-2 mt-2">
                     {skill.labels.map((label: string) => (
                       <span key={label} className={`inline-block px-2 py-1 text-sm text-grey-700 ${getRandomColor()} rounded-xl`}>

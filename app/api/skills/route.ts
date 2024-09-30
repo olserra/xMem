@@ -3,14 +3,35 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
 // Handle GET requests
+// Handle GET requests
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
 
-    // At this point, middleware has already validated the presence of userId
-    // Optionally, you can perform additional validation if needed
+    // Validate userId to ensure it is not null
+    if (!userId) {
+        return NextResponse.json(
+            { error: 'userId query parameter is required.' },
+            { status: 400 } // Bad request
+        );
+    }
+
+    // Log the userId for monitoring
+    console.log(`Fetching skills for user ID: ${userId}`);
 
     try {
+        // Optional: Check if the user exists
+        const userExists = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExists) {
+            return NextResponse.json(
+                { error: 'User not found.' },
+                { status: 404 } // Not found
+            );
+        }
+
         // Fetch all available skills
         const skills = await prisma.skill.findMany({
             select: {
@@ -22,6 +43,7 @@ export const GET = async (req: Request) => {
                 createdAt: true
             }
         });
+
         return NextResponse.json(skills); // Return all available skills
 
     } catch (error) {
@@ -29,6 +51,7 @@ export const GET = async (req: Request) => {
         return NextResponse.json({ error: 'Failed to fetch skills.' }, { status: 500 });
     }
 };
+
 
 // Handle POST requests
 export const POST = async (req: Request) => {
@@ -54,7 +77,7 @@ export const POST = async (req: Request) => {
     }
 
     try {
-        // Optional: Check if the user exists
+        // Check if the user exists
         const userExists = await prisma.user.findUnique({
             where: { id: userId },
         });
@@ -85,10 +108,12 @@ export const POST = async (req: Request) => {
                 description,
                 category,
                 labels, // Assuming labels is an array of strings
+                // Optionally link to user if your data model supports this
+                // userId: userId, // Uncomment if you have a userId field in your Skill model
             },
         });
 
-        // Optional: Log the action or perform user-specific logic
+        // Log the action or perform user-specific logic
         console.log(`User ${userId} created a new skill: ${name}`);
 
         return NextResponse.json(newSkill, { status: 201 }); // Created

@@ -53,7 +53,7 @@ export function middleware(req: NextRequest) {
         const userId = req.headers.get('userId');
         if (!userId) {
           return NextResponse.json(
-            { error: 'userId header is required.' },
+            { error: 'Middleware error: userId header is required.' },
             { status: 400, headers: res.headers }
           );
         }

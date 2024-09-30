@@ -63,7 +63,7 @@ export const POST = async (req: Request) => {
     // Validate userId
     if (!userId) {
         return NextResponse.json(
-            { error: 'userId header is required.' },
+            { error: 'API error: userId header is required.' },
             { status: 400 }
         );
     }

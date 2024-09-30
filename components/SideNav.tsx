@@ -36,20 +36,14 @@ export const SideNav = ({ menuItems, setIsOpen }: any) => {
         <div className="space-y-2">
           {session ? (
             <button
-              className={buttonVariants({
-                size: "sm",
-                className: "sm:hidden mr-3",
-              })}
+              className="bg-black text-white text-sm p-2 rounded focus:outline-none"
               onClick={handleClickSignOut}
             >
               Sign Out
             </button>
           ) : (
             <button
-              className={buttonVariants({
-                size: "sm",
-                className: "w-full text-center",
-              })}
+              className="bg-black text-white text-sm p-2 rounded focus:outline-none"
               onClick={handleGetStartedClick}
             >
               Get Started

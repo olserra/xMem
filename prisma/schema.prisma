@@ -8,29 +8,39 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?      @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role       @default(USER)
-  skills        Skill[]    @relation("UserSkills")
+  role          Role         @default(USER)
+  skills        Skill[]      @relation("UserSkills")
   Progress      Progress[]
+  Assessment    Assessment[]
+}
+
+model Assessment {
+  id        String   @id @default(cuid())
+  userId    String // Foreign key to the User model
+  data      Json // Store the assessment data as JSON
+  createdAt DateTime @default(now()) // Timestamp for when the assessment was created
+  updatedAt DateTime @updatedAt // Timestamp for the last update
+
+  user User @relation(fields: [userId], references: [id]) // Relation to User
 }
 
 model Skill {
   id          String     @id @default(cuid()) // Automatically generates a unique ID
   name        String     @unique // Unique name for the skill
-  description String?    // Optional description for the skill
-  category    String?    // Optional category for the skill
-  labels      String[]   // Array to store labels (you may want to change this to a relation if using a separate labels table)
+  description String? // Optional description for the skill
+  category    String? // Optional category for the skill
+  labels      String[] // Array to store labels (you may want to change this to a relation if using a separate labels table)
   users       User[]     @relation("UserSkills")
   progress    Progress[] // Each skill can have multiple progress entries for different users
   createdAt   DateTime   @default(now())
 }
-
 
 model Progress {
   id              String   @id @default(cuid())

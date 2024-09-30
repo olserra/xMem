@@ -1,102 +1,242 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-      "title": "OpenSkills API",
-      "version": "1.0.0",
-      "description": "API for managing user skills and progress."
-    },
-    "servers": [
-      {
-        "url": "https://openskills.online/api",
-        "description": "Production server"
-      }
-    ],
-    "paths": {
-      "/progress": {
-        "get": {
-          "summary": "Retrieve progress entries for a specific user",
-          "description": "Fetches all progress entries associated with a given user ID.",
-          "operationId": "getUserProgress",
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "description": "The unique identifier of the user",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "example": "cm1p1p3qd0000k46jwkdhb2t5"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenSkills API",
+    "version": "1.0.0",
+    "description": "API for managing user skills and progress."
+  },
+  "servers": [
+    {
+      "url": "https://openskills.online/api",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/progress": {
+      "get": {
+        "summary": "Retrieve progress entries for a specific user",
+        "description": "Fetches all progress entries associated with a given user ID.",
+        "operationId": "getUserProgress",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The unique identifier of the user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "cm1p1p3qd0000k46jwkdhb2t5"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of progress entries for the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgressEntry"
+                  }
+                }
               }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of progress entries for the user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ProgressEntry"
-                    },
-                    "example": [
-                      {
-                        "id": "cm1p135ic0001cn3rqg9eihhj",
-                        "skillId": "cm1owzibl00027muqy53gn8bi",
-                        "userId": "cm1p1p3qd0000k46jwkdhb2t5",
-                        "currentProgress": 0,
-                        "createdAt": "2024-09-30T13:11:13.571Z",
-                        "updatedAt": "2024-09-30T13:11:13.571Z",
-                        "skill": {
-                          "id": "cm1owzibl00027muqy53gn8bi",
-                          "name": "Mobile Development",
-                          "description": "Develop mobile applications.",
-                          "category": null,
-                          "labels": ["Technical", "Hard"],
-                          "createdAt": "2024-09-30T11:16:25.090Z"
-                        }
-                      }
-                    ]
-                  }
+          },
+          "400": {
+            "description": "Bad Request - Invalid or missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            },
-            "400": {
-              "description": "Bad Request - Invalid or missing parameters",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorResponse"
-                  },
-                  "example": {
-                    "error": "userId query parameter is required."
-                  }
+            }
+          },
+          "404": {
+            "description": "Not Found - No progress entries found for the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            },
-            "404": {
-              "description": "Not Found - No progress entries found for the user",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorResponse"
-                  },
-                  "example": {
-                    "error": "No progress entries found for the provided userId."
-                  }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            },
-            "500": {
-              "description": "Internal Server Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorResponse"
-                  },
-                  "example": {
-                    "error": "Failed to fetch progress entries."
-                  }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new progress entry",
+        "description": "Creates a new progress entry for a user and a specific skill.",
+        "operationId": "createProgressEntry",
+        "requestBody": {
+          "description": "Progress entry object that needs to be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgressEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Progress entry created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing progress entry",
+        "description": "Updates the current progress of an existing progress entry.",
+        "operationId": "updateProgressEntry",
+        "requestBody": {
+          "description": "Progress entry object that needs to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProgressEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Progress entry updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Progress entry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a progress entry",
+        "description": "Deletes an existing progress entry by its ID.",
+        "operationId": "deleteProgressEntry",
+        "requestBody": {
+          "description": "Progress entry ID that needs to be deleted",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteProgressEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Progress entry deleted successfully",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad Request - Missing progressId",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Progress entry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -104,102 +244,353 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "ProgressEntry": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "example": "cm1p135ic0001cn3rqg9eihhj"
-            },
-            "skillId": {
-              "type": "string",
-              "example": "cm1owzibl00027muqy53gn8bi"
-            },
-            "userId": {
+    "/skills": {
+      "get": {
+        "summary": "Retrieve all available skills",
+        "description": "Fetches a list of all available skills.",
+        "operationId": "getAllSkills",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The unique identifier of the user",
+            "required": true,
+            "schema": {
               "type": "string",
               "example": "cm1p1p3qd0000k46jwkdhb2t5"
-            },
-            "currentProgress": {
-              "type": "integer",
-              "example": 0
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2024-09-30T13:11:13.571Z"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2024-09-30T13:11:13.571Z"
-            },
-            "skill": {
-              "$ref": "#/components/schemas/Skill"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of all available skills",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Skill"
+                  }
+                }
+              }
             }
           },
-          "required": [
-            "id",
-            "skillId",
-            "userId",
-            "currentProgress",
-            "createdAt",
-            "updatedAt",
-            "skill"
-          ]
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new skill",
+        "description": "Creates a new skill with the provided details.",
+        "operationId": "createSkill",
+        "requestBody": {
+          "description": "Skill object that needs to be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Web Development"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Develop web applications."
+                  },
+                  "category": {
+                    "type": "string",
+                    "example": "Technical"
+                  },
+                  "labels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "Technical"
+                    },
+                    "example": [
+                      "Technical",
+                      "Hard"
+                    ]
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": "cm1p1p3qd0000k46jwkdhb2t5",
+                    "description": "The unique identifier of the user."
+                  }
+                },
+                "required": [
+                  "name",
+                  "description",
+                  "category",
+                  "labels",
+                  "userId"
+                ]
+              }
+            }
+          }
         },
-        "Skill": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "example": "cm1owzibl00027muqy53gn8bi"
-            },
-            "name": {
-              "type": "string",
-              "example": "Mobile Development"
-            },
-            "description": {
-              "type": ["string", "null"],
-              "example": "Develop mobile applications."
-            },
-            "category": {
-              "type": ["string", "null"],
-              "example": null
-            },
-            "labels": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "example": "Technical"
-              },
-              "example": ["Technical", "Hard"]
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2024-09-30T11:16:25.090Z"
+        "responses": {
+          "201": {
+            "description": "Skill created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
             }
           },
-          "required": [
-            "id",
-            "name",
-            "labels",
-            "createdAt"
-          ]
-        },
-        "ErrorResponse": {
-          "type": "object",
-          "properties": {
-            "error": {
-              "type": "string",
-              "example": "Error message describing what went wrong."
+          "400": {
+            "description": "Bad Request - Invalid or missing fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
             }
           },
-          "required": ["error"]
+          "409": {
+            "description": "Conflict - Skill already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "ProgressEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cm1p135ic0001cn3rqg9eihhj"
+          },
+          "skillId": {
+            "type": "string",
+            "example": "cm1owzibl00027muqy53gn8bi"
+          },
+          "userId": {
+            "type": "string",
+            "example": "cm1p1p3qd0000k46jwkdhb2t5"
+          },
+          "currentProgress": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-09-30T13:11:13.571Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-09-30T13:11:13.571Z"
+          },
+          "skill": {
+            "$ref": "#/components/schemas/Skill"
+          }
+        },
+        "required": [
+          "id",
+          "skillId",
+          "userId",
+          "currentProgress",
+          "createdAt",
+          "updatedAt",
+          "skill"
+        ]
+      },
+      "Skill": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cm1owzibl00027muqy53gn8bi"
+          },
+          "name": {
+            "type": "string",
+            "example": "Mobile Development"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Develop mobile applications."
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": null
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Technical"
+            },
+            "example": [
+              "Technical",
+              "Hard"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-09-30T11:16:25.090Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "labels",
+          "createdAt"
+        ]
+      },
+      "CreateProgressEntry": {
+        "type": "object",
+        "properties": {
+          "skillId": {
+            "type": "string",
+            "example": "cm1owzibl00027muqy53gn8bi"
+          },
+          "currentProgress": {
+            "type": "integer",
+            "example": 50
+          },
+          "userId": {
+            "type": "string",
+            "example": "cm1p1p3qd0000k46jwkdhb2t5"
+          }
+        },
+        "required": [
+          "skillId",
+          "currentProgress",
+          "userId"
+        ]
+      },
+      "UpdateProgressEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cm1p1p4jd0001k47jwkdhb2t6"
+          },
+          "currentProgress": {
+            "type": "integer",
+            "example": 75
+          },
+          "userId": {
+            "type": "string",
+            "example": "cm1p1p3qd0000k46jwkdhb2t5"
+          }
+        },
+        "required": [
+          "id",
+          "currentProgress",
+          "userId"
+        ]
+      },
+      "DeleteProgressEntry": {
+        "type": "object",
+        "properties": {
+          "progressId": {
+            "type": "string",
+            "example": "cm1p1p4jd0001k47jwkdhb2t6"
+          },
+          "userId": {
+            "type": "string",
+            "example": "cm1p1p3qd0000k46jwkdhb2t5"
+          }
+        },
+        "required": [
+          "progressId",
+          "userId"
+        ]
+      },
+      "CreateSkill": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Web Development"
+          },
+          "description": {
+            "type": "string",
+            "example": "Develop web applications."
+          },
+          "category": {
+            "type": "string",
+            "example": "Technical"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Technical"
+            },
+            "example": [
+              "Technical",
+              "Hard"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "example": "cm1p1p3qd0000k46jwkdhb2t5",
+            "description": "The unique identifier of the user."
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "category",
+          "labels",
+          "userId"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Error message describing what went wrong."
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
   }
-  
+}

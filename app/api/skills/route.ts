@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
 // Handle GET requests
-// Handle GET requests
 export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');

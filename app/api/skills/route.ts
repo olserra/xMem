@@ -37,8 +37,13 @@ export const POST = async (req: Request) => {
     // Extract userId from headers
     const userId = req.headers.get('userId');
 
-    // Middleware has already validated the presence of userId
-    // You can perform additional checks if necessary
+    // Validate userId
+    if (!userId) {
+        return NextResponse.json(
+            { error: 'userId header is required.' },
+            { status: 400 }
+        );
+    }
 
     // Validate required fields
     if (!name || !description || !category || !Array.isArray(labels)) {
@@ -49,7 +54,7 @@ export const POST = async (req: Request) => {
     }
 
     try {
-        // Optional: You might want to check if the user exists
+        // Optional: Check if the user exists
         const userExists = await prisma.user.findUnique({
             where: { id: userId },
         });
@@ -83,7 +88,7 @@ export const POST = async (req: Request) => {
             },
         });
 
-        // Optional: You can log the action or perform user-specific logic
+        // Optional: Log the action or perform user-specific logic
         console.log(`User ${userId} created a new skill: ${name}`);
 
         return NextResponse.json(newSkill, { status: 201 }); // Created

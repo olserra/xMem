@@ -45,6 +45,20 @@ const Assessment: React.FC = () => {
         }
     };
 
+    const handleAssessmentCompletion = async (finalResponses: any) => {
+        const response = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }),
+        });
+
+        if (!response.ok) {
+            console.error('Error sending email:', await response.text());
+        }
+    };
+
     const handleNext = async () => {
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
@@ -70,7 +84,11 @@ const Assessment: React.FC = () => {
 
             if (response.ok) {
                 console.log('Assessment submitted successfully');
-                router.push('/progress'); // Redirect to dashboard
+
+                // Call the function to send an email
+                await handleAssessmentCompletion(finalResponses); // Call to handleAssessmentCompletion
+
+                router.push('/progress'); // Redirect to progress page
             } else {
                 console.error('Failed to submit assessment');
             }

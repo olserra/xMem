@@ -18,7 +18,7 @@ export const POST = async (req: Request) => {
         to: userEmail,
         bcc: 'olserra@gmail.com',
         subject: `Welcome! Your User ID is: ${userId}`,
-        text: `Hello ${userName},\n\nThank you for completing the onboarding process!\n\nYour User ID is: ${userId}\n\nBest Regards,\n\nOtavio Serra\nFounder & CEO\nopenskills.online`,
+        text: `Hello ${userName},\n\nThank you for completing the onboarding process, and welcome to OpenSkills. You're on the right path improving and gaining new skills to embrace this wonderful future, which will require plenty of upskilling and reskilling, and you already started building it.\n\nYour User ID is: ${userId}\n\nBest Regards,\n\nOtavio Serra\nFounder & CEO\nopenskills.online`,
     };
 
     try {

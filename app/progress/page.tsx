@@ -22,6 +22,18 @@ const Skeleton: React.FC = () => (
     </div>
 );
 
+const handleCopyToClipboard = (userId: string) => {
+    navigator.clipboard.writeText(userId)
+        .then(() => {
+            console.log('User ID copied to clipboard:', userId);
+            // Optionally show a success message or toast notification
+        })
+        .catch(err => {
+            console.error('Failed to copy user ID:', err);
+        });
+};
+
+
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
@@ -196,7 +208,7 @@ const ProgressPage: React.FC = () => {
                     </button>
                 ))}
             </div>
-            <div className="flex justify-center items-center gap-2" onClick={() => handleSendEmail(userId, userEmail)}>
+            <div className="flex justify-center items-center gap-2" onClick={() => handleCopyToClipboard(userId)}>
                 <span>Copy my user ID</span>
                 <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />
             </div>

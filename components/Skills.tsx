@@ -29,14 +29,16 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
     return labelColors[Math.floor(Math.random() * labelColors.length)];
   };
 
-  const handleSkillClick = () => {
+  const handleSkillClick = (skillName: string) => {
     if (!session) {
       handleSignIn;
     } else {
-      // Redirect to the external link
-      window.open("https://chatgpt.com/g/g-kqRCHmM5H-openskills-online", "_blank");
+      // Redirect to the external link with skillName as a query parameter
+      const url = `https://chatgpt.com/g/g-kqRCHmM5H-openskills-online?skillName=${encodeURIComponent(skillName)}`;
+      window.open(url, "_blank");
     }
   };
+
 
   return (
     <>
@@ -45,7 +47,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
           {skills.slice(0, showAll ? skills.length : 10).map((skill: Skill) => (
             <div
               key={skill.title}
-              onClick={handleSkillClick} // Call handleSkillClick when clicked
+              onClick={() => handleSkillClick(skill.title)} // Pass the skill title to handleSkillClick
               className="cursor-pointer"
             >
               <Card className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">

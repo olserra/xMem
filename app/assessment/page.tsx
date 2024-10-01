@@ -45,7 +45,7 @@ const Assessment: React.FC = () => {
         }
     };
 
-    const handleAssessmentCompletion = async (finalResponses: any) => {
+    const handleAssessmentCompletion = async () => {
         const response = await fetch('/api/send-email', {
             method: 'POST',
             headers: {
@@ -77,7 +77,7 @@ const Assessment: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId, // Include userId in the body
+                    userId,
                     assessmentData: finalResponses,
                 }),
             });
@@ -86,9 +86,9 @@ const Assessment: React.FC = () => {
                 console.log('Assessment submitted successfully');
 
                 // Call the function to send an email
-                await handleAssessmentCompletion(finalResponses); // Call to handleAssessmentCompletion
+                await handleAssessmentCompletion();
 
-                router.push('/progress'); // Redirect to progress page
+                router.push('/progress');
             } else {
                 console.error('Failed to submit assessment');
             }

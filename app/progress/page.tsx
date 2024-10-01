@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useUser } from "../Context";
 import { AiFillDelete } from 'react-icons/ai';
 import { FaRegCopy } from "react-icons/fa";
-import { handleSendEmail } from "../helpers/handleSendEmail";
 
 interface Skill {
     id: string;
@@ -22,7 +21,7 @@ const Skeleton: React.FC = () => (
     </div>
 );
 
-const handleCopyToClipboard = (userId: string) => {
+const handleCopyToClipboard = (userId: any) => {
     navigator.clipboard.writeText(userId)
         .then(() => {
             console.log('User ID copied to clipboard:', userId);
@@ -36,7 +35,6 @@ const handleCopyToClipboard = (userId: string) => {
 
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
-    const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
     const { userId, userEmail } = useUser();
     const [loading, setLoading] = useState(true); // Loading state
 
@@ -65,70 +63,6 @@ const ProgressPage: React.FC = () => {
 
         fetchUserSkills();
     }, [userId]);
-
-    useEffect(() => {
-        const fetchAvailableSkills = async () => {
-            try {
-                const response = await fetch(`/api/skills`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'userId': userId
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch available skills');
-                }
-
-                const data = await response.json();
-                const filteredAvailableSkills = data.map((skill: any) => ({
-                    id: skill.id,
-                    skillId: skill.id,
-                    name: skill.name,
-                    progress: 0
-                })).filter((skill: Skill) =>
-                    !skills.some(userSkill => userSkill.skillId === skill.id)
-                );
-
-                setAvailableSkills(filteredAvailableSkills);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchAvailableSkills();
-    }, [skills, userId]);
-
-    // const handleSkillClick = async (skill: Skill) => {
-    //     const existingSkill = skills.find(s => s.skillId === skill.skillId);
-    //     if (existingSkill) return;
-
-    //     try {
-    //         const response = await fetch('/api/progress', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({
-    //                 skillId: skill.skillId,
-    //                 currentProgress: 0,
-    //                 userId: userId,
-    //             }),
-    //         });
-
-    //         if (!response.ok) {
-    //             const errorText = await response.text();
-    //             throw new Error(`Failed to save skill: ${response.status} ${errorText}`);
-    //         }
-
-    //         const newSkill = { ...skill, progress: 0 };
-    //         setSkills((prev) => [...prev, newSkill]);
-    //         setAvailableSkills((prev) => prev.filter(s => s.skillId !== skill.skillId));
-    //     } catch (error) {
-    //         console.error('Error saving skill:', error);
-    //     }
-    // };
 
     const handleDeleteSkill = async (skillId: string) => {
         try {
@@ -197,17 +131,6 @@ const ProgressPage: React.FC = () => {
                 )}
             </div>
 
-            {/* <div className="flex flex-wrap gap-2 mt-4">
-                {availableSkills.map(skill => (
-                    <button
-                        key={skill.id}
-                        className="border border-gray-400 rounded-lg p-2"
-                        onClick={() => handleSkillClick(skill)}
-                    >
-                        {skill.name}
-                    </button>
-                ))}
-            </div> */}
             <div className="flex justify-center items-center gap-2" onClick={() => handleCopyToClipboard(userId)}>
                 <span>Copy my user ID</span>
                 <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />

@@ -186,6 +186,7 @@ export const DELETE = async (req: Request) => {
         await prisma.progress.delete({
             where: { id: progressId },
         });
+        // Change this to return just the status code, without a JSON body
         return NextResponse.json(null, {
             status: 204,
             headers: {
@@ -208,16 +209,4 @@ export const DELETE = async (req: Request) => {
             }
         );
     }
-};
-
-// Handle OPTIONS requests (CORS preflight)
-export const OPTIONS = async () => {
-    return NextResponse.json(null, {
-        status: 204,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-    });
 };

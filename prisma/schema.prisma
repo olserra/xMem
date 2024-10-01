@@ -51,6 +51,8 @@ model Progress {
   updatedAt       DateTime @updatedAt // Automatically set to current timestamp on update
   user            User     @relation(fields: [userId], references: [id])
   skill           Skill    @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId]) // Add this line for unique constraint
 }
 
 model Account {

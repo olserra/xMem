@@ -45,13 +45,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ skills = [], onFilterSkills }) =>
 	};
 
 	return (
-		<div className="w-full max-w-md mx-auto mt-4">
+		<div className="w-full max-w-sm md:max-w-xl mx-auto mt-4">
 			<input
 				type="text"
 				value={searchQuery}
 				onChange={handleSearchChange}
 				placeholder="Search skills..."
-				className="w-full p-2 pl-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500"
+				className="w-full p-3 md:pl-4 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:border-blue-500"
 			/>
 		</div>
 	);

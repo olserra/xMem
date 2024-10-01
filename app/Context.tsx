@@ -4,8 +4,9 @@ import { createContext, useContext, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface UserContextType {
-    userId: any | null;
-    userEmail: any | null;
+    userId: string | null;
+    userEmail: string | null;
+    userName: string | null;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -16,9 +17,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // @ts-ignore
     const userId = session?.user?.id || null;
     const userEmail = session?.user?.email || null;
+    const userName = session?.user?.name || null;
 
     return (
-        <UserContext.Provider value={{ userId, userEmail }}>
+        <UserContext.Provider value={{ userId, userEmail, userName }}>
             {children}
         </UserContext.Provider>
     );

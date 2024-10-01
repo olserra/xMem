@@ -51,118 +51,93 @@ export const GET = async (req: Request) => {
 export const POST = async (req: Request) => {
     const { skillId, currentProgress, userId } = await req.json();
 
-    if (!skillId || typeof currentProgress !== 'number' || !userId) {
-        return NextResponse.json(
-            { error: 'skillId, currentProgress, and userId are required' },
-            {
-                status: 400,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            }
-        );
-    }
-
     try {
-        // Check if the skill exists
-        const skill = await prisma.skill.findUnique({
-            where: { id: skillId },
+      // Check if the progress entry already exists
+      const existingProgress = await prisma.progress.findUnique({
+        where: {
+          userId_skillId: {
+            userId: userId,
+            skillId: skillId,
+          },
+        },
+      });
+  
+      if (existingProgress) {
+        // If it exists, update the progress
+        const updatedProgress = await prisma.progress.update({
+          where: {
+            userId_skillId: {
+              userId: userId,
+              skillId: skillId,
+            },
+          },
+          data: {
+            currentProgress: currentProgress,
+          },
         });
-
-        if (!skill) {
-            return NextResponse.json(
-                { error: 'Skill not found' },
-                {
-                    status: 404,
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                    },
-                }
-            );
-        }
-
-        // Create the progress entry
+        return NextResponse.json(updatedProgress);
+      } else {
+        // Create a new entry
         const newProgress = await prisma.progress.create({
-            data: {
-                skillId,
-                currentProgress,
-                userId,
-            },
+          data: {
+            skillId: skillId,
+            userId: userId,
+            currentProgress: currentProgress,
+          },
         });
-        return NextResponse.json(newProgress, {
-            status: 201,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            },
-        });
+        return NextResponse.json(newProgress);
+      }
     } catch (error) {
-        console.error('Error creating progress:', error);
-        return NextResponse.json(
-            { error: 'Failed to create progress' },
-            {
-                status: 500,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            }
-        );
+      console.error('Error creating or updating progress:', error);
+      return NextResponse.json({ error: 'Failed to create or update progress' }, { status: 500 });
     }
-};
+  }
 
 // Handle PUT requests for updating progress
 export const PUT = async (req: Request) => {
-    const { id, currentProgress } = await req.json();
-
-    if (!id || typeof currentProgress !== 'number') {
-        return NextResponse.json(
-            { error: 'ID and currentProgress are required' },
-            {
-                status: 400,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            }
-        );
-    }
+    const { skillId, currentProgress, userId } = await req.json();
 
     try {
-        const updatedEntry = await prisma.progress.update({
-            where: { id },
-            data: { currentProgress },
-        });
-        return NextResponse.json(updatedEntry, {
-            status: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      // Check if the progress entry already exists
+      const existingProgress = await prisma.progress.findUnique({
+        where: {
+          userId_skillId: {
+            userId: userId,
+            skillId: skillId,
+          },
+        },
+      });
+  
+      if (existingProgress) {
+        // If it exists, update the progress
+        const updatedProgress = await prisma.progress.update({
+          where: {
+            userId_skillId: {
+              userId: userId,
+              skillId: skillId,
             },
+          },
+          data: {
+            currentProgress: currentProgress,
+          },
         });
+        return NextResponse.json(updatedProgress);
+      } else {
+        // Create a new entry
+        const newProgress = await prisma.progress.create({
+          data: {
+            skillId: skillId,
+            userId: userId,
+            currentProgress: currentProgress,
+          },
+        });
+        return NextResponse.json(newProgress);
+      }
     } catch (error) {
-        console.error('Error updating progress:', error);
-        return NextResponse.json(
-            { error: 'Failed to update progress' },
-            {
-                status: 500,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            }
-        );
+      console.error('Error creating or updating progress:', error);
+      return NextResponse.json({ error: 'Failed to create or update progress' }, { status: 500 });
     }
-};
+  }
 
 // Handle DELETE requests
 export const DELETE = async (req: Request) => {

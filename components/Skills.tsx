@@ -34,7 +34,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
       handleSignIn;
     } else {
       // Redirect to the external link with skillName as a query parameter
-      const url = `https://chatgpt.com/g/g-kqRCHmM5H-openskills-online?skillName=${encodeURIComponent(skillName)}`;
+      const url = `https://chatgpt.com/g/g-kqRCHmM5H-openskills?skillName=${encodeURIComponent(skillName)}`;
       window.open(url, "_blank");
     }
   };

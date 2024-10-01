@@ -107,7 +107,7 @@ const ProgressPage: React.FC = () => {
                             <p className="text-base text-center w-1/4">{skill.progress}%</p>
                             <div className="flex items-center">
                                 <a
-                                    href={"https://chatgpt.com/g/g-kqRCHmM5H-openskills-online"}
+                                    href={"https://chatgpt.com/g/g-kqRCHmM5H-openskills"}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >

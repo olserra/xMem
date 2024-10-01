@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 export const POST = async (req: Request) => {
-    const { userId } = await req.json();
+    const { userId, userEmail } = await req.json();
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -15,7 +15,7 @@ export const POST = async (req: Request) => {
     // Email options
     const mailOptions = {
         from: 'olserra@gmail.com',
-        to: userId,
+        to: userEmail,
         bcc: 'olserra@gmail.com',
         subject: `Welcome! Your User ID is: ${userId}`,
         text: `Hello,\n\nThank you for completing the onboarding process!\n\nYour User ID is: ${userId}\n\nBest Regards,\nOtavio Serra\nFounder & CEO\nopenskills.online`,

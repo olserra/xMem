@@ -29,7 +29,7 @@ const Assessment: React.FC = () => {
     const [responses, setResponses] = useState<string[]>(Array(questions.length).fill(''));
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const router = useRouter();
-    const { userId } = useUser(); // Access the userId from the context
+    const { userId, userEmail } = useUser();
 
     const handleOptionSelect = (option: string) => {
         if (currentQuestion === 0) {
@@ -51,7 +51,7 @@ const Assessment: React.FC = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId }),
+            body: JSON.stringify({ userId, userEmail }),
         });
 
         if (!response.ok) {

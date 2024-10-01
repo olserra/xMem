@@ -100,35 +100,35 @@ const ProgressPage: React.FC = () => {
         fetchAvailableSkills();
     }, [skills, userId]);
 
-    const handleSkillClick = async (skill: Skill) => {
-        const existingSkill = skills.find(s => s.skillId === skill.skillId);
-        if (existingSkill) return;
+    // const handleSkillClick = async (skill: Skill) => {
+    //     const existingSkill = skills.find(s => s.skillId === skill.skillId);
+    //     if (existingSkill) return;
 
-        try {
-            const response = await fetch('/api/progress', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    skillId: skill.skillId,
-                    currentProgress: 0,
-                    userId: userId,
-                }),
-            });
+    //     try {
+    //         const response = await fetch('/api/progress', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({
+    //                 skillId: skill.skillId,
+    //                 currentProgress: 0,
+    //                 userId: userId,
+    //             }),
+    //         });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to save skill: ${response.status} ${errorText}`);
-            }
+    //         if (!response.ok) {
+    //             const errorText = await response.text();
+    //             throw new Error(`Failed to save skill: ${response.status} ${errorText}`);
+    //         }
 
-            const newSkill = { ...skill, progress: 0 };
-            setSkills((prev) => [...prev, newSkill]);
-            setAvailableSkills((prev) => prev.filter(s => s.skillId !== skill.skillId));
-        } catch (error) {
-            console.error('Error saving skill:', error);
-        }
-    };
+    //         const newSkill = { ...skill, progress: 0 };
+    //         setSkills((prev) => [...prev, newSkill]);
+    //         setAvailableSkills((prev) => prev.filter(s => s.skillId !== skill.skillId));
+    //     } catch (error) {
+    //         console.error('Error saving skill:', error);
+    //     }
+    // };
 
     const handleDeleteSkill = async (skillId: string) => {
         try {
@@ -197,7 +197,7 @@ const ProgressPage: React.FC = () => {
                 )}
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-4">
+            {/* <div className="flex flex-wrap gap-2 mt-4">
                 {availableSkills.map(skill => (
                     <button
                         key={skill.id}
@@ -207,7 +207,7 @@ const ProgressPage: React.FC = () => {
                         {skill.name}
                     </button>
                 ))}
-            </div>
+            </div> */}
             <div className="flex justify-center items-center gap-2" onClick={() => handleCopyToClipboard(userId)}>
                 <span>Copy my user ID</span>
                 <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />

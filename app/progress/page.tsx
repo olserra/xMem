@@ -198,7 +198,7 @@ const ProgressPage: React.FC = () => {
             </div>
             <div className="flex justify-center items-center gap-2" onClick={() => handleSendEmail(userId, userEmail)}>
                 <span>Copy my user ID</span>
-                <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg" size={34} />
+                <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />
             </div>
         </div>
     );

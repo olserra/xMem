@@ -1,10 +1,11 @@
 'use client';
 
-import { useSession, signIn } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // Import the useRouter hook for navigation
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skill } from '@/app/page';
 import { useState } from 'react'; // Import useState
+import { handleSignIn } from '@/app/helpers/handleSignIn';
 
 const Skills = ({ skills }: { skills: Skill[] }) => {
   const { data: session } = useSession();
@@ -30,7 +31,7 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
 
   const handleSkillClick = () => {
     if (!session) {
-      signIn();
+      handleSignIn;
     } else {
       // Redirect to the external link
       window.open("https://chatgpt.com/g/g-kqRCHmM5H-openskills-online", "_blank");

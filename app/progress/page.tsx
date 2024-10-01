@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../Context";
 import { AiFillDelete } from 'react-icons/ai';
+import { FaRegCopy } from "react-icons/fa";
+import { handleSendEmail } from "../helpers/handleSendEmail";
 
 interface Skill {
     id: string;
@@ -23,7 +25,7 @@ const Skeleton: React.FC = () => (
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
-    const { userId } = useUser();
+    const { userId, userEmail } = useUser();
     const [loading, setLoading] = useState(true); // Loading state
 
     useEffect(() => {
@@ -193,6 +195,10 @@ const ProgressPage: React.FC = () => {
                         {skill.name}
                     </button>
                 ))}
+            </div>
+            <div className="flex justify-center items-center gap-2" onClick={() => handleSendEmail(userId, userEmail)}>
+                <span>Copy my user ID</span>
+                <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg" size={34} />
             </div>
         </div>
     );

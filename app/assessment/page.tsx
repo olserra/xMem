@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '../Context';
+import { handleSendEmail } from '../helpers/handleSendEmail';
 
 interface Question {
     question: string;
@@ -45,20 +46,6 @@ const Assessment: React.FC = () => {
         }
     };
 
-    const handleAssessmentCompletion = async () => {
-        const response = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId, userEmail }),
-        });
-
-        if (!response.ok) {
-            console.error('Error sending email:', await response.text());
-        }
-    };
-
     const handleNext = async () => {
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
@@ -86,7 +73,7 @@ const Assessment: React.FC = () => {
                 console.log('Assessment submitted successfully');
 
                 // Call the function to send an email
-                await handleAssessmentCompletion();
+                await handleSendEmail(userId, userEmail);
 
                 router.push('/progress');
             } else {

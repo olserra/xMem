@@ -6,7 +6,9 @@ import { useState } from "react"; // Import useState
 import { cn } from "@/lib/utils";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { MobileNav } from "@/components/MobileNav";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { handleSignIn } from "@/app/helpers/handleSignIn";
+import { handleSignOut } from "@/app/helpers/handleSignOut";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -17,21 +19,9 @@ const Navbar = () => {
     { label: 'In-demand', href: '/in-demand' }
   ];
 
-  const handleClickSignIn = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    signIn("google", {
-      callbackUrl: "https://www.openskills.online/api/auth/callback/google",
-    });
-  };
-
-  const handleClickSignOut = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    signOut();
-  };
-
   const handleMenuItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!session) {
-      handleClickSignIn(e);
+      handleSignIn(e);
     } else {
       window.location.href = href;
     }
@@ -62,7 +52,7 @@ const Navbar = () => {
             <div className="hidden items-center space-x-4 sm:flex">
               {!session ? (
                 <>
-                  <button className="bg-black text-white text-sm py-2 px-3 rounded-lg focus:outline-none" onClick={handleClickSignIn}>
+                  <button className="bg-black text-white text-sm py-2 px-3 rounded-lg focus:outline-none" onClick={handleSignIn}>
                     Get started
                   </button>
                 </>
@@ -72,7 +62,7 @@ const Navbar = () => {
                     <p>Welcome,</p>
                     <p className="font-bold underline">{session.user?.name}</p>
                   </div>
-                  <button className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none" onClick={handleClickSignOut}>
+                  <button className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none" onClick={handleSignOut}>
                     Sign Out
                   </button>
                 </>

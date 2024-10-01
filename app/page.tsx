@@ -6,7 +6,8 @@ import Skills from "@/components/Skills";
 import SearchBar from "@/components/ui/SearchBar";
 import { useEffect, useState } from "react";
 import { skills } from "./data/skills"; // Import from the new external skills file
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { handleSignIn } from "./helpers/handleSignIn";
 
 export interface Skill {
   title: string;
@@ -23,13 +24,11 @@ export default function Home() {
     // This is where you'd fetch or update the initial skill data if needed
   }, []);
 
-  const handleChatClick = async () => {
+  const handleChatClick = () => {
     if (!session) {
-      // If not signed in, trigger Google sign-in
-      await signIn("google", { callbackUrl: "https://chatgpt.com/g/g-kqRCHmM5H-openskills-online" });
+      handleSignIn;
     } else {
-      // If signed in, redirect to the specified link
-      window.open("https://chatgpt.com/g/g-kqRCHmM5H-openskills-online", "_blank");
+      window.open("https://chatgpt.com/g/g-kqRCHmM5H-openskills", "_blank");
     }
   };
 

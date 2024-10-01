@@ -1,32 +1,24 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { buttonVariants } from "@/components/ui/button";
-import { signOut, signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { handleSignIn } from "@/app/helpers/handleSignIn";
+import { handleSignOut } from "@/app/helpers/handleSignOut";
 
 export const SideNav = ({ menuItems, setIsOpen }: any) => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const handleClickSignOut = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    signOut();
-  };
-
   const handleMenuItemClick = (href: string) => {
     if (!session) {
-      signIn("google", {
-        callbackUrl: "https://www.openskills.online/api/auth/callback/google",
-      });
+      handleSignIn;
     } else {
       router.push(href);
-      setIsOpen(false); // Close the sidebar when a menu item is clicked
+      setIsOpen(false);
     }
   };
 
   const handleGetStartedClick = () => {
-    signIn("google", {
-      callbackUrl: "https://www.openskills.online/api/auth/callback/google",
-    });
+    handleSignIn;
     setIsOpen(false); // Close the sidebar on "Get Started"
   };
 
@@ -37,7 +29,7 @@ export const SideNav = ({ menuItems, setIsOpen }: any) => {
           {session ? (
             <button
               className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none"
-              onClick={handleClickSignOut}
+              onClick={handleSignOut}
             >
               Sign Out
             </button>

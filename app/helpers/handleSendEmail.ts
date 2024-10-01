@@ -1,10 +1,10 @@
-export const handleSendEmail = async (userId : string, userEmail: string) => {
+export const handleSendEmail = async (userId : any, userEmail: any) => {
     const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, userEmail }), // Include userId and userEmail in the request body
+        body: JSON.stringify({ userId, userEmail }),
     });
 
     if (!response.ok) {

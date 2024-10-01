@@ -8,17 +8,28 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?      @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role         @default(USER)
-  skills        Skill[]      @relation("UserSkills")
-  Progress      Progress[]
-  Assessment    Assessment[]
+  role          Role           @default(USER)
+  skills        Skill[]        @relation("UserSkills")
+  progress      Progress[]
+  assessments   Assessment[]
+  knowledge     UserKnowledge? @relation("UserKnowledgeRelation")
+}
+
+model UserKnowledge {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  preferences Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation("UserKnowledgeRelation", fields: [userId], references: [id])
 }
 
 model Assessment {

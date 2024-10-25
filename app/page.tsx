@@ -3,8 +3,7 @@
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Image from "next/image";
 import Skills from "@/components/Skills";
-import SearchBar from "@/components/ui/SearchBar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { skills } from "./data/skills"; // Import from the new external skills file
 import { useSession } from "next-auth/react";
 import { handleSignIn } from "./helpers/handleSignIn";
@@ -18,7 +17,6 @@ export interface Skill {
 
 export default function Home() {
   const { data: session } = useSession(); // Get session data
-  const [filteredSkills, setFilteredSkills] = useState<Skill[]>(skills);
 
   useEffect(() => {
     // This is where you'd fetch or update the initial skill data if needed
@@ -37,24 +35,17 @@ export default function Home() {
     <>
       {/* Hero */}
       <MaxWidthWrapper className="mt-10 flex flex-col items-center justify-center text-center sm:mt-12">
-        <div className="mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
-          <button onClick={handleChatClick}>
-            <p className="cursor-pointer text-sm font-semibold text-gray-700">
-              Chat with our AI Coach
-            </p>
-          </button>
-        </div>
         <h1 className="max-w-4xl text-4xl font-bold md:text-6xl lg:text-7xl">
-          <span className="text-blue-600">Ignite your Growth</span>{" "} Master the Skills of the Future
+          <span className="text-blue-600">A personal AI Coach</span>{" "} Best way to learn DevOps
         </h1>
-
         <p className="mt-5 max-w-prose text-base text-zinc-700 sm:text-xl">
           Learn In-Demand Skills for a Brighter Future
         </p>
-        <SearchBar
-          skills={skills}
-          onFilterSkills={setFilteredSkills}
-        />
+        <button className="bg-black cursor-pointer text-white text-sm px-4 py-2 mb-3 mt-5 rounded-lg focus:outline-none" onClick={handleChatClick}>
+          <p>
+            Chat with AI Coach
+          </p>
+        </button>
       </MaxWidthWrapper>
 
       {/* Value Prop */}
@@ -72,9 +63,7 @@ export default function Home() {
               className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#0a95ff] to-[#95f2fa] opacity-30 sm:left-[calc(50%-20rem)] sm:w-[72.1875rem] sm:translate-y-8"
             />
           </div>
-
-          <Skills skills={filteredSkills} />
-
+          <Skills skills={skills} />
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"

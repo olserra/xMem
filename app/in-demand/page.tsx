@@ -15,60 +15,36 @@ interface Skill {
 const HighIncomeSkillsPage: React.FC = () => {
     const skills: Skill[] = [
         {
-            id: "software-development",
-            name: "Software Development",
-            salaryRange: "$95,000 - $115,000",
-            category: "development",
-            description: "Developing, maintaining, and improving technology systems. Skills in Python, Java, and C++ are highly valued.",
-            slug: "software-development"
+            id: "devops-engineer",
+            name: "DevOps Engineer",
+            salaryRange: "$100,000 - $130,000",
+            category: "devops",
+            description: "Integrating development and operations to improve deployment frequency and quality. Requires skills in CI/CD, cloud services, and containerization.",
+            slug: "devops-engineer"
         },
         {
-            id: "data-analysis",
-            name: "Data Analysis",
-            salaryRange: "$83,000 - $113,000",
-            category: "data",
-            description: "Analyzing data to provide insights for decision-making. Requires skills in Excel, SQL, Python, and Tableau.",
-            slug: "data-analysis"
+            id: "cloud-engineer",
+            name: "Cloud Engineer",
+            salaryRange: "$110,000 - $140,000",
+            category: "devops",
+            description: "Designing and managing cloud infrastructure and services. Proficiency in AWS, Azure, or Google Cloud is essential.",
+            slug: "cloud-engineer"
         },
         {
-            id: "ux-design",
-            name: "UX Design",
-            salaryRange: "$70,000 - $93,000",
-            category: "design",
-            description: "Focusing on user experience in product design, requiring creativity and technical skills in UI/UX design.",
-            slug: "ux-design"
+            id: "site-reliability-engineer",
+            name: "Site Reliability Engineer",
+            salaryRange: "$105,000 - $135,000",
+            category: "devops",
+            description: "Ensuring the reliability and uptime of services. Combines software engineering with systems administration.",
+            slug: "site-reliability-engineer"
         },
         {
-            id: "web-development",
-            name: "Web Development",
-            salaryRange: "$71,000 - $90,000",
-            category: "development",
-            description: "Combines software development and design. Requires knowledge in front-end, back-end, and SEO.",
-            slug: "web-development"
-        },
-        {
-            id: "project-management",
-            name: "Project Management",
-            salaryRange: "$62,000 - $94,000",
-            category: "management",
-            description: "Managing and coordinating project teams, schedules, and budgets. A vital skill in organizational leadership.",
-            slug: "project-management"
-        },
-        {
-            id: "account-management",
-            name: "Account Management",
-            salaryRange: "$63,000 - $108,000",
-            category: "sales",
-            description: "Negotiating and maintaining customer relationships. Involves using CRM tools like Salesforce.",
-            slug: "account-management"
-        },
-        {
-            id: "content-creation",
-            name: "Content Creation",
-            salaryRange: "$55,000 - $109,000",
-            category: "marketing",
-            description: "Storytelling and marketing with creativity and social perceptiveness. Often involves marketing analytics.",
-            slug: "content-creation"
+            id: "automation-engineer",
+            name: "Automation Engineer",
+            salaryRange: "$95,000 - $120,000",
+            category: "devops",
+            description: "Developing automated systems for software development and deployment processes. Requires scripting and programming skills.",
+            slug: "automation-engineer"
         }
     ];
 

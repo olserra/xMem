@@ -1,7 +1,6 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // Import the useRouter hook for navigation
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skill } from '@/app/page';
 import { useState } from 'react'; // Import useState
@@ -38,19 +37,25 @@ const Skills = ({ skills }: { skills: Skill[] }) => {
     }
   };
 
-
   return (
     <>
-      <div className="flex items-center justify-center py-6 md:px-12">
-        <div className="flex flex-col gap-6 md:flex-row flex-wrap justify-center">
+      <div className="flex items-center justify-center px-4 py-6 md:px-12">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
           {skills.slice(0, showAll ? skills.length : 10).map((skill: Skill) => (
-            <Card key={skill.title} className="flex flex-col items-center justify-center gap-2 p-6 md:flex-1">
+            <Card
+              key={skill.title}
+              className="flex flex-col items-center justify-center gap-2 p-6 cursor-pointer"
+              onClick={() => handleSkillClick(skill.title)} // Add click handler
+            >
               <CardTitle>{skill.title}</CardTitle>
               <CardDescription className="mb-3 text-center">{skill.description}</CardDescription>
               {skill.labels && skill.labels.length > 0 && (
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col gap-2 mt-2 w-full">
                   {skill.labels.map((label: string) => (
-                    <span key={label} className={`inline-block px-2 py-1 text-sm text-grey-700 ${getRandomColor()} rounded-xl`}>
+                    <span
+                      key={label}
+                      className={`inline-block px-2 py-1 text-sm text-grey-700 ${getRandomColor()} rounded-xl w-full text-center`}
+                    >
                       {label}
                     </span>
                   ))}

@@ -81,10 +81,7 @@ const Navbar = () => {
                       ) : (
                         <button
                           className="bg-black text-white text-sm p-2 rounded-lg focus:outline-none"
-                          onClick={() => {
-                            handleSignIn;
-                            setIsOpen(false); // Close the sidebar
-                          }}
+                          onClick={handleSignIn}
                         >
                           Get Started
                         </button>

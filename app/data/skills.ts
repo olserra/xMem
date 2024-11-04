@@ -1,91 +1,83 @@
 export const skills = [
     {
-        "title": "DevOps",
-        "description": "Integrate development and operations to enhance software delivery.",
-        "category": "devops",
+        "title": "Machine Learning",
+        "description": "Learn algorithms and techniques to enable computers to learn from data.",
+        "category": "ai",
+        "labels": [
+            "Intermediate",
+            "Data Science"
+        ]
+    },
+    {
+        "title": "Natural Language Processing (NLP)",
+        "description": "Understand how to process and analyze human language using AI.",
+        "labels": [
+            "Intermediate",
+            "Linguistics"
+        ]
+    },
+    {
+        "title": "Computer Vision",
+        "description": "Develop algorithms to enable computers to interpret and understand visual information.",
+        "labels": [
+            "Advanced",
+            "Image Processing"
+        ]
+    },
+    {
+        "title": "Reinforcement Learning",
+        "description": "Explore techniques where agents learn to make decisions through trial and error.",
+        "labels": [
+            "Advanced",
+            "Decision Making"
+        ]
+    },
+    {
+        "title": "AI Ethics",
+        "description": "Understand the ethical implications and responsibilities of AI development.",
         "labels": [
             "Beginner",
-            "Collaboration"
+            "Ethics"
         ]
     },
     {
-        "title": "CI/CD",
-        "description": "Implement CI/CD practices to automate software delivery.",
-        "labels": [
-            "Intermediate",
-            "Automation"
-        ]
-    },
-    {
-        "title": "Containerization",
-        "description": "Use containers (like Docker) to streamline application deployment.",
-        "labels": [
-            "Intermediate",
-            "Deployment"
-        ]
-    },
-    {
-        "title": "Infrastructure as Code (IaC)",
-        "description": "Manage infrastructure using code and automation tools.",
+        "title": "Deep Learning",
+        "description": "Utilize neural networks to tackle complex problems and improve model performance.",
         "labels": [
             "Advanced",
-            "Scalability"
+            "Neural Networks"
         ]
     },
     {
-        "title": "Monitoring and Logging",
-        "description": "Set up monitoring and logging systems to track application performance.",
-        "labels": [
-            "Intermediate",
-            "Observability"
-        ]
-    },
-    {
-        "title": "Cloud Computing",
-        "description": "Utilize cloud services effectively for application deployment.",
-        "labels": [
-            "Intermediate",
-            "Scalability"
-        ]
-    },
-    {
-        "title": "Version Control",
-        "description": "Use version control systems (like Git) effectively.",
+        "title": "Data Preprocessing",
+        "description": "Learn techniques to prepare and clean data for effective AI modeling.",
         "labels": [
             "Beginner",
-            "Collaboration"
+            "Data Management"
         ]
     },
     {
-        "title": "Microservices Architecture",
-        "description": "Design and implement applications using microservices architecture.",
+        "title": "Prompt Engineering",
+        "description": "Develop skills in crafting effective prompts for AI language models.",
+        "labels": [
+            "Intermediate",
+            "AI Interaction"
+        ]
+    },
+    {
+        "title": "AI Model Evaluation",
+        "description": "Understand methods to evaluate and improve AI model performance.",
+        "labels": [
+            "Intermediate",
+            "Modeling"
+        ]
+    },
+    {
+        "title": "Generative AI",
+        "description": "Learn about models that can generate new content, such as text and images.",
         "labels": [
             "Advanced",
-            "Scalability"
-        ]
-    },
-    {
-        "title": "Configuration Management",
-        "description": "Manage and maintain system configurations using tools like Ansible or Chef.",
-        "labels": [
-            "Advanced",
-            "Automation"
-        ]
-    },
-    {
-        "title": "Networking Fundamentals",
-        "description": "Understand the basics of networking for better deployment strategies.",
-        "labels": [
-            "Beginner",
-            "Foundational"
-        ]
-    },
-    {
-        "title": "Security Practices",
-        "description": "Implement security best practices in DevOps processes.",
-        "labels": [
-            "Advanced",
-            "Risk Management"
+            "Creativity"
         ]
     }
 ];

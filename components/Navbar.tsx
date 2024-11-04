@@ -22,6 +22,7 @@ const Navbar = () => {
 
   const menuItems = [
     { label: 'Dashboard', href: '/progress' },
+    { label: 'Skills', href: '/skills' },
   ];
 
   // Handle menu item click: If no session, sign in; else navigate to the page

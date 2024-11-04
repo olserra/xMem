@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../Context";
 import { AiFillDelete } from 'react-icons/ai';
-import { FaRegCopy } from "react-icons/fa";
+import { FaRegCopy, FaCheck } from "react-icons/fa";
 
 interface Skill {
     id: string;
@@ -21,22 +21,25 @@ const Skeleton: React.FC = () => (
     </div>
 );
 
-const handleCopyToClipboard = (userId: any) => {
+const handleCopyToClipboard = (userId: any, setCopied: (value: boolean) => void) => {
     navigator.clipboard.writeText(userId)
         .then(() => {
             console.log('User ID copied to clipboard:', userId);
-            // Optionally show a success message or toast notification
+            setCopied(true); // Set copied state to true
+
+            // Reset copied state after 5 seconds
+            setTimeout(() => setCopied(false), 5000);
         })
         .catch(err => {
             console.error('Failed to copy user ID:', err);
         });
 };
 
-
 const ProgressPage: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
     const { userId, userEmail } = useUser();
     const [loading, setLoading] = useState(true); // Loading state
+    const [copied, setCopied] = useState(false); // State to track copy status
 
     useEffect(() => {
         const fetchUserSkills = async () => {
@@ -116,7 +119,6 @@ const ProgressPage: React.FC = () => {
                                     >
                                         {skill.progress > 0 ? 'Resume' : 'Start'}
                                     </button>
-
                                 </a>
                                 <button
                                     className="ml-2 text-grey-500"
@@ -131,9 +133,16 @@ const ProgressPage: React.FC = () => {
                 )}
             </div>
 
-            <div className="flex justify-center items-center gap-2" onClick={() => handleCopyToClipboard(userId)}>
+            <div className="flex justify-center items-center gap-2" onClick={() => handleCopyToClipboard(userId, setCopied)}>
                 <span>Copy my user ID</span>
-                <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />
+                {copied ? (
+                    <div className="flex items-center">
+                        <FaCheck className="text-green-500 p-1 border border-green-500 rounded-lg" size={24} />
+                        <span className="text-green-500 ml-2">Copied</span>
+                    </div>
+                ) : (
+                    <FaRegCopy className="text-gray-500 p-1 border border-gray-500 rounded-lg cursor-pointer" size={34} />
+                )}
             </div>
         </div>
     );

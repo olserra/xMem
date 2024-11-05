@@ -4,29 +4,19 @@ import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { handleSignIn } from '@/app/helpers/handleSignIn';
 import { skills } from '../data/skills';
+import { useRouter } from 'next/navigation';
 
-// Define the Skill interface
-interface Skill {
-  title: string;
-  description: string;
-  labels: string[];
-}
-
-interface SkillsProps {
-  skills: Skill[];
-}
-
-const Skills: React.FC<SkillsProps> = () => {
+const Skills = () => {
   const { data: session } = useSession();
   const [showAll, setShowAll] = useState(false);
+  const router = useRouter(); // Initialize router
 
   // Function to handle skill click
   const handleSkillClick = (skillName: string) => {
     if (!session) {
       handleSignIn;
     } else {
-      const url = `https://chatgpt.com/g/g-kqRCHmM5H-openskills?skillName=${encodeURIComponent(skillName)}`;
-      window.open(url, "_blank");
+      router.push(`/quiz?skillName=${encodeURIComponent(skillName)}`);
     }
   };
 

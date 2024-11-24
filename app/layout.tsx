@@ -9,7 +9,7 @@ import SessionWrapper from '../components/SessionWrapper';
 import { UserProvider } from "./Context";
 
 export const metadata: Metadata = {
-  title: "OpenSkills | Learn the in-demand skills",
+  title: "xmem | Learn the in-demand skills",
   description: "Learn the in-demand skills",
 };
 

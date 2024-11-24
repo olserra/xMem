@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto w-full max-w-screen-xl p-6 md:py-8">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <span className="text-2xl font-semibold">OpenSkills</span>
+            <span className="text-2xl font-semibold">xmem</span>
           </Link>
           <Link href="/privacy-policy">
             <span className="cursor-pointer underline">Privacy Policy</span>
@@ -20,7 +20,7 @@ export default function Footer() {
             href="https://tryconvo.vercel.app/"
             className="hover:underline"
           >
-            OpenSkills
+            xmem
           </a>
           . All Rights Reserved.
         </span>

@@ -8,65 +8,14 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?        @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role           @default(USER)
-  skills        Skill[]        @relation("UserSkills") // Relation to Skills
-  progress      Progress[] // Tracks user's progress on skills
-  assessments   Assessment[] // Stores assessments taken by the user
-  knowledge     UserKnowledge? @relation("UserKnowledgeRelation")
-  quizzes       Quiz[] // Track quizzes completed by the user
-}
-
-model UserKnowledge {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  preferences Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation("UserKnowledgeRelation", fields: [userId], references: [id])
-}
-
-model Assessment {
-  id        String   @id @default(cuid())
-  userId    String // Foreign key to the User model
-  data      Json // Store the assessment data as JSON
-  createdAt DateTime @default(now()) // Timestamp for when the assessment was created
-  updatedAt DateTime @updatedAt // Timestamp for the last update
-
-  user User @relation(fields: [userId], references: [id]) // Relation to User
-}
-
-model Skill {
-  id          Int      @id @default(autoincrement()) // Change to Int and auto-increment
-  name        String   @unique
-  description String?
-  category    String?
-  labels      String[]
-  quizzes     Quiz[] // Relation to quizzes
-  createdAt   DateTime @default(now())
-
-  users    User[]     @relation("UserSkills") // Add this relation to User
-  Progress Progress[]
-}
-
-model Progress {
-  id              String   @id @default(cuid())
-  skillId         Int // Change skillId to Int
-  userId          String
-  currentProgress Int // Current progress percentage
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt // Automatically set to current timestamp on update
-  user            User     @relation(fields: [userId], references: [id])
-  skill           Skill    @relation(fields: [skillId], references: [id])
-
-  @@unique([userId, skillId]) // Unique constraint
+  role          Role      @default(USER)
 }
 
 model Account {
@@ -105,20 +54,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Quiz {
-  id             String   @id @default(cuid())
-  userId         String
-  name           String   @default("Unnamed Quiz") // Set a default value
-  skillId        Int
-  score          Int
-  totalQuestions Int
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user  User  @relation(fields: [userId], references: [id])
-  skill Skill @relation(fields: [skillId], references: [id])
 }
 
 enum Role {

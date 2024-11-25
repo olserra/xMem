@@ -65,7 +65,7 @@ export default function Home() {
               <LuBrainCircuit className="text-gray-600 text-4xl mb-4 md:text-5xl" />
               <h3 className="text-lg font-semibold">Digital Memory</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
-                Own and control your memories like a wallet that works like Web3 for your data.
+                Own and control your data. Start LLM interactions with the context you need.
               </p>
             </div>
             {/* Step 3 */}

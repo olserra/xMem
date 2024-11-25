@@ -42,7 +42,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="mt-10 px-4 flex flex-col items-center justify-center text-center sm:mt-12">
         <h1 className="max-w-4xl text-3xl font-bold sm:text-4xl md:text-6xl lg:text-7xl">
-          <span className="font-light">Preserve and access</span> your digital memories
+          Persist memory and context<span className="font-light"> across LLMs</span>
         </h1>
         <p className="mt-5 max-w-prose text-sm text-zinc-700 sm:text-base md:text-xl">
           Join us in building a smarter way to store and connect your memories for the future.

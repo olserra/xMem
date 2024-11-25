@@ -9,16 +9,16 @@ import SessionWrapper from '../components/SessionWrapper';
 import { UserProvider } from "./Context";
 
 export const metadata: Metadata = {
-  title: "xmem | Preserve and access your digital memories",
-  description: "Preserve and access your digital memories",
+  title: "xmem | Persist memory and context across LLMs",
+  description: "Persist memory and context across LLMs",
   openGraph: {
-    title: "xmem | Preserve and access your digital memories",
-    description: "Preserve and access your digital memories with ease. xmem empowers you to store, manage, and connect your memories securely.",
+    title: "xmem | Persist memory and context across LLMs",
+    description: "Persist memory and context across LLMs with ease. xmem empowers you to store, manage, and connect your memories securely.",
     url: "https://xmem.digital",
     images: [
       {
         url: "/logo.jpg",
-        width: 1200, 
+        width: 1200,
         height: 630,
         alt: "xmem Logo",
       },
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "xmem | Preserve and access your digital memories",
-    description: "Preserve and access your digital memories with ease. xmem empowers you to store, manage, and connect your memories securely.",
+    title: "xmem | Persist memory and context across LLMs",
+    description: "Persist memory and context across LLMs with ease. xmem empowers you to store, manage, and connect your memories securely.",
     images: ["/logo.jpg"],
   },
 };

@@ -28,9 +28,6 @@
       "@/components/*": [
         "components/*"
       ],
-      "@/prisma/*": [
-        "prisma/*"
-      ],
       "@/lib/*": [
         "lib/*"
       ],

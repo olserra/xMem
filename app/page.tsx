@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FaDatabase, FaSync, FaUserShield, FaSearch, FaBrain } from "react-icons/fa";
 import { AiOutlineApi } from "react-icons/ai";
 
-
 export default function Home() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -49,43 +48,11 @@ export default function Home() {
           Empower your organization with organized, accessible, and secure data management solutions.
         </p>
 
-        {/* How It Works Section */}
-        <div className="my-16 md:my-24 flex flex-col items-center text-center">
-          <h2 className="text-xl font-bold mb-8 sm:text-2xl">How It Works</h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 w-full max-w-4xl">
-            {/* Step 1 */}
-            <div className="flex flex-col items-center">
-              <FaDatabase className="text-gray-600 text-4xl mb-4 md:text-5xl" />
-              <h3 className="text-lg font-semibold">Centralized Knowledge Management</h3>
-              <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
-                Organize, store, and retrieve your company’s documentation, best practices, and critical information through our intuitive platform.
-              </p>
-            </div>
-            {/* Step 2 */}
-            <div className="flex flex-col items-center">
-              <AiOutlineApi className="text-gray-600 text-4xl mb-4 md:text-5xl" />
-              <h3 className="text-lg font-semibold">Robust API Access and Integration</h3>
-              <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
-                Seamlessly integrate your existing tools and platforms with xmem.xyz through our comprehensive API.
-              </p>
-            </div>
-            {/* Step 3 */}
-            <div className="flex flex-col items-center">
-              <FaSync className="text-gray-600 text-4xl mb-4 md:text-5xl" />
-              <h3 className="text-lg font-semibold">Real-Time Data Synchronization</h3>
-              <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
-                Ensure that all teams are working with the latest information through instant data syncing across platforms.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Key Features Section */}
-        <div className="my-16 md:my-24 flex flex-col items-center text-center">
-          <h2 className="text-xl font-bold mb-8 sm:text-2xl">Key Features</h2>
+        <div className="my-16 md:my-24 flex flex-col items-center text-center w-full">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-3 w-full max-w-6xl">
             {/* Feature 1: Centralized Data Repository */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <FaDatabase className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">Centralized Data Repository</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -93,7 +60,7 @@ export default function Home() {
               </p>
             </div>
             {/* Feature 2: Robust API Access and Integration */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <AiOutlineApi className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">Robust API Access and Integration</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -101,7 +68,7 @@ export default function Home() {
               </p>
             </div>
             {/* Feature 3: Real-Time Data Synchronization */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <FaSync className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">Real-Time Data Synchronization</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -109,7 +76,7 @@ export default function Home() {
               </p>
             </div>
             {/* Feature 4: Role-Based Access Control (RBAC) */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <FaUserShield className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">Role-Based Access Control</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -117,7 +84,7 @@ export default function Home() {
               </p>
             </div>
             {/* Feature 5: Advanced Search and Intelligent Retrieval */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <FaSearch className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">Advanced Search and Intelligent Retrieval</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -125,7 +92,7 @@ export default function Home() {
               </p>
             </div>
             {/* Feature 6: AI and LLM Integration */}
-            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm">
+            <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition duration-200">
               <FaBrain className="text-gray-600 text-3xl mb-4" />
               <h3 className="text-lg font-semibold">AI and LLM Integration</h3>
               <p className="mt-2 text-xs text-zinc-600 sm:text-sm">
@@ -138,6 +105,7 @@ export default function Home() {
         {/* Email Collection Form */}
         {!submitted ? (
           <form
+            id="email-form"
             onSubmit={handleSubmit}
             className="mt-10 flex flex-col items-center space-y-3 w-full px-4"
           >

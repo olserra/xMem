@@ -9,11 +9,11 @@ import SessionWrapper from '../components/SessionWrapper';
 import { UserProvider } from "./Context";
 
 export const metadata: Metadata = {
-  title: "xmem | Persist memory and context across LLMs",
-  description: "Persist memory and context across LLMs",
+  title: "xmem | Streamline Knowledge Sharing Across Teams",
+  description: "Streamline Knowledge Sharing Across Teams",
   openGraph: {
-    title: "xmem | Persist memory and context across LLMs",
-    description: "Persist memory and context across LLMs with ease. xmem empowers you to store, manage, and connect your memories securely.",
+    title: "xmem | Streamline Knowledge Sharing Across Teams",
+    description: "Streamline Knowledge Sharing Across Teams with ease. xmem empowers you to store, manage, and share your data securely and smartly.",
     url: "https://xmem.digital",
     images: [
       {
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "xmem | Persist memory and context across LLMs",
-    description: "Persist memory and context across LLMs with ease. xmem empowers you to store, manage, and connect your memories securely.",
+    title: "xmem | Streamline Knowledge Sharing Across Teams",
+    description: "Streamline Knowledge Sharing Across Teams with ease. xmem empowers you to store, manage, and share your data securely and smartly.",
     images: ["/logo.jpg"],
   },
 };

@@ -1,0 +1,46 @@
+import { NextResponse } from 'next/server';
+
+// Fetch and store user entries (GET and POST requests)
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+        return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    try {
+        const entries = await prisma.userData.findMany({
+            where: { userId },
+        });
+        return NextResponse.json(entries);
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 });
+    }
+}
+
+export async function POST(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    const { text, labels } = await req.json();  // Receive text and labels
+
+    if (!userId) {
+        return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    if (!text || !labels || labels.length < 3) {
+        return NextResponse.json({ error: 'Entry text and at least 3 labels are required' }, { status: 400 });
+    }
+
+    try {
+        const newEntry = await prisma.userData.create({
+            data: {
+                userId,
+                data: { text, labels },   // Store the text and labels in a JSON field
+            },
+        });
+        return NextResponse.json(newEntry, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to create entry' }, { status: 500 });
+    }
+}

@@ -75,17 +75,17 @@ const Navbar = () => {
                       {/* Render mobile menu items */}
                       <div className="flex flex-col">
                         {session && menuItems.map((item) => (
-                          <menuitem
+                          <button
                             key={item.label}
                             onClick={(e) => {
-                              e.preventDefault(); // Prevent default button behavior
-                              handleMenuItemClick(session, e, item.href); // Call your custom click handler
+                              e.preventDefault();
+                              handleMenuItemClick(session, e, item.href);
                             }}
                             className="uppercase text-black text-sm p-2 hover:bg-gray-200 rounded-lg cursor-pointer"
-                            style={{ background: 'none', border: 'none', padding: 0 }} // Optional: Style to remove button default styles
+                            style={{ background: 'none', border: 'none', padding: 0 }}
                           >
                             {item.label}
-                          </menuitem>
+                          </button>
                         ))}
                       </div>
                     </div>

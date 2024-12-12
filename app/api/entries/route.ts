@@ -44,3 +44,57 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Failed to create entry' }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    const entryId = searchParams.get("entryId");
+
+    if (!userId || !entryId) {
+        return NextResponse.json({ error: 'User ID and Entry ID are required' }, { status: 400 });
+    }
+
+    try {
+        // Delete the entry by userId and entryId
+        const deletedEntry = await prisma.userData.delete({
+            where: {
+                id: entryId,
+                userId: userId,
+            },
+        });
+        return NextResponse.json(deletedEntry, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to delete entry' }, { status: 500 });
+    }
+}
+
+export async function PUT(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    const entryId = searchParams.get("entryId");
+    const { text, labels } = await req.json();
+
+    if (!userId || !entryId) {
+        return NextResponse.json({ error: 'User ID and Entry ID are required' }, { status: 400 });
+    }
+
+    if (!text || !labels || labels.length < 3) {
+        return NextResponse.json({ error: 'Entry text and at least 3 labels are required' }, { status: 400 });
+    }
+
+    try {
+        // Update the entry by userId and entryId
+        const updatedEntry = await prisma.userData.update({
+            where: {
+                id: entryId,
+                userId: userId,
+            },
+            data: {
+                data: { text, labels },   // Update the text and labels in the JSON field
+            },
+        });
+        return NextResponse.json(updatedEntry, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
+    }
+}

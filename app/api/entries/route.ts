@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/prisma/prisma';
 
 // Fetch and store user entries (GET and POST requests)
 export async function GET(req: Request) {

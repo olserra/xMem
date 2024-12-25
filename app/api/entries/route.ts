@@ -23,21 +23,21 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
-    const { text, labels } = await req.json();  // Receive text and labels
+    const { text, tags } = await req.json();  // Receive text and tags
 
     if (!userId) {
         return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    if (!text || !labels || labels.length < 3) {
-        return NextResponse.json({ error: 'Entry text and at least 3 labels are required' }, { status: 400 });
+    if (!text || !tags || tags.length < 3) {
+        return NextResponse.json({ error: 'Entry text and at least 3 tags are required' }, { status: 400 });
     }
 
     try {
         const newEntry = await prisma.userData.create({
             data: {
                 userId,
-                data: { text, labels },   // Store the text and labels in a JSON field
+                data: { text, tags },   // Store the text and tags in a JSON field
             },
         });
         return NextResponse.json(newEntry, { status: 201 });
@@ -73,14 +73,14 @@ export async function PUT(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const entryId = searchParams.get("entryId");
-    const { text, labels } = await req.json();
+    const { text, tags } = await req.json();
 
     if (!userId || !entryId) {
         return NextResponse.json({ error: 'User ID and Entry ID are required' }, { status: 400 });
     }
 
-    if (!text || !labels || labels.length < 3) {
-        return NextResponse.json({ error: 'Entry text and at least 3 labels are required' }, { status: 400 });
+    if (!text || !tags || tags.length < 3) {
+        return NextResponse.json({ error: 'Entry text and at least 3 tags are required' }, { status: 400 });
     }
 
     try {
@@ -91,7 +91,7 @@ export async function PUT(req: Request) {
                 userId: userId,
             },
             data: {
-                data: { text, labels },   // Update the text and labels in the JSON field
+                data: { text, tags },   // Update the text and tags in the JSON field
             },
         });
         return NextResponse.json(updatedEntry, { status: 200 });

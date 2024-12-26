@@ -54,7 +54,7 @@ const Dashboard = () => {
                     setEntries([]);
                 }
             } catch (err) {
-                setError("Failed to fetch entries");
+                setError("Failed to fetch entries. Please try again.");
                 setEntries([]);
             } finally {
                 setLoading(false);
@@ -62,7 +62,7 @@ const Dashboard = () => {
         };
 
         fetchEntries();
-    }, [session, status, userId]); // Re-fetch entries when session changes
+    }, [session, status, userId]);
 
     const handleCopyToClipboard = () => {
         const allUserData = JSON.stringify(entries);
@@ -94,22 +94,12 @@ const Dashboard = () => {
             }
 
             const newEntryData = await response.json();
-            console.log("New entry created:", newEntryData); // Debugging log
-
-            // Add the new entry to the existing entries array in the state
             setEntries(prevEntries => [...prevEntries, newEntryData]);
-
-            // Reset fields after submission
             setNewEntry("");
             setSelectedTags([]);
             setError(null);
-
         } catch (err) {
-            if (err instanceof Error) {
-                setError(`Failed to create a new entry: ${err.message}`);
-            } else {
-                setError("Failed to create a new entry");
-            }
+            setError("Failed to create a new entry. Please try again.");
         }
     };
 
@@ -118,7 +108,7 @@ const Dashboard = () => {
             const response = await fetch(`/api/entries?userId=${userId}&entryId=${id}`, { method: "DELETE" });
 
             if (response.ok) {
-                setEntries(entries.filter(entry => entry.id !== id)); // Directly update the state to remove the entry
+                setEntries(entries.filter(entry => entry.id !== id));
             } else {
                 setError("Failed to delete entry.");
             }
@@ -204,6 +194,7 @@ const Dashboard = () => {
                                     key={index}
                                     onClick={() => handleTagToggle(tag)}
                                     className={`px-3 py-1 text-sm font-medium rounded-full cursor-pointer ${selectedTags.includes(tag) ? 'bg-black text-white' : 'bg-gray-300 text-black'}`}
+                                    title={`Tag: ${tag}`} // Add tooltip for each tag
                                 >
                                     {tag}
                                 </span>
@@ -211,7 +202,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="flex justify-between mt-2">
-                        <span>{editEntryId ? editText.length : newEntry.length} / {editEntryId ? 1000 : 280}</span> {/* Unlimited text for new entry */}
                         <button
                             onClick={editEntryId ? handleUpdateEntry : handleNewEntrySubmit}
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg"

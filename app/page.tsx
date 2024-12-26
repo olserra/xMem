@@ -122,7 +122,7 @@ export default function Home() {
               alt="screenshot"
               width={1200}
               height={800}
-              className="p-12 border rounded-lg overflow-hidden w-full h-full object-cover"
+              className="p-8 border rounded-lg overflow-hidden w-full h-full object-cover"
             />
           </div>
 
@@ -168,7 +168,7 @@ export default function Home() {
               </div>
 
               {/* Input Field 3 (end) - With fake typing animation */}
-              <div className="flex items-center justify-center text-center w-full max-w-lg"> {/* Same width as Input 2 */}
+              <div className="flex items-center justify-center text-center w-full max-w-xl"> {/* Same width as Input 2 */}
                 <TypeAnimation
                   sequence={[
                     'Remember that I prefer concise answers', // Typing the sentence

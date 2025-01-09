@@ -1,6 +1,6 @@
 'use client'; // Ensure this is a Client Component
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface UserContextType {
@@ -19,8 +19,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const userEmail = session?.user?.email || null;
     const userName = session?.user?.name || null;
 
+    const userValue = useMemo(() => ({ userId, userEmail, userName }), [userId, userEmail, userName]);
+
     return (
-        <UserContext.Provider value={{ userId, userEmail, userName }}>
+        <UserContext.Provider value={userValue}>
             {children}
         </UserContext.Provider>
     );

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { FaDatabase, FaSync, FaUserShield, FaSearch, FaBrain } from "react-icons/fa";
 import { AiOutlineApi } from "react-icons/ai";
+import Image from "next/image";
+import IMG1 from "@/public/home1.png";
+import { TypeAnimation } from 'react-type-animation';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -40,9 +43,9 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <div className="mt-10 px-4 flex flex-col items-center justify-center text-center sm:mt-12">
+      <div className="mt-10 px-4 md:px-12 flex flex-col items-center justify-center text-center sm:mt-12">
         <h1 className="max-w-4xl text-3xl font-bold sm:text-4xl md:text-6xl lg:text-7xl">
-          Streamline Knowledge <span className="font-light"> Sharing Across Teams</span>
+          Share Data <span className="font-light"> Across Platforms and LLMs</span>
         </h1>
         <p className="mt-5 max-w-prose text-sm text-zinc-700 sm:text-base md:text-xl">
           Empower your organization with organized, accessible, and secure data management solutions.
@@ -102,6 +105,96 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Screenshot with Animated Components Around */}
+        <div className="w-full relative p-6 group">
+          {/* Animated left and right lines for mobile */}
+          <div className="absolute top-0 left-0 h-full w-[4px] bg-gray-600 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-[10px] transition-all duration-300 ease-in-out sm:w-[2px] sm:group-hover:translate-x-[5px]"></div>
+          <div className="absolute top-0 right-0 h-full w-[4px] bg-gray-600 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-[-10px] transition-all duration-300 ease-in-out sm:w-[2px] sm:group-hover:translate-x-[-5px]"></div>
+
+          {/* Animated top and bottom lines */}
+          <div className="absolute top-0 left-0 w-full h-[4px] bg-gray-600 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-[10px] transition-all duration-300 ease-in-out sm:h-[2px] sm:group-hover:translate-y-[5px]"></div>
+          <div className="absolute bottom-0 left-0 w-full h-[4px] bg-gray-600 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-[-10px] transition-all duration-300 ease-in-out sm:h-[2px] sm:group-hover:translate-y-[-5px]"></div>
+
+          {/* Main Screenshot Image Container */}
+          <div className="w-full h-[600px] bg-black rounded-lg overflow-hidden relative shadow-lg sm:h-[400px]">
+            <Image
+              src={IMG1}
+              alt="screenshot"
+              width={1200}
+              height={800}
+              className="p-8 border rounded-lg overflow-hidden w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Animated circles around the image */}
+          <div className="absolute top-10 left-10 w-16 h-16 rounded-full bg-gray-600 opacity-0 group-hover:opacity-50 animate-pulse sm:w-12 sm:h-12 sm:top-6 sm:left-6"></div>
+          <div className="absolute top-20 right-10 w-16 h-16 rounded-full bg-gray-600 opacity-0 group-hover:opacity-50 animate-pulse sm:w-12 sm:h-12 sm:top-10 sm:right-6"></div>
+          <div className="absolute bottom-20 left-20 w-16 h-16 rounded-full bg-gray-600 opacity-0 group-hover:opacity-50 animate-pulse sm:w-12 sm:h-12 sm:bottom-10 sm:left-6"></div>
+        </div>
+
+        {/* Memory Persistence Examples */}
+        <div className="w-full py-24 mx-12 bg-white mt-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold text-gray-800">
+              Memory Persistence Examples
+            </h2>
+            <p className="text-gray-600 mt-4">
+              Here are some examples of what could be remembered in a memory persistence system.
+            </p>
+          </div>
+
+          {/* Black Border with Animation */}
+          <div className="relative p-4 border-4 border-black rounded-lg overflow-hidden transition-all duration-500 hover:border-gray-800">
+            {/* Input fields section - Horizontal layout */}
+            <div className="flex flex-col gap-4 justify-between p-6 w-full">
+              {/* Input Field 1 (start) */}
+              <div className="w-full max-w-md">
+                <input
+                  type="text"
+                  value="Please do not provide comments on my code"
+                  readOnly
+                  className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 hover:bg-gray-100 text-lg" // Same text size
+                />
+              </div>
+
+              {/* Input Field 2 (middle) */}
+              <div className="w-full max-w-lg">
+                <input
+                  type="text"
+                  value="Always use marketing best practices when we are talking about product and marketing"
+                  readOnly
+                  className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 hover:bg-gray-100 text-lg" // Same text size
+                />
+              </div>
+
+              {/* Input Field 3 (end) - With fake typing animation */}
+              <div className="flex items-center justify-center text-center w-full max-w-xl"> {/* Same width as Input 2 */}
+                <TypeAnimation
+                  sequence={[
+                    'Remember that I prefer concise answers', // Typing the sentence
+                    2000, // Wait for 2 seconds after typing
+                    () => {
+                      console.log('Typing sequence completed');
+                    },
+                  ]}
+                  wrapper="span"
+                  cursor={true}
+                  repeat={Infinity}
+                  style={{
+                    fontSize: '1.25rem', // Ensures consistent text size
+                    display: 'inline-block',
+                    fontFamily: 'Arial, sans-serif',
+                    padding: '4px',
+                    width: '100%', // Ensures full width
+                    height: '56px', // Set a fixed height to match Input 2
+                  }}
+                  className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 hover:bg-gray-100 text-lg" // Same text size
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Email Collection Form */}
         {!submitted ? (
           <form
@@ -133,7 +226,7 @@ export default function Home() {
             Thank you! We’ll let you know when we’re ready to launch.
           </p>
         )}
-      </div>
+      </div >
     </>
   );
 }

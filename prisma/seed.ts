@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 async function main() {
     const userId = 'cm4lkdkwo000j64yrz2rpx35o'; // User ID for Otávio Serra
 
-    // Data for seeding, where each paragraph becomes a post
-    const posts = [
+    // Data for seeding, where each paragraph becomes a memory entry
+    const memories = [
         {
             text: "O usuário está desenvolvendo um projeto chamado Storyplay.xyz, que visa impactar crianças e seus pais por meio de uma plataforma de histórias personalizadas, com o objetivo de abordar temas relevantes como mudanças climáticas e habilidades como pensamento crítico. O projeto contará com uma base científica e psicológica, e a inclusão de psicólogos e PhDs em ciência cognitiva e educação para ajudar a criar a metodologia. Além disso, a plataforma terá avatares de personagens e recompensas como badges para as crianças, com elementos de gamificação e integrações entre o mundo físico e virtual, incluindo possíveis recursos em AR/VR no futuro. O projeto está no início e busca um modelo de negócio B2C e B2B, com foco em impacto educacional e psicológico.",
             labels: ["Projeto Educacional", "Gamificação", "Mudanças Climáticas"]
@@ -113,15 +113,15 @@ async function main() {
         },
     ];
 
-    // Seed UserData
-    for (const post of posts) {
+    // Seed Memory
+    for (const memory of memories) {
         try {
-            await prisma.userData.create({
+            await prisma.memory.create({
                 data: {
                     userId: userId,
                     data: {
-                        text: post.text,
-                        labels: post.labels,
+                        text: memory.text,
+                        labels: memory.labels,
                     },
                 },
             });

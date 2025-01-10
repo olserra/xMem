@@ -8,21 +8,21 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role       @default(USER)
-  data          UserData[] // Relation to UserData, which stores all entries
+  role          Role      @default(USER)
+  data          Memory[] // Relation to Memory, which stores all memories
 }
 
-model UserData {
+model Memory {
   id        String   @id @default(cuid())
   userId    String   @map("user_id")
-  data      Json // Stores the entry (text) and labels (array of strings)
+  data      Json // Stores the memory content (e.g., text, metadata)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -6,8 +6,8 @@ import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { useUser } from "../Context";
 
-// Define interfaces for the label and entry state
-interface Entry {
+// Define interfaces for the label and memory state
+interface Memory {
     id: string;
     data: {
         text: string;
@@ -20,13 +20,13 @@ interface Entry {
 const Dashboard = () => {
     const { userId } = useUser();
     const { data: session, status } = useSession();
-    const [newEntry, setNewEntry] = useState<string>("");
+    const [newMemory, setNewMemory] = useState<string>("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [entries, setEntries] = useState<Entry[]>([]);
+    const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [filterLabel, setFilterLabel] = useState<string>("");
-    const [editEntryId, setEditEntryId] = useState<string | null>(null);
+    const [editMemoryId, setEditMemoryId] = useState<string | null>(null);
     const [editText, setEditText] = useState<string>("");
     const [editTags, setEditTags] = useState<string[]>([]);
 
@@ -42,38 +42,38 @@ const Dashboard = () => {
     useEffect(() => {
         if (!session || status !== "authenticated") return;
 
-        const fetchEntries = async () => {
+        const fetchMemory = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`/api/entries?userId=${userId}`);
+                const response = await fetch(`/api/memory?userId=${userId}`);
                 const data = await response.json();
 
                 if (Array.isArray(data)) {
-                    setEntries(data); // Set entries when fetched
+                    setMemory(data); // Set memories when fetched
                 } else {
-                    setEntries([]);
+                    setMemory([]);
                 }
             } catch (err) {
-                setError("Failed to fetch entries. Please try again.");
-                setEntries([]);
+                setError("Failed to fetch memory. Please try again.");
+                setMemory([]);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchEntries();
+        fetchMemory();
     }, [session, status, userId]);
 
     const handleCopyToClipboard = () => {
-        const allUserData = JSON.stringify(entries);
-        navigator.clipboard.writeText(allUserData)
+        const allUserMemory = JSON.stringify(memory);
+        navigator.clipboard.writeText(allUserMemory)
             .then(() => console.log('User data copied to clipboard'))
             .catch(err => console.error('Failed to copy user data:', err));
     };
 
-    const handleNewEntrySubmit = async () => {
-        if (newEntry.length === 0) {
-            setError("Entry cannot be empty.");
+    const handleNewMemorySubmit = async () => {
+        if (newMemory.length === 0) {
+            setError("Memory cannot be empty.");
             return;
         }
 
@@ -83,51 +83,51 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch(`/api/entries?userId=${userId}`, {
+            const response: Response = await fetch(`/api/memory?userId=${userId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: newEntry, tags: selectedTags }),
+                body: JSON.stringify({ text: newMemory, tags: selectedTags }),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to create a new entry");
+                throw new Error("Failed to create a new memory");
             }
 
-            const newEntryData = await response.json();
-            setEntries(prevEntries => [...prevEntries, newEntryData]);
-            setNewEntry("");
+            const newMemoryData = await response.json();
+            setMemory(prevMemory => [...prevMemory, newMemoryData]);
+            setNewMemory("");
             setSelectedTags([]);
             setError(null);
         } catch (err) {
-            setError("Failed to create a new entry. Please try again.");
+            setError("Failed to create a new memory. Please try again.");
         }
     };
 
-    const handleDeleteEntry = async (id: string) => {
+    const handleDeleteMemory = async (id: string) => {
         try {
-            const response = await fetch(`/api/entries?userId=${userId}&entryId=${id}`, { method: "DELETE" });
+            const response = await fetch(`/api/memory?userId=${userId}&memoryId=${id}`, { method: "DELETE" });
 
             if (response.ok) {
-                setEntries(entries.filter(entry => entry.id !== id));
+                setMemory(memory.filter(memory => memory.id !== id));
             } else {
-                setError("Failed to delete entry.");
+                setError("Failed to delete memory.");
             }
         } catch (err) {
-            setError("Failed to delete entry.");
+            setError("Failed to delete memory.");
         }
     };
 
-    const handleEditEntry = (entry: Entry) => {
-        setEditEntryId(entry.id);
-        setEditText(entry.data.text);
-        setEditTags(entry.data.tags);
-        setNewEntry("");
+    const handleEditMemory = (memory: Memory) => {
+        setEditMemoryId(memory.id);
+        setEditText(memory.data.text);
+        setEditTags(memory.data.tags);
+        setNewMemory("");
         setSelectedTags([]);
     };
 
-    const handleUpdateEntry = async () => {
+    const handleUpdateMemory = async () => {
         if (editText.length === 0) {
-            setError("Entry cannot be empty.");
+            setError("Memory cannot be empty.");
             return;
         }
 
@@ -137,32 +137,32 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch(`/api/entries?userId=${userId}&entryId=${editEntryId}`, {
+            const response = await fetch(`/api/memories?userId=${userId}&memoryId=${editMemoryId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: editText, tags: editTags }),
             });
 
             if (response.ok) {
-                const updatedEntry = await response.json();
-                setEntries(entries.map(entry => entry.id === editEntryId ? updatedEntry : entry));
-                setEditEntryId(null);
+                const updatedMemory = await response.json();
+                setMemory(memory.map(memory => memory.id === editMemoryId ? updatedMemory : memory));
+                setEditMemoryId(null);
                 setEditText("");
                 setEditTags([]);
             } else {
-                setError("Failed to update entry.");
+                setError("Failed to update memory.");
             }
         } catch (err) {
-            setError("Failed to update entry.");
+            setError("Failed to update memory.");
         }
     };
 
-    const filteredEntries = entries.filter(entry =>
-        filterLabel ? entry.data.text.includes(filterLabel) || entry.data.tags.some((tag: string) => tag.includes(filterLabel)) : true
+    const filteredMemories = memory.filter(m =>
+        filterLabel ? m.data.text.includes(filterLabel) || m.data.tags.some((tag: string) => tag.includes(filterLabel)) : true
     );
 
     if (loading) {
-        return <p>Loading entries...</p>;
+        return <p>Loading memories...</p>;
     }
 
     const handleTagToggle = (tag: string) => {
@@ -176,12 +176,12 @@ const Dashboard = () => {
     return (
         <MaxWidthWrapper>
             <div className="p-8">
-                {/* New Entry Form */}
+                {/* New Memory Form */}
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Create New Entry</h2>
+                    <h2 className="text-xl font-semibold mb-2">Create New Memory</h2>
                     <textarea
-                        value={editEntryId ? editText : newEntry}
-                        onChange={(e) => { editEntryId ? setEditText(e.target.value) : setNewEntry(e.target.value); }}
+                        value={editMemoryId ? editText : newMemory}
+                        onChange={(e) => { editMemoryId ? setEditText(e.target.value) : setNewMemory(e.target.value); }}
                         placeholder="Enter your thoughts here..."
                         rows={5}
                         className="w-full p-3 border rounded-lg"
@@ -203,18 +203,18 @@ const Dashboard = () => {
                     </div>
                     <div className="flex justify-between mt-2">
                         <button
-                            onClick={editEntryId ? handleUpdateEntry : handleNewEntrySubmit}
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                            onClick={editMemoryId ? handleUpdateMemory : handleNewMemorySubmit}
+                            className="bg-black text-white px-4 py-2 rounded-lg"
                         >
-                            {editEntryId ? "Save" : "Submit"}
+                            {editMemoryId ? "Save" : "Submit"}
                         </button>
                     </div>
                     {error && <p className="text-red-500 mt-2">{error}</p>}
                 </div>
 
-                {/* Filter Entries by Tag or Text */}
+                {/* Filter Memories by Tag or Text */}
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Filter Entries by Tag or Text</h2>
+                    <h2 className="text-xl font-semibold mb-2">Filter Memories by Tag or Text</h2>
                     <input
                         type="text"
                         value={filterLabel}
@@ -224,24 +224,24 @@ const Dashboard = () => {
                     />
                 </div>
 
-                {/* Display Entries */}
+                {/* Display Memories */}
                 <div>
-                    <h2 className="text-xl font-semibold mb-2">Your Entries</h2>
+                    <h2 className="text-xl font-semibold mb-2">Your Memories</h2>
                     <div className="space-y-4">
-                        {filteredEntries.length === 0 ? (
-                            <p>No entries found. Start creating some!</p>
+                        {filteredMemories.length === 0 ? (
+                            <p>No memories found. Start creating some!</p>
                         ) : (
-                            filteredEntries.map((entry: Entry) => (
-                                <div key={entry.id} className="border p-4 rounded-lg">
+                            filteredMemories.map((memory: Memory) => (
+                                <div key={memory.id} className="border p-4 rounded-lg">
                                     <div className="text-sm text-gray-500 mb-2">
-                                        {new Date(entry.createdAt).toLocaleString()}
+                                        {new Date(memory.createdAt).toLocaleString()}
                                     </div>
                                     <div>
-                                        <p>{entry.data.text}</p>
+                                        <p>{memory.data.text}</p>
                                         <div className="mt-2">
                                             <strong>Tags:</strong>
                                             <div className="space-x-2 mt-2">
-                                                {entry.data.tags.map((tag: string, index: number) => (
+                                                {memory.data.tags.map((tag: string, index: number) => (
                                                     <span key={index} className="inline-block px-3 py-1 text-sm font-medium text-white rounded-full bg-black">
                                                         {tag}
                                                     </span>
@@ -249,10 +249,10 @@ const Dashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex justify-end mt-4 space-x-4">
-                                            <button onClick={() => handleEditEntry(entry)}>
+                                            <button onClick={() => handleEditMemory(memory)}>
                                                 <FaPen className="text-blue-500" />
                                             </button>
-                                            <button onClick={() => handleDeleteEntry(entry.id)}>
+                                            <button onClick={() => handleDeleteMemory(memory.id)}>
                                                 <FaTrash className="text-red-500" />
                                             </button>
                                         </div>
@@ -264,7 +264,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Copy Data Button */}
-                {filteredEntries.length > 0 && (
+                {filteredMemories.length > 0 && (
                     <div className="mt-8">
                         <h2 className="text-xl font-semibold mb-2">Copy Your Data</h2>
                         <button

@@ -16,9 +16,13 @@ interface Project {
     };
 }
 
+interface ProjectWithCount extends Project {
+    memoryCount: number;
+}
+
 export default function ProjectsPage() {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const { userId } = useUser(); // Get userId from context
+    const [projects, setProjects] = useState<ProjectWithCount[]>([]);
+    const { userId } = useUser();
 
     useEffect(() => {
         const fetchProjects = async () => {

@@ -16,20 +16,24 @@ export async function GET(req: Request, { params }: { params: { memoryId: string
 }
 
 export async function PUT(req: Request, { params }: { params: { memoryId: string } }) {
-    const { text, tags } = await req.json();
-    if (!text || !tags || tags.length < 3) {
-        return NextResponse.json({ error: 'Memory text and at least 3 tags are required' }, { status: 400 });
+    const { content, tags } = await req.json();
+
+    if (!content || !tags || tags.length < 3) {
+        return NextResponse.json({ error: 'Memory content and at least 3 tags are required' }, { status: 400 });
     }
 
     try {
         const updatedMemory = await prisma.memory.update({
             where: { id: params.memoryId },
             data: {
-                data: { text, tags },
+                content,
+                tags,
+                updatedAt: new Date(),
             },
         });
         return NextResponse.json(updatedMemory, { status: 200 });
     } catch (error) {
+        console.error('Error updating memory:', error);
         return NextResponse.json({ error: 'Failed to update memory' }, { status: 500 });
     }
 }

@@ -50,7 +50,7 @@ const Navbar = () => {
                     className="rounded-full object-cover aspect-square"
                   />
                 )}
-                <p className="font-semibold text-sm">{session?.user?.name} projects</p>
+                {session && <p className="font-semibold text-sm">{session?.user?.name} projects</p>}
               </div>
             </div>
 

@@ -9,12 +9,13 @@ import SessionWrapper from '../components/SessionWrapper';
 import { UserProvider } from "./Context";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://xmem.xyz'),
   title: "xmem | Streamline Knowledge Sharing Across Teams",
   description: "Streamline Knowledge Sharing Across Teams",
   openGraph: {
     title: "xmem | Streamline Knowledge Sharing Across Teams",
     description: "Streamline Knowledge Sharing Across Teams with ease. xmem empowers you to store, manage, and share your data securely and smartly.",
-    url: "https://xmem.digital",
+    url: "https://xmem.xyz",
     images: [
       {
         url: "/logo.jpg",

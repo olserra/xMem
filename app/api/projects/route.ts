@@ -6,8 +6,10 @@ export async function POST(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
-    if (!name || !description) {
-        return NextResponse.json({ error: 'Project name and description are required' }, { status: 400 });
+    if (!name || !description || !userId) {
+        return NextResponse.json({
+            error: 'Project name, description, and user ID are required'
+        }, { status: 400 });
     }
 
     try {
@@ -16,7 +18,7 @@ export async function POST(req: Request) {
             data: {
                 name,
                 description,
-                userId,
+                userId: userId as string,
                 visibility: 'private',
             },
         });
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
                 type: memory.type || 'memory',
                 metadata: memory.metadata || {},
                 projectId: project.id,
+                userId: userId as string,
             }));
 
             // Insert the memories into the database
@@ -38,7 +41,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(project, { status: 201 });
     } catch (error) {
-        console.error('Error creating project', error);
+        console.error('Error creating project:', error);
         return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
     }
 }
@@ -47,6 +50,12 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const projectId = searchParams.get("projectId");
+
+    if (!userId) {
+        return NextResponse.json({
+            error: 'User ID is required'
+        }, { status: 400 });
+    }
 
     try {
         if (projectId) {
@@ -66,7 +75,7 @@ export async function GET(req: Request) {
 
         const projects = await prisma.project.findMany({
             where: {
-                userId,
+                userId: userId as string,
             },
             include: {
                 _count: {

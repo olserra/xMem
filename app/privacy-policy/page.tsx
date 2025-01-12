@@ -63,8 +63,8 @@ const PrivacyPolicyPage: React.FC = () => {
             <p>
                 If you have any questions about this Privacy Policy, please contact us:
             </p>
-            <p>Email: <a href="mailto:support@xmem.digital">support@xmem.digital</a></p>
-            <p>Website: <a href="https://www.xmem.digital">https://www.xmem.digital</a></p>
+            <p>Email: <a href="mailto:support@xmem.xyz">support@xmem.xyz</a></p>
+            <p>Website: <a href="https://www.xmem.xyz">https://www.xmem.xyz</a></p>
         </div>
     );
 };

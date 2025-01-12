@@ -16,19 +16,44 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role      @default(USER)
-  data          Memory[] // Relation to Memory, which stores all memories
+  projects      Project[] // Only projects relation, no direct memories
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  type        String? // Make type optional
+  visibility  String   @default("private")
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  memories    Memory[]
+
+  @@index([userId])
+  @@index([type])
+  @@index([visibility])
 }
 
 model Memory {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  data      Json // Stores the memory content (e.g., text, metadata)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  content    String   @db.Text // The actual memory content
+  metadata   Json? // Additional metadata about the memory
+  tags       String[] // Array of tags for categorization
+  type       String // Type of memory (e.g., "fact", "conversation", "note")
+  projectId  String?
+  userId     String
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
+  version    Int      @default(1) // For tracking memory versions
 
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId]) // Index to optimize querying by userId
+  @@index([projectId])
+  @@index([type])
+  @@index([tags])
+  @@index([userId])
 }
 
 model Account {

@@ -12,7 +12,7 @@ export default function HelpPage() {
         <div className="flex flex-col items-start justify-start min-h-screen pt-4 md:pt-24">
             <div className="text-center">
                 {/* Icon and Title */}
-                <div className="text-4xl font-bold text-gray-800">
+                <div className="flex flex-col items-center text-4xl font-bold text-gray-800">
                     <div className="flex justify-center">
                         {/* Replace with your logo */}
                         <Image
@@ -23,10 +23,10 @@ export default function HelpPage() {
                             className="mr-2 rounded-lg border"
                         />
                     </div>
-                    <h1 className="mt-4 text-3xl font-extrabold text-gray-900">
+
+                    <h1 className="mt-4 text-xl font-semibold text-gray-900">
                         Reach out on our official support platform.
                     </h1>
-                    <p className="text-lg text-gray-600">• All systems normal</p>
                 </div>
 
                 {/* Links to support */}

@@ -54,7 +54,7 @@ export default function HelpPage() {
                             Submit a case directly to our customer success team for personalized help.
                         </p>
                         <a
-                            href="mailto:support@yourdomain.com"  // Replace with your support email or link
+                            href="mailto:olserra@gmail.com"  // Replace with your support email or link
                             className="mt-4 inline-block bg-black text-white text-center py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors"
                         >
                             Get Help

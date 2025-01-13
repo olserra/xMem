@@ -12,14 +12,14 @@ export default function ApiReferencePage() {
 
             <div className="space-y-4">
                 <p className="leading-7">
-                    The xmem API allows you to integrate your project’s memories and data into other applications. You can
+                    The xmem API allows you to integrate your project&apos;s memories and data into other applications. You can
                     use the API to interact with your data programmatically, automate workflows, and extend the functionality
                     of xmem beyond its standard interface.
                 </p>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Overview</h2>
                 <p className="leading-7">
-                    xmem’s API provides a set of RESTful endpoints that you can use to interact with your projects, memories,
+                    xmem&apos;s API provides a set of RESTful endpoints that you can use to interact with your projects, memories,
                     and tags. The API is designed to be simple and flexible, allowing you to create, read, update, and delete
                     resources. You can use the API to access your data, integrate with third-party tools, and automate processes.
                 </p>
@@ -64,7 +64,7 @@ export default function ApiReferencePage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Response Format</h2>
                 <p className="leading-7">
-                    The API returns data in JSON format. Here's an example response for the <strong>GET /api/memories</strong> endpoint:
+                    The API returns data in JSON format. Here&apos;s an example response for the <strong>GET /api/memories</strong> endpoint:
                 </p>
                 <pre className="bg-gray-100 p-2 rounded mt-2">
                     {`[

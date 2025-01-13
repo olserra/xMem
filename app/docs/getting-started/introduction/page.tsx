@@ -21,15 +21,15 @@ export default function IntroductionPage() {
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">What is xmem?</h2>
                 <p className="leading-7">
                     xmem is a next-generation knowledge management system that centralizes your notes,
-                    documents, and memories in one place. Whether you're an individual looking to organize your thoughts
+                    documents, and memories in one place. Whether you&apos;re an individual looking to organize your thoughts
                     or a team collaborating on projects, xmem helps you stay organized, find information quickly, and
-                    share insights effectively. It's designed to be simple to use but powerful enough to scale as your
+                    share insights effectively. It&apos;s designed to be simple to use but powerful enough to scale as your
                     knowledge base grows.
                 </p>
 
                 <p className="leading-7">
                     With xmem, your team or personal knowledge is always at your fingertips, making it easier
-                    to manage and access critical information when needed. It's a platform built with modern teams in
+                    to manage and access critical information when needed. It&apos;s a platform built with modern teams in
                     mind, offering the flexibility to handle all types of data, from simple notes to complex projects.
                 </p>
 
@@ -38,16 +38,16 @@ export default function IntroductionPage() {
                     <li><strong>Project-based Organization:</strong> xmem helps you organize your knowledge by projects, allowing you to maintain focused, compartmentalized collections of information.</li>
                     <li><strong>Smart Tagging System:</strong> Tags make it easy to categorize and search through your content. You can create custom tags to group memories or notes in a way that fits your workflow.</li>
                     <li><strong>Real-time Collaboration:</strong> Collaborate seamlessly with team members by sharing memories and working together on projects, ensuring that knowledge is accessible and actionable.</li>
-                    <li><strong>Powerful Search Capabilities:</strong> xmem's search functionality is designed to help you find relevant information quickly, whether you're looking for a specific memory or a set of related documents.</li>
+                    <li><strong>Powerful Search Capabilities:</strong> xmem&apos;s search functionality is designed to help you find relevant information quickly, whether you&apos;re looking for a specific memory or a set of related documents.</li>
                     <li><strong>Version Control:</strong> Track the evolution of your documents and memories. xmem allows you to manage different versions of your content, providing full history and version rollback capabilities.</li>
-                    <li><strong>AI Integration:</strong> Leverage artificial intelligence to analyze and synthesize information from your memories. Whether it's organizing insights or generating summaries, xmem's AI-powered features can enhance your productivity.</li>
+                    <li><strong>AI Integration:</strong> Leverage artificial intelligence to analyze and synthesize information from your memories. Whether it&apos;s organizing insights or generating summaries, xmem&apos;s AI-powered features can enhance your productivity.</li>
                     <li><strong>APIs for Custom Integrations:</strong> xmem provides developers with APIs to integrate the platform with other tools and services, enabling seamless workflows and automation.</li>
                 </ul>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">How xmem Benefits You</h2>
                 <p className="leading-7">
-                    xmem isn’t just a note-taking app – it’s a full knowledge management system designed to scale with your needs.
-                    Whether you're managing your personal knowledge, collaborating with a team, or integrating data from other systems,
+                    xmem isn&apos;t just a note-taking app – it&apos;s a full knowledge management system designed to scale with your needs.
+                    Whether you&apos;re managing your personal knowledge, collaborating with a team, or integrating data from other systems,
                     xmem adapts to ensure that your workflow remains smooth, efficient, and productive.
                 </p>
 
@@ -58,7 +58,7 @@ export default function IntroductionPage() {
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Getting Started</h2>
                 <p className="leading-7">
                     To get started with xmem, follow the documentation on setting up your account, organizing your first project, and
-                    creating your first memory. Whether you're using xmem for personal knowledge management or to drive your team's success,
+                    creating your first memory. Whether you&apos;re using xmem for personal knowledge management or to drive your team&apos;s success,
                     this guide will provide you with the resources you need to start capturing valuable insights and knowledge.
                 </p>
             </div>

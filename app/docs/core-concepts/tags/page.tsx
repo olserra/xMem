@@ -37,7 +37,7 @@ export default function TagsPage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Best Practices for Tagging</h2>
                 <p className="leading-7">
-                    To keep your memories organized, it's important to use tags consistently. Here are some best practices:
+                    To keep your memories organized, it&apos;s important to use tags consistently. Here are some best practices:
                 </p>
                 <ul className="list-disc list-inside space-y-2">
                     <li>Use meaningful tags that clearly describe the content of the memory.</li>

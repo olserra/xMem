@@ -86,14 +86,14 @@ export default function InstallationPage() {
                     <div className="bg-gray-50 p-4 rounded-lg">
                         <p className="font-mono text-sm">6. Sign in with Google</p>
                         <p className="leading-7">
-                            Once the server is running, you can sign in to xmem using your Google account. If it's the first time you're using the system, you may be asked to configure additional settings.
+                            Once the server is running, you can sign in to xmem using your Google account. If it&apos;s the first time you&apos;re using the system, you may be asked to configure additional settings.
                         </p>
                     </div>
                 </div>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Next Steps</h2>
                 <p className="leading-7">
-                    Now that you’ve installed xmem, you can start capturing memories, organizing your knowledge into projects, and collaborating with your team.
+                    Now that you&apos;ve installed xmem, you can start capturing memories, organizing your knowledge into projects, and collaborating with your team.
                 </p>
                 <ul className="list-disc list-inside space-y-2">
                     <li><a href="/docs/getting-started" className="text-blue-500 hover:underline">Getting Started with Projects</a> – Learn how to create and manage projects in xmem.</li>

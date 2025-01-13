@@ -36,7 +36,7 @@ export default function MemoriesPage() {
                 </p>
                 <ol className="list-decimal list-inside space-y-2">
                     <li>Go to your project page.</li>
-                    <li>Click the <strong>"Create Memory"</strong> button.</li>
+                    <li>Click the <strong>&quot;Create Memory&quot;</strong> button.</li>
                     <li>Enter the content of your memory.</li>
                     <li>Add <strong>exactly 3 tags</strong> to categorize your memory.</li>
                     <li>Click <strong>Save</strong> to add your memory to the project.</li>

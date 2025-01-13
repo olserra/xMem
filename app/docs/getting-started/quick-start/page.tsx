@@ -12,7 +12,7 @@ export default function QuickStartPage() {
 
             <div className="space-y-4">
                 <p className="leading-7">
-                    Welcome to the <strong>xmem</strong> Quick Start guide! In this section, we'll walk you through the
+                    Welcome to the <strong>xmem</strong> Quick Start guide! In this section, we&apos;ll walk you through the
                     basics of getting started with xmem, from creating your first project to adding memories, so you can
                     start organizing your knowledge right away.
                 </p>
@@ -24,7 +24,7 @@ export default function QuickStartPage() {
                 </p>
                 <ol className="list-decimal list-inside space-y-2">
                     <li>Navigate to the <strong>Projects</strong> page from the main dashboard.</li>
-                    <li>Click the <strong>"New Project"</strong> button at the top right of the page.</li>
+                    <li>Click the <strong>&quot;New Project&quot;</strong> button at the top right of the page.</li>
                     <li>Fill in the project details, including the name and description, to help you identify the project later.</li>
                     <li>Click <strong>Create</strong> to finalize your project. Your new project will now appear on the dashboard.</li>
                 </ol>
@@ -32,14 +32,14 @@ export default function QuickStartPage() {
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Adding Memories</h2>
                 <p className="leading-7">
                     Memories are the core elements within each project. You can add your thoughts, notes, and insights as memories.
-                    Once you’ve created a project, follow these steps to add memories to it:
+                    Once you&apos;ve created a project, follow these steps to add memories to it:
                 </p>
                 <ol className="list-decimal list-inside space-y-2">
                     <li>Go to the <strong>Project</strong> page that you just created.</li>
-                    <li>Click the <strong>"Create Memory"</strong> button to open the memory creation form.</li>
-                    <li>Enter the content of your memory. This can include notes, ideas, or anything you’d like to capture.</li>
+                    <li>Click the <strong>&quot;Create Memory&quot;</strong> button to open the memory creation form.</li>
+                    <li>Enter the content of your memory. This can include notes, ideas, or anything you&apos;d like to capture.</li>
                     <li>Add <strong>exactly 3 tags</strong> to your memory to categorize it. Tags are important for easy searching and organizing your content later.</li>
-                    <li>Click <strong>Save</strong> to add your memory to the project. Your memory will now be listed under the project’s details.</li>
+                    <li>Click <strong>Save</strong> to add your memory to the project. Your memory will now be listed under the project&apos;s details.</li>
                 </ol>
 
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
@@ -51,7 +51,7 @@ export default function QuickStartPage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Next Steps</h2>
                 <p className="leading-7">
-                    Now that you’ve created your first project and added a memory, you’re ready to explore more advanced features.
+                    Now that you&apos;ve created your first project and added a memory, you&apos;re ready to explore more advanced features.
                     Here are some next steps you can take:
                 </p>
                 <ul className="list-disc list-inside space-y-2">

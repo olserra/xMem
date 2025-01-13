@@ -17,6 +17,12 @@ const Navbar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
 
+  const menuMainItems = [
+    { label: 'Docs', href: '/docs' },
+    { label: 'Help', href: '/help' },
+  ];
+
+
   const menuItems = [
     { label: 'Projects', href: '/dashboard/projects' },
     { label: 'Memories', href: '/dashboard/memories' },
@@ -31,7 +37,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={cn("sticky inset-x-0 top-0 z-30 border-b border-gray-200 bg-white/40 backdrop-blur-lg transition-all")}>
+    <nav className={cn(
+      "sticky inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/40 backdrop-blur-lg transition-all"
+    )}>
       <MaxWidthWrapper>
         <div className="flex flex-col">
           <div className="flex justify-between h-14 items-center border-zinc-200">
@@ -113,6 +121,15 @@ const Navbar = () => {
                   </button>
                 ) : (
                   <>
+                    {menuMainItems.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className="text-sm text-gray-600 hover:text-black transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                     <button className="bg-black text-white text-sm p-2 px-4 rounded-lg focus:outline-none" onClick={handleSignOut}>
                       Sign Out
                     </button>

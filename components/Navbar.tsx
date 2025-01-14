@@ -42,8 +42,10 @@ const Navbar = () => {
     )}>
       <MaxWidthWrapper>
         <div className="flex flex-col">
-          <div className="flex justify-between h-14 items-center border-zinc-200">
-            <div className="flex">
+          <div className={cn(
+            "flex justify-between items-center border-zinc-200",
+            session ? "h-14 md:pt-3" : "h-10 md:pt-5"
+          )}>            <div className="flex">
               <Link href="/" className="flex items-center gap-2">
                 <MdMemory size={30} className="text-black" />
                 {session ? <h1 className="md:text-xl text-gray-400">/</h1> : <span className="text-2xl font-semibold text-black">xmem</span>}

@@ -8,8 +8,8 @@ import { prisma } from "../../../../prisma/prisma";
 const options = {
   providers: [
     GoogleProvider({
-      clientId: process.env.NEXT_PUBLIC_GOOGLE_ID as string,
-      clientSecret: process.env.NEXT_PUBLIC_GOOGLE_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
@@ -21,18 +21,33 @@ const options = {
     }),
   ],
   adapter: PrismaAdapter(prisma),
-  secret: process.env.JWT_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async redirect() {
-      return "/dashboard/projects";
+    async signIn({ user, account, profile }: { user: any; account: any; profile: any }) {
+      console.log("SignIn Attempt:", { user, account, profile });
+      return true;
     },
-    session: async ({ session, token, user }: any) => {
+    async session({ session, token, user }: { session: any; token: any; user: any }) {
+      console.log("Session Callback:", { session, token, user });
       session.user.id = user.id as string;
       return session;
     },
+    async redirect() {
+      return "/dashboard/projects";
+    },
   },
+
 };
 
-const handler = NextAuth(options);
+const handler = NextAuth({
+  ...options,
+  callbacks: {
+    ...options.callbacks,
+    signIn: async ({ user, account, profile, email, credentials }) => {
+      console.log("SignIn Attempt:", { user, account, profile, email, credentials });
+      return true;
+    },
+  },
+});
 
 export { handler as GET, handler as POST };

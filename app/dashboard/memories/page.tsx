@@ -6,6 +6,7 @@ import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { useUser } from "../../Context";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Define interfaces for the label and memory state
 interface Project {
@@ -28,25 +29,13 @@ interface Memory {
 
 const Memories = () => {
     const { userId } = useUser();
+    const router = useRouter();
     const { data: session, status } = useSession();
-    const [newMemory, setNewMemory] = useState<string>("");
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [filterLabel, setFilterLabel] = useState<string>("");
-    const [editMemoryId, setEditMemoryId] = useState<string | null>(null);
-    const [editText, setEditText] = useState<string>("");
-    const [editTags, setEditTags] = useState<string[]>([]);
 
-    // Predefined tags (clusters)
-    const availableTags = [
-        "Personal Facts", "Preferences", "Work History", "Hobbies", "Education",
-        "Skills", "Goals", "Challenges", "Achievements", "Important Dates",
-        "Insights", "Experiences", "Health", "Technology", "Mindset",
-        "Creativity", "Productivity", "Learning", "Well-being", "Motivation",
-        "Self-Improvement"
-    ];
 
     useEffect(() => {
         if (!session || status !== "authenticated") return;
@@ -80,8 +69,6 @@ const Memories = () => {
             .catch(err => console.error('Failed to copy user data:', err));
     };
 
-
-
     const handleDeleteMemory = async (id: string) => {
         try {
             const response = await fetch(`/api/memory?userId=${userId}&memoryId=${id}`, { method: "DELETE" });
@@ -97,11 +84,14 @@ const Memories = () => {
     };
 
     const handleEditMemory = (memory: Memory) => {
-        setEditMemoryId(memory.id);
-        setEditText(memory.content);
-        setEditTags(memory.tags);
-        setNewMemory("");
-        setSelectedTags([]);
+        const queryParams = new URLSearchParams({
+            id: memory.id,
+            content: memory.content,
+            tags: memory.tags.join(","),
+            projectId: memory.projectId || "",
+        }).toString();
+
+        router.push(`/dashboard/memories/create?${queryParams}`);
     };
 
     const filteredMemories = memory.filter(m =>

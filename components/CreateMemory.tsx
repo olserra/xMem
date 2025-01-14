@@ -54,7 +54,6 @@ function useWindowSize() {
 
 export default function CreateMemory() {
     const { userId } = useUser();
-    const { data: session } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialProjectId = searchParams.get('projectId');
@@ -75,6 +74,25 @@ export default function CreateMemory() {
         "Insights", "Experiences", "Health", "Technology", "Mindset",
         "Creativity", "Productivity", "Learning", "Well-being", "Motivation",
     ];
+
+    useEffect(() => {
+        const id = searchParams.get('id');
+        const content = searchParams.get('content');
+        const tags = searchParams.get('tags')?.split(",") || [];
+        const projectId = searchParams.get('projectId');
+
+        if (id && content) {
+            setFormData({
+                content,
+                tags,
+                projectId: projectId || undefined  // Ensure projectId is properly set
+            });
+        }
+    }, [searchParams]);
+
+
+    const memoryId = searchParams.get('id');
+    const isEditing = Boolean(memoryId);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -109,16 +127,19 @@ export default function CreateMemory() {
             return;
         }
 
+        const memoryId = searchParams.get('id');
+        const isEditing = Boolean(memoryId);
+
         try {
-            const response = await fetch('/api/memory', {
-                method: 'POST',
+            const response = await fetch(isEditing ? `/api/memory/${memoryId}` : '/api/memory', {
+                method: isEditing ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     content: formData.content,
                     tags: formData.tags,
                     type: "note",
                     metadata: {},
-                    projectId: formData.projectId || undefined,
+                    projectId: formData.projectId !== undefined ? formData.projectId : null,  // Explicitly handle null
                     userId: userId,
                     isArchived: false,
                     version: 1
@@ -127,16 +148,14 @@ export default function CreateMemory() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create memory');
+                throw new Error(errorData.error || (isEditing ? 'Failed to update memory' : 'Failed to create memory'));
             }
 
-            if (formData.projectId) {
-                router.push(`/dashboard/projects/${formData.projectId}`);
-            } else {
-                router.push('/dashboard/memories');
-            }
+            // Redirect after saving
+            router.push('/dashboard/memories');
+
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create memory. Please try again.');
+            setError(err instanceof Error ? err.message : 'Failed to save memory. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -251,8 +270,9 @@ export default function CreateMemory() {
                             disabled={loading}
                             className="w-full bg-black text-white py-2.5 sm:py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 text-sm sm:text-base"
                         >
-                            {loading ? 'Creating...' : 'Create Memory'}
+                            {loading ? (isEditing ? 'Saving...' : 'Creating...') : (isEditing ? 'Save' : 'Create Memory')}
                         </button>
+
                     </form>
                 </div>
             </div>

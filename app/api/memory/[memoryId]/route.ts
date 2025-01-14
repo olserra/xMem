@@ -16,7 +16,7 @@ export async function GET(req: Request, { params }: { params: { memoryId: string
 }
 
 export async function PUT(req: Request, { params }: { params: { memoryId: string } }) {
-    const { content, tags } = await req.json();
+    const { content, tags, projectId } = await req.json();
 
     if (!content || !tags || tags.length < 3) {
         return NextResponse.json({ error: 'Memory content and at least 3 tags are required' }, { status: 400 });
@@ -28,6 +28,7 @@ export async function PUT(req: Request, { params }: { params: { memoryId: string
             data: {
                 content,
                 tags,
+                projectId: projectId || null,  // ✅ Update the projectId
                 updatedAt: new Date(),
             },
         });
@@ -37,6 +38,7 @@ export async function PUT(req: Request, { params }: { params: { memoryId: string
         return NextResponse.json({ error: 'Failed to update memory' }, { status: 500 });
     }
 }
+
 
 export async function DELETE(req: Request, { params }: { params: { memoryId: string } }) {
     try {

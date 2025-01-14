@@ -5,10 +5,18 @@ export async function GET(req: Request, { params }: { params: { projectId: strin
     try {
         const project = await prisma.project.findUnique({
             where: { id: params.projectId },
+            include: {
+                _count: {
+                    select: { memories: true }
+                },
+                memories: true
+            }
         });
+
         if (!project) {
             return NextResponse.json({ error: 'Project not found' }, { status: 404 });
         }
+
         return NextResponse.json(project);
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch project' }, { status: 500 });

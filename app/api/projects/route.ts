@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
 export async function POST(req: Request) {
-    const { name, description, memoryTemplate } = await req.json();
+    const { name, description } = await req.json();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
@@ -22,22 +22,6 @@ export async function POST(req: Request) {
                 visibility: 'private',
             },
         });
-
-        // If a memory template is provided, create the memories
-        if (memoryTemplate && Array.isArray(memoryTemplate)) {
-            const memories = memoryTemplate.map((memory: any) => ({
-                content: memory.content || '',
-                type: memory.type || 'memory',
-                metadata: memory.metadata || {},
-                projectId: project.id,
-                userId: userId as string,
-            }));
-
-            // Insert the memories into the database
-            await prisma.memory.createMany({
-                data: memories,
-            });
-        }
 
         return NextResponse.json(project, { status: 201 });
     } catch (error) {

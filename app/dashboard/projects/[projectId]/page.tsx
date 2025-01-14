@@ -29,7 +29,6 @@ interface Memory {
 
 export default function ProjectPage() {
     const { projectId } = useParams();
-    const router = useRouter();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -43,9 +42,10 @@ export default function ProjectPage() {
     useEffect(() => {
         if (projectId) {
             setLoading(true);
-            fetch(`/api/projects/${projectId}`)
+            fetch(`/api/projects/${projectId}?includeCount=true`)  // Pass a query param to include count
                 .then((response) => response.json())
                 .then((data) => {
+                    console.log(data); // Debug to verify if _count is included
                     setProject(data);
                     setEditedProject({
                         name: data.name,
@@ -60,6 +60,7 @@ export default function ProjectPage() {
                 });
         }
     }, [projectId]);
+
 
     const handleSave = async () => {
         try {
@@ -201,34 +202,9 @@ export default function ProjectPage() {
                             </div>
                             <div>
                                 <h4 className="text-sm font-medium text-gray-500">Memory Count</h4>
-                                <p>{project?._count?.memories || 0} memories</p>
+                                <p>{project?._count?.memories ?? 0} memories</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Memories List */}
-                <div>
-                    <h2 className="text-xl font-semibold mb-4">Memories</h2>
-                    <div className="space-y-4">
-                        {project?.memories?.map((memory) => (
-                            <div key={memory.id} className="bg-white rounded-lg shadow p-4">
-                                <p className="mb-2">{memory.content}</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {memory.tags.map((tag, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-2 py-1 bg-gray-100 text-sm rounded-full"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="mt-2 text-sm text-gray-500">
-                                    Created: {new Date(memory.createdAt).toLocaleString()}
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </div>

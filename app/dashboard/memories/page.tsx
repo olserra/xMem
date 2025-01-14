@@ -71,7 +71,7 @@ const Memories = () => {
 
     const handleDeleteMemory = async (id: string) => {
         try {
-            const response = await fetch(`/api/memory?userId=${userId}&memoryId=${id}`, { method: "DELETE" });
+            const response = await fetch(`/api/memory/${id}?userId=${userId}`, { method: "DELETE" });
 
             if (response.ok) {
                 setMemory(memory.filter(memory => memory.id !== id));
@@ -82,6 +82,7 @@ const Memories = () => {
             setError("Failed to delete memory.");
         }
     };
+
 
     const handleEditMemory = (memory: Memory) => {
         const queryParams = new URLSearchParams({

@@ -11,22 +11,10 @@ export default function CreateProject() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        memoryTemplate: '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Parse the memory template if provided
-        let parsedMemoryTemplate = null;
-        if (formData.memoryTemplate) {
-            try {
-                parsedMemoryTemplate = JSON.parse(formData.memoryTemplate);
-            } catch (error) {
-                console.error('Invalid JSON in memory template', error);
-                return;
-            }
-        }
 
         // Send the data to the API to create the project
         const response = await fetch(`/api/projects?userId=${userId}`, {
@@ -34,7 +22,6 @@ export default function CreateProject() {
             body: JSON.stringify({
                 name: formData.name,
                 description: formData.description,
-                memoryTemplate: parsedMemoryTemplate // Pass parsed memory template (or null)
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -85,21 +72,6 @@ export default function CreateProject() {
                             className="w-full p-2 border rounded-lg"
                             rows={4}
                             required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Memory Template (JSON) (Optional)</label>
-                        <textarea
-                            value={formData.memoryTemplate}
-                            onChange={(e) => setFormData({ ...formData, memoryTemplate: e.target.value })}
-                            className="w-full p-2 border rounded-lg font-mono"
-                            rows={6}
-                            placeholder='{
-                                            "type": "memory",
-                                            "content": "",
-                                            "metadata": {}
-                                        }'
                         />
                     </div>
 

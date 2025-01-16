@@ -161,7 +161,7 @@ const Navbar = () => {
                       {isModalOpen && (
                         <Modal onClose={() => setIsModalOpen(false)} position={getAvatarPosition()}>
                           <div className="flex flex-col space-y-2">
-                            <Link href="/api" className="text-sm text-gray-600 hover:text-black transition-colors">
+                            <Link href="/api-page" className="text-sm text-gray-600 hover:text-black transition-colors">
                               API settings
                             </Link>
                             <button

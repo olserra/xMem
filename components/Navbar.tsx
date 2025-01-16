@@ -12,16 +12,19 @@ import { handleMenuItemClick } from "@/app/helpers/handleMenuItemClick";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
+import { useState, useRef } from 'react';
+import Modal from "./ui/modal";
 
 const Navbar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const avatarRef = useRef<HTMLImageElement>(null);
 
   const menuMainItems = [
     { label: 'Docs', href: '/docs' },
     { label: 'Help', href: '/help' },
   ];
-
 
   const menuItems = [
     { label: 'Projects', href: '/dashboard/projects' },
@@ -36,6 +39,18 @@ const Navbar = () => {
     return false;
   };
 
+  const handleAvatarClick = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  const getAvatarPosition = () => {
+    if (avatarRef.current) {
+      const rect = avatarRef.current.getBoundingClientRect();
+      return { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX };
+    }
+    return { top: 0, left: 0 };
+  };
+
   return (
     <nav className={cn(
       "sticky inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/40 backdrop-blur-lg transition-all"
@@ -45,7 +60,8 @@ const Navbar = () => {
           <div className={cn(
             "flex justify-between items-center border-zinc-200",
             session ? "h-14 md:pt-3" : "h-10 md:pt-5"
-          )}>            <div className="flex">
+          )}>
+            <div className="flex">
               <Link href="/" className="flex items-center gap-2">
                 <MdMemory size={30} className="text-black" />
                 {session ? <h1 className="md:text-xl text-gray-400">/</h1> : <span className="text-2xl font-semibold text-black">xmem</span>}
@@ -132,9 +148,32 @@ const Navbar = () => {
                         {item.label}
                       </Link>
                     ))}
-                    <button className="bg-black text-white text-sm p-2 px-4 rounded-lg focus:outline-none" onClick={handleSignOut}>
-                      Sign Out
-                    </button>
+                    <div className="relative">
+                      <Image
+                        ref={avatarRef}
+                        src={session?.user?.image || '/default-avatar.png'}
+                        alt="User avatar"
+                        width={30}
+                        height={30}
+                        className="rounded-full cursor-pointer"
+                        onClick={handleAvatarClick}
+                      />
+                      {isModalOpen && (
+                        <Modal onClose={() => setIsModalOpen(false)} position={getAvatarPosition()}>
+                          <div className="flex flex-col space-y-2">
+                            <Link href="/api" className="text-sm text-gray-600 hover:text-black transition-colors">
+                              API settings
+                            </Link>
+                            <button
+                              className="text-sm text-gray-600 hover:text-black transition-colors"
+                              onClick={handleSignOut}
+                            >
+                              Sign Out
+                            </button>
+                          </div>
+                        </Modal>
+                      )}
+                    </div>
                   </>
                 )}
               </div>

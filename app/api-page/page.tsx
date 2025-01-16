@@ -44,6 +44,7 @@ const ApiPage = () => {
                                 value={apiKey}
                                 readOnly
                                 className="border border-gray-300 rounded-md p-2 w-full h-10 pr-10"
+                                style={{ minWidth: '500px' }} // Set a minimum width for the input
                             />
                             <button
                                 onClick={toggleApiKeyVisibility}
@@ -54,15 +55,15 @@ const ApiPage = () => {
                         </div>
                         <button
                             onClick={copyToClipboard}
-                            className="border p-2 border-gray-300 rounded-md h-10 flex items-center justify-center"
+                            className="border p-2 border-gray-300 rounded-md h-10 w-10 flex items-center justify-center"
                         >
-                            <FaRegCopy className="text-black" size={20} />
+                            <FaRegCopy className="text-black" size={15} />
                         </button>
                         <button
                             onClick={revokeApiKey}
-                            className="border p-2 border-gray-300 rounded-md h-10 flex items-center justify-center"
+                            className="text-md border p-2 border-gray-300 rounded-md h-10 flex items-center justify-center"
                         >
-                            Revoke API Key
+                            Revoke
                         </button>
                     </div>
                 </div>

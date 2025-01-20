@@ -21,7 +21,7 @@
     "geist": "^1.1.0",
     "lucide-react": "^0.294.0",
     "micro": "^10.0.1",
-    "next": "14.2.13",
+    "next": "14.2.21",
     "next-auth": "^4.24.7",
     "nodemailer": "^6.9.15",
     "prisma": "^6.2.1",

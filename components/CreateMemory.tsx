@@ -200,7 +200,7 @@ export default function CreateMemory() {
                                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                                 placeholder="What's on your mind?"
                                 rows={5}
-                                className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
+                                className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg resize-none focus:border-gray-400 text-sm sm:text-base"
                                 required
                             />
                         </div>

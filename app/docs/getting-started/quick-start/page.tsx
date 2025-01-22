@@ -38,16 +38,8 @@ export default function QuickStartPage() {
                     <li>Go to the <strong>Project</strong> page that you just created.</li>
                     <li>Click the <strong>&quot;Create Memory&quot;</strong> button to open the memory creation form.</li>
                     <li>Enter the content of your memory. This can include notes, ideas, or anything you&apos;d like to capture.</li>
-                    <li>Add <strong>exactly 3 tags</strong> to your memory to categorize it. Tags are important for easy searching and organizing your content later.</li>
                     <li>Click <strong>Save</strong> to add your memory to the project. Your memory will now be listed under the project&apos;s details.</li>
                 </ol>
-
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
-                    <p className="text-yellow-700">
-                        <strong>Tip:</strong> Tags are essential for organizing your memories. Consistently use relevant tags for each memory
-                        to make it easier to search and filter later.
-                    </p>
-                </div>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Next Steps</h2>
                 <p className="leading-7">

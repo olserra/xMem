@@ -40,7 +40,6 @@ model Memory {
   id         String   @id @default(cuid())
   content    String   @db.Text // The actual memory content
   metadata   Json? // Additional metadata about the memory
-  tags       String[] // Array of tags for categorization
   type       String // Type of memory (e.g., "fact", "conversation", "note")
   projectId  String?
   userId     String
@@ -52,7 +51,6 @@ model Memory {
 
   @@index([projectId])
   @@index([type])
-  @@index([tags])
   @@index([userId])
 }
 

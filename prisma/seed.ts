@@ -34,14 +34,12 @@ async function main() {
                 create: [
                     {
                         content: "Run 5 miles",
-                        tags: ["exercise", "running"],
                         type: "task",
                         metadata: { duration: "40 minutes" },
                         userId: user.id,
                     },
                     {
                         content: "Lift weights (chest)",
-                        tags: ["exercise", "strength"],
                         type: "task",
                         metadata: { reps: 12, sets: 4 },
                         userId: user.id,

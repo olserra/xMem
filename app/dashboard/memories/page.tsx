@@ -142,7 +142,7 @@ const Memories = () => {
                         value={filterLabel}
                         onChange={(e) => setFilterLabel(e.target.value)}
                         placeholder="Enter text to filter by"
-                        className="p-2 border rounded-lg w-full"
+                        className="p-2 border border-gray-300 rounded-lg w-full"
                     />
                 </div>
 
@@ -154,7 +154,7 @@ const Memories = () => {
                             <p>No memories found. Start creating some!</p>
                         ) : (
                             filteredMemories.map((memory: Memory) => (
-                                <div key={memory.id} className="border p-4 rounded-lg">
+                                <div key={memory.id} className="border border-gray-300 bg-white p-4 rounded-lg">
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="text-sm text-gray-500">
                                             {new Date(memory.createdAt).toLocaleString()}

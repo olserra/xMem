@@ -193,14 +193,14 @@ export default function CreateMemory() {
                             </div>
                         </div>
 
-                        <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm">
+                        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-300 shadow-sm">
                             <h2 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Memory Content</h2>
                             <textarea
                                 value={formData.content}
                                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                                 placeholder="What's on your mind?"
                                 rows={5}
-                                className="w-full p-2 sm:p-3 border rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
+                                className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
                                 required
                             />
                         </div>

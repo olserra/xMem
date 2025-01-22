@@ -18,7 +18,6 @@ interface Memory {
     id: string;
     content: string;
     type: string;
-    tags: string[];
     metadata?: any;
     userId: string;
     projectId?: string;
@@ -34,7 +33,9 @@ const Memories = () => {
     const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isImport, setIsImport] = useState(true);
     const [filterLabel, setFilterLabel] = useState<string>("");
+    const [importedMemories, setImportedMemories] = useState("");
 
 
     useEffect(() => {
@@ -62,6 +63,7 @@ const Memories = () => {
         fetchMemory();
     }, [session, status, userId]);
 
+
     const handleCopyToClipboard = () => {
         const allUserMemory = JSON.stringify(memory);
         navigator.clipboard.writeText(allUserMemory)
@@ -83,12 +85,36 @@ const Memories = () => {
         }
     };
 
+    const handleImportMemories = async () => {
+        const memories = importedMemories.split("\n").filter(Boolean);
+        const newMemories = memories.map((content: string) => ({ content }));
+
+        try {
+            const response = await fetch("/api/memory", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ memories: newMemories, userId }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setMemory([...memory, ...data]);
+                setImportedMemories("");
+                setIsImport(false);
+            } else {
+                setError("Failed to import memories.");
+            }
+        } catch (err) {
+            setError("Failed to import memories.");
+        }
+    }
 
     const handleEditMemory = (memory: Memory) => {
         const queryParams = new URLSearchParams({
             id: memory.id,
             content: memory.content,
-            tags: memory.tags.join(","),
             projectId: memory.projectId || "",
         }).toString();
 
@@ -97,9 +123,7 @@ const Memories = () => {
 
     const filteredMemories = memory.filter(m =>
         filterLabel
-            ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) ||
-            m.tags.some((tag: string) => tag.toLowerCase().includes(filterLabel.toLowerCase()))
-            : true
+            ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
     );
 
     if (loading) {
@@ -109,14 +133,14 @@ const Memories = () => {
     return (
         <MaxWidthWrapper>
             <div className="p-8">
-                {/* Filter Memories by Tag or Text */}
+                {/* Filter Memories by Text */}
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Filter Memories by Tag or Text</h2>
+                    <h2 className="text-xl font-semibold mb-2">Filter Memories By Text</h2>
                     <input
                         type="text"
                         value={filterLabel}
                         onChange={(e) => setFilterLabel(e.target.value)}
-                        placeholder="Enter text or tag to filter by"
+                        placeholder="Enter text to filter by"
                         className="p-2 border rounded-lg w-full"
                     />
                 </div>
@@ -146,19 +170,6 @@ const Memories = () => {
                                     </div>
                                     <div>
                                         <p>{memory.content}</p>
-                                        <div className="mt-2">
-                                            <strong>Tags:</strong>
-                                            <div className="space-x-2 mt-2">
-                                                {memory.tags.map((tag: string, index: number) => (
-                                                    <span
-                                                        key={index}
-                                                        className="inline-block px-3 py-1 text-sm font-medium text-white rounded-full bg-black"
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
                                         <div className="flex justify-end mt-4 space-x-4">
                                             <button onClick={() => handleEditMemory(memory)}>
                                                 <FaPen className="text-black" />
@@ -173,6 +184,23 @@ const Memories = () => {
                         )}
                     </div>
                 </div>
+
+                {isImport && (
+                    <div className="mt-4">
+                        <textarea
+                            value={importedMemories}
+                            onChange={(e) => setImportedMemories(e.target.value)}
+                            placeholder="Paste your memories here"
+                            className="p-2 border rounded-lg w-full"
+                        />
+                        <button
+                            className="mt-2 bg-black text-white p-2 rounded-lg"
+                            onClick={handleImportMemories}
+                        >
+                            Import memories
+                        </button>
+                    </div>
+                )}
 
                 {/* Copy Data Button */}
                 {filteredMemories.length > 0 && (

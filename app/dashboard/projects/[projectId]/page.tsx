@@ -23,7 +23,6 @@ interface Memory {
     id: string;
     content: string;
     type: string;
-    tags: string[];
     createdAt: string;
 }
 

@@ -48,7 +48,7 @@ export async function POST(req: Request) {
             data: {
                 content,
                 type,
-                tags,
+                tags, // This will default to an empty array if not provided
                 metadata,
                 userId: userId,
                 ...(projectId && { projectId }),

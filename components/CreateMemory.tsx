@@ -153,7 +153,7 @@ export default function CreateMemory() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                        <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm">
+                        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-300 shadow-sm">
                             <h2 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Project Association (Optional)</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                                 <button

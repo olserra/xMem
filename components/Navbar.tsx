@@ -46,7 +46,17 @@ const Navbar = () => {
   const getAvatarPosition = () => {
     if (avatarRef.current) {
       const rect = avatarRef.current.getBoundingClientRect();
-      return { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX };
+      const top = rect.bottom + window.scrollY; // Position below the avatar
+      const left = rect.left + window.scrollX; // Align with avatar's left position
+
+      // Ensure modal stays within the viewport
+      const modalWidth = 100; // Adjust based on your modal's width
+      const availableSpaceRight = window.innerWidth - left;
+
+      // If there's not enough space to the right, align to the left side of the avatar
+      const modalLeft = availableSpaceRight < modalWidth ? left - modalWidth + rect.width : left;
+
+      return { top, left: modalLeft };
     }
     return { top: 0, left: 0 };
   };

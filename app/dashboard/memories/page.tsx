@@ -36,6 +36,7 @@ const Memories = () => {
     const [isImport, setIsImport] = useState(false);
     const [filterLabel, setFilterLabel] = useState<string>("");
     const [importedMemories, setImportedMemories] = useState("");
+    const [isCopied, setIsCopied] = useState(false);
 
 
     useEffect(() => {
@@ -65,10 +66,17 @@ const Memories = () => {
 
 
     const handleCopyToClipboard = () => {
+        setIsCopied(true);
+
         const allUserMemory = JSON.stringify(memory);
         navigator.clipboard.writeText(allUserMemory)
             .then(() => console.log('User data copied to clipboard'))
             .catch(err => console.error('Failed to copy user data:', err));
+
+        // Reset isCopied to false after 3 seconds
+        setTimeout(() => {
+            setIsCopied(false);
+        }, 1000);
     };
 
     const handleDeleteMemory = async (id: string) => {
@@ -148,7 +156,20 @@ const Memories = () => {
 
                 {/* Display Memories */}
                 <div>
-                    <h2 className="text-xl font-semibold mb-2">Your Memories</h2>
+                    <div className="flex flew-row justify-start align-center">
+                        <h2 className="text-xl font-semibold">Your Memories</h2>
+                        {/* Copy Data Button */}
+                        {filteredMemories.length > 0 && (
+                            <button
+                                className="flex justify-center items-center gap-2 p-2 cursor-pointer"
+                                onClick={handleCopyToClipboard}
+                                aria-label="Copy all user data"
+                            >
+                                <FaRegCopy className="text-gray-500 hover:text-gray-400 pb-1" size={20} />
+                                {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
+                            </button>
+                        )}
+                    </div>
                     <div className="space-y-4">
                         {filteredMemories.length === 0 ? (
                             <p>No memories found. Start creating some!</p>
@@ -199,7 +220,7 @@ const Memories = () => {
                 )}
                 <div className="flex flex-row gap-2 md:mt-4">
                     <button
-                        className="mt-2 bg-black text-white p-2 rounded-lg h-10"
+                        className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm"
                         onClick={handleImportMemories}
                     >
                         Import memories
@@ -207,24 +228,9 @@ const Memories = () => {
 
                     {/* create a button that says Create a memory, that will redirect the user to /dashboard/memories/create */}
                     <Link href="/dashboard/memories/create">
-                        <button className="mt-2 bg-black text-white p-2 rounded-lg h-10">Create a memory</button>
+                        <button className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm">Create a memory</button>
                     </Link>
                 </div>
-
-                {/* Copy Data Button */}
-                {filteredMemories.length > 0 && (
-                    <div className="mt-8">
-                        <h2 className="text-xl font-semibold mb-2">Copy Your Data</h2>
-                        <button
-                            className="flex justify-center items-center gap-2 p-2 border border-gray-500 rounded-lg cursor-pointer"
-                            onClick={handleCopyToClipboard}
-                            aria-label="Copy all user data"
-                        >
-                            <span>Copy all user data</span>
-                            <FaRegCopy className="text-gray-500" size={34} />
-                        </button>
-                    </div>
-                )}
             </div>
         </MaxWidthWrapper>
     );

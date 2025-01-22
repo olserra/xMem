@@ -50,17 +50,6 @@ export default function ProjectsPage() {
     return (
         <MaxWidthWrapper>
             <div className="py-6">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-2xl font-semibold">Projects</h1>
-                    <Link
-                        href="/dashboard/projects/create"
-                        className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-                    >
-                        <Plus size={20} />
-                        <span>New Project</span>
-                    </Link>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-start">
                     {projects.map((project) => (
                         <Link
@@ -78,6 +67,14 @@ export default function ProjectsPage() {
                             </div>
                         </Link>
                     ))}
+                </div>
+                <div className="flex justify-between items-center mt-2 md:mt-4">
+                    <Link
+                        href="/dashboard/projects/create"
+                        className="flex items-center text-sm gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+                    >
+                        <span>New Project</span>
+                    </Link>
                 </div>
             </div>
         </MaxWidthWrapper>

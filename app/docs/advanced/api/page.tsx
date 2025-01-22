@@ -19,8 +19,7 @@ export default function ApiReferencePage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Overview</h2>
                 <p className="leading-7">
-                    xmem&apos;s API provides a set of RESTful endpoints that you can use to interact with your projects, memories,
-                    and tags. The API is designed to be simple and flexible, allowing you to create, read, update, and delete
+                    xmem&apos;s API provides a set of RESTful endpoints that you can use to interact with your projects and memories. The API is designed to be simple and flexible, allowing you to create, read, update, and delete
                     resources. You can use the API to access your data, integrate with third-party tools, and automate processes.
                 </p>
 
@@ -71,13 +70,11 @@ export default function ApiReferencePage() {
                         {
                             "id": "memoryId1",
                             "content": "This is a memory",
-                            "tags": ["tag1", "tag2"],
                             "createdAt": "2025-01-01T10:00:00Z"
                         },
                         {
                             "id": "memoryId2",
                             "content": "Another memory",
-                            "tags": ["tag3", "tag4"],
                             "createdAt": "2025-01-02T10:00:00Z"
                         }
                     ]`}

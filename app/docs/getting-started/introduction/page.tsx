@@ -36,7 +36,6 @@ export default function IntroductionPage() {
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Key Features</h2>
                 <ul className="list-disc list-inside space-y-2">
                     <li><strong>Project-based Organization:</strong> xmem helps you organize your knowledge by projects, allowing you to maintain focused, compartmentalized collections of information.</li>
-                    <li><strong>Smart Tagging System:</strong> Tags make it easy to categorize and search through your content. You can create custom tags to group memories or notes in a way that fits your workflow.</li>
                     <li><strong>Real-time Collaboration:</strong> Collaborate seamlessly with team members by sharing memories and working together on projects, ensuring that knowledge is accessible and actionable.</li>
                     <li><strong>Powerful Search Capabilities:</strong> xmem&apos;s search functionality is designed to help you find relevant information quickly, whether you&apos;re looking for a specific memory or a set of related documents.</li>
                     <li><strong>Version Control:</strong> Track the evolution of your documents and memories. xmem allows you to manage different versions of your content, providing full history and version rollback capabilities.</li>

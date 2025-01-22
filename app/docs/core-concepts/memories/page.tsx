@@ -13,7 +13,7 @@ export default function MemoriesPage() {
             <div className="space-y-4">
                 <p className="leading-7">
                     In xmem, memories are the core units of knowledge. They are used to capture thoughts, ideas, insights,
-                    and any other type of information you wish to store. Memories are versatile and can be organized, tagged,
+                    and any other type of information you wish to store. Memories are versatile and can be organized,
                     and searched to help you stay organized.
                 </p>
 
@@ -24,7 +24,6 @@ export default function MemoriesPage() {
                 </p>
                 <ul className="list-disc list-inside space-y-2">
                     <li><strong>Content:</strong> The main body of your memory, where you describe your thoughts or ideas.</li>
-                    <li><strong>Tags:</strong> Labels you assign to categorize your memory. Tags help with organization and searching.</li>
                     <li><strong>Project:</strong> Memories belong to specific projects, making it easy to organize knowledge related to a particular theme.</li>
                     <li><strong>Metadata:</strong> Additional details such as the creation date and any custom information relevant to the memory.</li>
                 </ul>
@@ -38,17 +37,15 @@ export default function MemoriesPage() {
                     <li>Go to your project page.</li>
                     <li>Click the <strong>&quot;Create Memory&quot;</strong> button.</li>
                     <li>Enter the content of your memory.</li>
-                    <li>Add <strong>exactly 3 tags</strong> to categorize your memory.</li>
                     <li>Click <strong>Save</strong> to add your memory to the project.</li>
                 </ol>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Managing Memories</h2>
                 <p className="leading-7">
-                    You can edit, delete, or organize your memories within a project. By using tags, you can easily filter and
+                    You can edit, delete, or organize your memories within a project. You can easily filter and
                     search for specific memories. Here are some tips for managing your memories effectively:
                 </p>
                 <ul className="list-disc list-inside space-y-2">
-                    <li>Use meaningful tags that represent the content of your memory.</li>
                     <li>Group related memories within the same project for easy access.</li>
                     <li>Review and update your memories regularly to keep them relevant.</li>
                 </ul>

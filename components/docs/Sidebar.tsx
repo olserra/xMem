@@ -13,7 +13,6 @@ const sidebarItems = {
     "Core Concepts": [
         { title: "Projects", href: "/docs/core-concepts/projects" },
         { title: "Memories", href: "/docs/core-concepts/memories" },
-        { title: "Tags", href: "/docs/core-concepts/tags" },
     ],
     "Advanced Usage": [
         { title: "API Reference", href: "/docs/advanced/api" },

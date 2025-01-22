@@ -35,28 +35,47 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { content, type = "note", tags = [], metadata = {}, projectId, userId } = await req.json();
+    const { memories, content, type = "note", metadata = {}, projectId, userId } = await req.json();
 
-    if (!content || !userId) {
+    if (!userId) {
         return NextResponse.json({
-            error: 'Content and userId are required'
+            error: 'User ID is required'
         }, { status: 400 });
     }
 
     try {
-        const newMemory = await prisma.memory.create({
-            data: {
-                content,
-                type,
-                tags, // This will default to an empty array if not provided
-                metadata,
-                userId: userId,
-                ...(projectId && { projectId }),
-                isArchived: false,
-                version: 1
-            },
-        });
-        return NextResponse.json(newMemory, { status: 201 });
+        if (memories && Array.isArray(memories)) {
+            // Handle bulk import of memories
+            const newMemories = await prisma.memory.createMany({
+                data: memories.map(memory => ({
+                    ...memory,
+                    userId,
+                    projectId: memory.projectId || projectId,
+                    type: memory.type || "note", // Ensure type is provided
+                    isArchived: false,
+                    version: 1,
+                })),
+            });
+            return NextResponse.json(newMemories, { status: 201 });
+        } else if (content) {
+            // Handle single memory creation
+            const newMemory = await prisma.memory.create({
+                data: {
+                    content,
+                    type,
+                    metadata,
+                    userId,
+                    ...(projectId && { projectId }),
+                    isArchived: false,
+                    version: 1
+                },
+            });
+            return NextResponse.json(newMemory, { status: 201 });
+        } else {
+            return NextResponse.json({
+                error: 'Content is required for single memory creation'
+            }, { status: 400 });
+        }
     } catch (error) {
         console.error('Error creating memory:', error);
         return NextResponse.json({

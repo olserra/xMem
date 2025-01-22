@@ -40,7 +40,7 @@ model Memory {
   id         String   @id @default(cuid())
   content    String   @db.Text // The actual memory content
   metadata   Json? // Additional metadata about the memory
-  tags       String[] // Array of tags for categorization
+  tags       String[] @default([]) // Array of tags for categorization with default empty array
   type       String // Type of memory (e.g., "fact", "conversation", "note")
   projectId  String?
   userId     String

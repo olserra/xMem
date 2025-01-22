@@ -33,7 +33,7 @@ const Memories = () => {
     const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isImport, setIsImport] = useState(true);
+    const [isImport, setIsImport] = useState(false);
     const [filterLabel, setFilterLabel] = useState<string>("");
     const [importedMemories, setImportedMemories] = useState("");
 
@@ -61,7 +61,7 @@ const Memories = () => {
         };
 
         fetchMemory();
-    }, [session, status, userId]);
+    }, [session, status, userId, importedMemories]);
 
 
     const handleCopyToClipboard = () => {
@@ -86,6 +86,7 @@ const Memories = () => {
     };
 
     const handleImportMemories = async () => {
+        setIsImport(true);
         const memories = importedMemories.split("\n").filter(Boolean);
         const newMemories = memories.map((content: string) => ({ content }));
 
@@ -193,14 +194,22 @@ const Memories = () => {
                             placeholder="Paste your memories here"
                             className="p-2 border rounded-lg w-full"
                         />
-                        <button
-                            className="mt-2 bg-black text-white p-2 rounded-lg"
-                            onClick={handleImportMemories}
-                        >
-                            Import memories
-                        </button>
+
                     </div>
                 )}
+                <div className="flex flex-row gap-2 md:mt-4">
+                    <button
+                        className="mt-2 bg-black text-white p-2 rounded-lg h-10"
+                        onClick={handleImportMemories}
+                    >
+                        Import memories
+                    </button>
+
+                    {/* create a button that says Create a memory, that will redirect the user to /dashboard/memories/create */}
+                    <Link href="/dashboard/memories/create">
+                        <button className="mt-2 bg-black text-white p-2 rounded-lg h-10">Create a memory</button>
+                    </Link>
+                </div>
 
                 {/* Copy Data Button */}
                 {filteredMemories.length > 0 && (

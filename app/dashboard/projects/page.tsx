@@ -66,7 +66,7 @@ export default function ProjectsPage() {
                         <Link
                             key={project.id}
                             href={`/dashboard/projects/${project.id}`}
-                            className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                            className="border border-gray-300 bg-white rounded-lg p-4 hover:border-gray-400 transition-shadow"
                         >
                             <div className="flex flex-col h-full">
                                 <h2 className="text-lg font-semibold mb-2">{project.name}</h2>

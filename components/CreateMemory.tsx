@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { useUser } from "@/app/Context";
@@ -22,7 +21,6 @@ interface Memory {
     id: string;
     content: string;
     type: string;
-    tags: string[];
     metadata?: any;
     projectId: string;
     createdAt: string;
@@ -31,7 +29,6 @@ interface Memory {
 
 interface CreateMemoryForm {
     content: string;
-    tags: string[];
     projectId?: string;
 }
 
@@ -61,30 +58,20 @@ export default function CreateMemory() {
 
     const [formData, setFormData] = useState<CreateMemoryForm>({
         content: "",
-        tags: [],
         projectId: initialProjectId || undefined
     });
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const availableTags = [
-        "Personal Facts", "Preferences", "Work History", "Hobbies", "Education",
-        "Skills", "Goals", "Challenges", "Achievements", "Important Dates",
-        "Insights", "Experiences", "Health", "Technology", "Mindset",
-        "Creativity", "Productivity", "Learning", "Well-being", "Motivation",
-    ];
-
     useEffect(() => {
         const id = searchParams.get('id');
         const content = searchParams.get('content');
-        const tags = searchParams.get('tags')?.split(",") || [];
         const projectId = searchParams.get('projectId');
 
         if (id && content) {
             setFormData({
                 content,
-                tags,
                 projectId: projectId || undefined  // Ensure projectId is properly set
             });
         }
@@ -121,12 +108,6 @@ export default function CreateMemory() {
             return;
         }
 
-        if (formData.tags.length !== 3) {
-            setError("Please select exactly 3 tags");
-            setLoading(false);
-            return;
-        }
-
         const memoryId = searchParams.get('id');
         const isEditing = Boolean(memoryId);
 
@@ -136,7 +117,6 @@ export default function CreateMemory() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     content: formData.content,
-                    tags: formData.tags,
                     type: "note",
                     metadata: {},
                     projectId: formData.projectId !== undefined ? formData.projectId : null,  // Explicitly handle null
@@ -159,18 +139,6 @@ export default function CreateMemory() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleTagToggle = (tag: string) => {
-        setFormData(prev => {
-            if (prev.tags.includes(tag)) {
-                return { ...prev, tags: prev.tags.filter(t => t !== tag) };
-            }
-            if (prev.tags.length < 3) {
-                return { ...prev, tags: [...prev.tags, tag] };
-            }
-            return prev;
-        });
     };
 
     return (
@@ -235,30 +203,6 @@ export default function CreateMemory() {
                                 className="w-full p-2 sm:p-3 border rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
                                 required
                             />
-                        </div>
-
-                        <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm">
-                            <div className="flex justify-between items-center mb-3 sm:mb-4">
-                                <h2 className="text-base sm:text-lg font-medium">Select Tags (3)</h2>
-                                <span className="text-xs sm:text-sm text-gray-500">
-                                    {formData.tags.length}/3 selected
-                                </span>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                {availableTags.map((tag) => (
-                                    <button
-                                        key={tag}
-                                        type="button"
-                                        onClick={() => handleTagToggle(tag)}
-                                        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${formData.tags.includes(tag)
-                                            ? 'bg-black text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        {tag}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
 
                         {error && (

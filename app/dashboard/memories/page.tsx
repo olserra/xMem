@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { useUser } from "../../Context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Skeleton from "react-loading-skeleton";
 
 interface Project {
     id: string;
@@ -17,7 +18,6 @@ interface Memory {
     id: string;
     content: string;
     type: string;
-    metadata?: any;
     userId: string;
     projectId?: string;
     project?: Project;
@@ -31,13 +31,11 @@ const Memories = () => {
     const { data: session, status } = useSession();
     const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [isImport, setIsImport] = useState(false);
     const [filterLabel, setFilterLabel] = useState<string>("");
-    const [importedMemories, setImportedMemories] = useState("");
+    const [importedMemories, setImportedMemories] = useState<string>("");
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (!session || status !== "authenticated") return;
@@ -49,12 +47,11 @@ const Memories = () => {
                 const data = await response.json();
 
                 if (Array.isArray(data)) {
-                    setMemory(data); // Set memories when fetched
+                    setMemory(data);
                 } else {
                     setMemory([]);
                 }
             } catch (err) {
-                setError("Failed to fetch memory. Please try again.");
                 setMemory([]);
             } finally {
                 setLoading(false);
@@ -62,11 +59,10 @@ const Memories = () => {
         };
 
         fetchMemory();
-    }, [session, status, userId, importedMemories]);
+    }, [session, status, userId]);
 
-    const handleCopyToClipboard = () => {
+    const handleCopyToClipboard = useCallback(() => {
         setIsCopied(true);
-
         const allUserMemory = JSON.stringify(memory);
         navigator.clipboard.writeText(allUserMemory)
             .then(() => console.log('User data copied to clipboard'))
@@ -75,41 +71,37 @@ const Memories = () => {
         setTimeout(() => {
             setIsCopied(false);
         }, 1000);
-    };
+    }, [memory]);
 
-    const handleDeleteMemory = async (id: string) => {
+    const handleDeleteMemory = useCallback(async (id: string) => {
         try {
             const response = await fetch(`/api/memory/${id}?userId=${userId}`, { method: "DELETE" });
 
             if (response.ok) {
-                setMemory(memory.filter(memory => memory.id !== id));
-            } else {
-                setError("Failed to delete memory.");
+                setMemory(memory.filter((m) => m.id !== id)); // Remove the deleted memory from the state
             }
         } catch (err) {
-            setError("Failed to delete memory.");
+            console.error("Failed to delete memory.");
         }
-    };
+    }, [memory, userId]);
 
-    const handleDeleteSelectedMemories = async () => {
+    const handleDeleteSelectedMemories = useCallback(async () => {
         try {
-            const deletePromises = Array.from(selectedMemories).map(id =>
+            const deletePromises = Array.from(selectedMemories).map((id) =>
                 fetch(`/api/memory/${id}?userId=${userId}`, { method: "DELETE" })
             );
             const responses = await Promise.all(deletePromises);
 
-            if (responses.every(response => response.ok)) {
-                setMemory(memory.filter(memory => !selectedMemories.has(memory.id)));
-                setSelectedMemories(new Set()); // Clear selection after delete
-            } else {
-                setError("Failed to delete selected memories.");
+            if (responses.every((response) => response.ok)) {
+                setMemory(memory.filter((m) => !selectedMemories.has(m.id)));
+                setSelectedMemories(new Set()); // Clear the selected memories after deleting
             }
         } catch (err) {
-            setError("Failed to delete selected memories.");
+            console.error("Failed to delete selected memories.");
         }
-    };
+    }, [memory, selectedMemories, userId]);
 
-    const handleImportMemories = async () => {
+    const handleImportMemories = useCallback(async () => {
         const memories = importedMemories.split("\n").filter(Boolean);
         const newMemories = memories.map((content: string) => ({ content }));
 
@@ -126,16 +118,14 @@ const Memories = () => {
                 const data = await response.json();
                 setMemory([...memory, ...data]);
                 setImportedMemories("");
-                setIsModalOpen(false); // Close the modal after successful import
-            } else {
-                setError("Failed to import memories.");
+                setIsModalOpen(false);
             }
         } catch (err) {
-            setError("Failed to import memories.");
+            console.error("Failed to import memories.");
         }
-    };
+    }, [importedMemories, memory, userId]);
 
-    const handleEditMemory = (memory: Memory) => {
+    const handleEditMemory = useCallback((memory: Memory) => {
         const queryParams = new URLSearchParams({
             id: memory.id,
             content: memory.content,
@@ -143,13 +133,15 @@ const Memories = () => {
         }).toString();
 
         router.push(`/dashboard/memories/create?${queryParams}`);
-    };
+    }, [router]);
 
-    const filteredMemories = memory.filter(m =>
-        filterLabel ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
-    );
+    const filteredMemories = useMemo(() => {
+        return memory.filter(m =>
+            filterLabel ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
+        );
+    }, [memory, filterLabel]);
 
-    const toggleSelection = (id: string) => {
+    const toggleSelection = useCallback((id: string) => {
         setSelectedMemories(prev => {
             const newSelected = new Set(prev);
             if (newSelected.has(id)) {
@@ -159,18 +151,22 @@ const Memories = () => {
             }
             return newSelected;
         });
-    };
+    }, []);
 
-    const toggleSelectAll = () => {
+    const toggleSelectAll = useCallback(() => {
         if (selectedMemories.size === filteredMemories.length) {
             setSelectedMemories(new Set());
         } else {
-            setSelectedMemories(new Set(filteredMemories.map(memory => memory.id)));
+            setSelectedMemories(new Set(filteredMemories.map((memory) => memory.id)));
         }
-    };
+    }, [filteredMemories, selectedMemories]);
 
     if (loading) {
-        return <p>Loading memories...</p>;
+        return (
+            <div className="space-y-4">
+                <Skeleton count={5} height={80} />
+            </div>
+        );
     }
 
     return (
@@ -219,16 +215,6 @@ const Memories = () => {
 
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-xl font-semibold">Your Memories</h2>
-                    {isImport && (
-                        <div className="mt-4">
-                            <textarea
-                                value={importedMemories}
-                                onChange={(e) => setImportedMemories(e.target.value)}
-                                placeholder="Paste your memories here"
-                                className="p-2 border rounded-lg w-full"
-                            />
-                        </div>
-                    )}
 
                     <div className="flex flex-row gap-2 items-center justify-between">
                         <button
@@ -313,6 +299,13 @@ const Memories = () => {
                                     <div className="flex justify-end mt-4 space-x-4">
                                         <button onClick={() => handleEditMemory(memory)}>
                                             <FaPen className="text-black" />
+                                        </button>
+                                        <button
+                                            className="p-2 text-black rounded-lg"
+                                            onClick={() => handleDeleteMemory(memory.id)} // This should work now
+                                            aria-label="Delete Memory"
+                                        >
+                                            <FaTrash />
                                         </button>
                                     </div>
                                 </div>

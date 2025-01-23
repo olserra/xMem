@@ -52,7 +52,7 @@ export default function MemoriesPage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Importing Memories</h2>
                 <p className="leading-7">
-                    If you have a set of memories from another source, such as ChatGPT, you can import them into xmem. Here's how:
+                    If you have a set of memories from another source, such as ChatGPT, you can import them into xmem. Here is how:
                 </p>
                 <ol className="list-decimal list-inside space-y-2">
                     <li>Copy the desired memories from your source, such as ChatGPT.</li>

@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     try {
         if (memories && Array.isArray(memories)) {
             // Handle bulk import of memories
-            const newMemories = await prisma.memory.createMany({
+            await prisma.memory.createMany({
                 data: memories.map(memory => ({
                     ...memory,
                     userId,
@@ -56,7 +56,16 @@ export async function POST(req: Request) {
                     version: 1,
                 })),
             });
-            return NextResponse.json(newMemories, { status: 201 });
+
+            // Fetch the newly created memories
+            const createdMemories = await prisma.memory.findMany({
+                where: {
+                    userId,
+                    content: { in: memories.map(memory => memory.content) }
+                }
+            });
+
+            return NextResponse.json(createdMemories, { status: 201 });
         } else if (content) {
             // Handle single memory creation
             const newMemory = await prisma.memory.create({
@@ -70,6 +79,7 @@ export async function POST(req: Request) {
                     version: 1
                 },
             });
+
             return NextResponse.json(newMemory, { status: 201 });
         } else {
             return NextResponse.json({

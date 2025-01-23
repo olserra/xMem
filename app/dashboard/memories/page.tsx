@@ -36,6 +36,7 @@ const Memories = () => {
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [importSuccess, setImportSuccess] = useState(false);
 
     useEffect(() => {
         if (!session || status !== "authenticated") return;
@@ -59,7 +60,7 @@ const Memories = () => {
         };
 
         fetchMemory();
-    }, [session, status, userId]);
+    }, [session, status, userId, importSuccess]);
 
     const handleCopyToClipboard = useCallback(() => {
         setIsCopied(true);
@@ -102,6 +103,7 @@ const Memories = () => {
     }, [memory, selectedMemories, userId]);
 
     const handleImportMemories = useCallback(async () => {
+        setIsModalOpen(false);
         const memories = importedMemories.split("\n").filter(Boolean);
         const newMemories = memories.map((content: string) => ({ content }));
 
@@ -116,14 +118,16 @@ const Memories = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setMemory([...memory, ...data]);
+                setMemory(prevMemory => [...prevMemory, ...data]);
                 setImportedMemories("");
-                setIsModalOpen(false);
+                setImportSuccess(true);
             }
         } catch (err) {
             console.error("Failed to import memories.");
         }
-    }, [importedMemories, memory, userId]);
+    }, [importedMemories, userId]);
+
+
 
     const handleEditMemory = useCallback((memory: Memory) => {
         const queryParams = new URLSearchParams({

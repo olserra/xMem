@@ -37,6 +37,7 @@ const Memories = () => {
     const [importedMemories, setImportedMemories] = useState("");
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
     useEffect(() => {
         if (!session || status !== "authenticated") return;
@@ -109,7 +110,6 @@ const Memories = () => {
     };
 
     const handleImportMemories = async () => {
-        setIsImport(true);
         const memories = importedMemories.split("\n").filter(Boolean);
         const newMemories = memories.map((content: string) => ({ content }));
 
@@ -126,14 +126,14 @@ const Memories = () => {
                 const data = await response.json();
                 setMemory([...memory, ...data]);
                 setImportedMemories("");
-                setIsImport(false);
+                setIsModalOpen(false); // Close the modal after successful import
             } else {
                 setError("Failed to import memories.");
             }
         } catch (err) {
             setError("Failed to import memories.");
         }
-    }
+    };
 
     const handleEditMemory = (memory: Memory) => {
         const queryParams = new URLSearchParams({
@@ -217,9 +217,66 @@ const Memories = () => {
                     />
                 </div>
 
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-2">
                     <h2 className="text-xl font-semibold">Your Memories</h2>
+                    {isImport && (
+                        <div className="mt-4">
+                            <textarea
+                                value={importedMemories}
+                                onChange={(e) => setImportedMemories(e.target.value)}
+                                placeholder="Paste your memories here"
+                                className="p-2 border rounded-lg w-full"
+                            />
+                        </div>
+                    )}
+
+                    <div className="flex flex-row gap-2 items-center justify-between">
+                        <button
+                            className="mt-2 text-black py-2 px-3 rounded-lg"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            Import memories
+                        </button>
+
+                        <Link href="/dashboard/memories/create">
+                            <button className="mt-2 text-black py-2 px-3 rounded-lg h-10">Create a memory</button>
+                        </Link>
+                    </div>
                 </div>
+
+                {/* Modal for importing memories */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+                        <div className="bg-white p-8 rounded-lg w-96">
+                            <div className="flex flex-row items-center gap-4">
+                                <h3 className="text-xl font-semibold mb-4">Import Memories</h3>
+                                <Link href="/docs/core-concepts/memories" className="text-blue-500 underline mb-4">
+                                    <span className="text-sm">Read more</span>
+                                </Link>
+                            </div>
+                            <textarea
+                                value={importedMemories}
+                                onChange={(e) => setImportedMemories(e.target.value)}
+                                placeholder="Paste your memories here"
+                                className="p-2 border rounded-lg w-full mb-4"
+                            />
+                            <div className="flex justify-between">
+                                <button
+                                    className="bg-gray-300 text-black py-2 px-3 rounded-lg"
+                                    onClick={() => setIsModalOpen(false)} // Close the modal
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="bg-black text-white py-2 px-3 rounded-lg"
+                                    onClick={handleImportMemories}
+                                >
+                                    Import
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     {filteredMemories.length === 0 ? (
@@ -227,27 +284,29 @@ const Memories = () => {
                     ) : (
                         filteredMemories.map((memory: Memory) => (
                             <div key={memory.id} className="border border-gray-300 bg-white p-4 rounded-lg relative">
-                                <div className="flex flex-row">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedMemories.has(memory.id)}
-                                        onChange={() => toggleSelection(memory.id)}
-                                        className="mr-2"
-                                    />
-                                    <div className="text-sm text-gray-500">
-                                        {new Date(memory.createdAt).toLocaleString()}
+                                <div className="flex flex-row items-center justify-between">
+                                    <div className="flex">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedMemories.has(memory.id)}
+                                            onChange={() => toggleSelection(memory.id)}
+                                            className="mr-2"
+                                        />
+                                        <div className="text-sm text-gray-500">
+                                            {new Date(memory.createdAt).toLocaleString()}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex justify-between items-start mb-2">
-                                    {memory.projectId && memory.project && (
-                                        <Link
-                                            href={`/dashboard/projects/${memory.projectId}`}
-                                            className="text-sm px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-1"
-                                        >
-                                            <span className="w-2 h-2 rounded-full bg-black"></span>
-                                            {memory.project.name}
-                                        </Link>
-                                    )}
+                                    <div className="flex justify-between items-start mb-2">
+                                        {memory.projectId && memory.project && (
+                                            <Link
+                                                href={`/dashboard/projects/${memory.projectId}`}
+                                                className="text-sm px-3 py-1 bg-gray-100 border border-gray-200 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-1"
+                                            >
+                                                <span className="w-2 h-2 rounded-full bg-black"></span>
+                                                {memory.project.name}
+                                            </Link>
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <p>{memory.content}</p>
@@ -260,30 +319,6 @@ const Memories = () => {
                             </div>
                         ))
                     )}
-                </div>
-
-                {isImport && (
-                    <div className="mt-4">
-                        <textarea
-                            value={importedMemories}
-                            onChange={(e) => setImportedMemories(e.target.value)}
-                            placeholder="Paste your memories here"
-                            className="p-2 border rounded-lg w-full"
-                        />
-                    </div>
-                )}
-
-                <div className="flex flex-row gap-2 md:mt-4">
-                    <button
-                        className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm"
-                        onClick={handleImportMemories}
-                    >
-                        Import memories
-                    </button>
-
-                    <Link href="/dashboard/memories/create">
-                        <button className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm">Create a memory</button>
-                    </Link>
                 </div>
             </div>
         </MaxWidthWrapper>

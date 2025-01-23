@@ -49,6 +49,18 @@ export default function MemoriesPage() {
                     <li>Group related memories within the same project for easy access.</li>
                     <li>Review and update your memories regularly to keep them relevant.</li>
                 </ul>
+
+                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Importing Memories</h2>
+                <p className="leading-7">
+                    If you have a set of memories from another source, such as ChatGPT, you can import them into xmem. Here's how:
+                </p>
+                <ol className="list-decimal list-inside space-y-2">
+                    <li>Copy the desired memories from your source, such as ChatGPT.</li>
+                    <li>Go to your Memories page in xmem.</li>
+                    <li>Click the <strong>&quot;Import Memories&quot;</strong> button.</li>
+                    <li>Paste the copied content into the memory field.</li>
+                    <li>Click <strong>Save</strong> to add the imported memories to your project.</li>
+                </ol>
             </div>
         </div>
     );

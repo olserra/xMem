@@ -177,7 +177,37 @@ const Memories = () => {
         <MaxWidthWrapper>
             <div className="p-8">
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Filter Memories By Text</h2>
+                    <div className="flex justify-between">
+                        <h2 className="text-xl font-semibold mb-2">Filter Memories By Text</h2>
+                        <div className="flex items-center gap-2">
+                            <button
+                                className="p-2"
+                                onClick={toggleSelectAll}
+                                aria-label="Select All"
+                            >
+                                {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
+                            </button>
+                            {selectedMemories.size > 0 && (
+                                <>
+                                    <button
+                                        className="p-2 text-black rounded-lg"
+                                        onClick={handleDeleteSelectedMemories}
+                                        aria-label="Delete Selected Memories"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                    <button
+                                        className="p-2 text-black hover:text-gray-400"
+                                        onClick={handleCopyToClipboard}
+                                        aria-label="Copy all user data"
+                                    >
+                                        <FaRegCopy />
+                                        {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <input
                         type="text"
                         value={filterLabel}
@@ -189,34 +219,6 @@ const Memories = () => {
 
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Your Memories</h2>
-                    <div className="flex items-center gap-2">
-                        <button
-                            className="p-2"
-                            onClick={toggleSelectAll}
-                            aria-label="Select All"
-                        >
-                            {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
-                        </button>
-                        {selectedMemories.size > 0 && (
-                            <>
-                                <button
-                                    className="p-2 text-black rounded-lg"
-                                    onClick={handleDeleteSelectedMemories}
-                                    aria-label="Delete Selected Memories"
-                                >
-                                    <FaTrash />
-                                </button>
-                                <button
-                                    className="p-2 text-black hover:text-gray-400"
-                                    onClick={handleCopyToClipboard}
-                                    aria-label="Copy all user data"
-                                >
-                                    <FaRegCopy />
-                                    {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
-                                </button>
-                            </>
-                        )}
-                    </div>
                 </div>
 
                 <div className="space-y-4">

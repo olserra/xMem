@@ -8,7 +8,6 @@ import { useUser } from "../../Context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// Define interfaces for the label and memory state
 interface Project {
     id: string;
     name: string;
@@ -37,7 +36,7 @@ const Memories = () => {
     const [filterLabel, setFilterLabel] = useState<string>("");
     const [importedMemories, setImportedMemories] = useState("");
     const [isCopied, setIsCopied] = useState(false);
-
+    const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (!session || status !== "authenticated") return;
@@ -64,7 +63,6 @@ const Memories = () => {
         fetchMemory();
     }, [session, status, userId, importedMemories]);
 
-
     const handleCopyToClipboard = () => {
         setIsCopied(true);
 
@@ -73,7 +71,6 @@ const Memories = () => {
             .then(() => console.log('User data copied to clipboard'))
             .catch(err => console.error('Failed to copy user data:', err));
 
-        // Reset isCopied to false after 3 seconds
         setTimeout(() => {
             setIsCopied(false);
         }, 1000);
@@ -90,6 +87,24 @@ const Memories = () => {
             }
         } catch (err) {
             setError("Failed to delete memory.");
+        }
+    };
+
+    const handleDeleteSelectedMemories = async () => {
+        try {
+            const deletePromises = Array.from(selectedMemories).map(id =>
+                fetch(`/api/memory/${id}?userId=${userId}`, { method: "DELETE" })
+            );
+            const responses = await Promise.all(deletePromises);
+
+            if (responses.every(response => response.ok)) {
+                setMemory(memory.filter(memory => !selectedMemories.has(memory.id)));
+                setSelectedMemories(new Set()); // Clear selection after delete
+            } else {
+                setError("Failed to delete selected memories.");
+            }
+        } catch (err) {
+            setError("Failed to delete selected memories.");
         }
     };
 
@@ -131,9 +146,28 @@ const Memories = () => {
     };
 
     const filteredMemories = memory.filter(m =>
-        filterLabel
-            ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
+        filterLabel ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
     );
+
+    const toggleSelection = (id: string) => {
+        setSelectedMemories(prev => {
+            const newSelected = new Set(prev);
+            if (newSelected.has(id)) {
+                newSelected.delete(id);
+            } else {
+                newSelected.add(id);
+            }
+            return newSelected;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedMemories.size === filteredMemories.length) {
+            setSelectedMemories(new Set());
+        } else {
+            setSelectedMemories(new Set(filteredMemories.map(memory => memory.id)));
+        }
+    };
 
     if (loading) {
         return <p>Loading memories...</p>;
@@ -142,7 +176,6 @@ const Memories = () => {
     return (
         <MaxWidthWrapper>
             <div className="p-8">
-                {/* Filter Memories by Text */}
                 <div className="mb-6">
                     <h2 className="text-xl font-semibold mb-2">Filter Memories By Text</h2>
                     <input
@@ -154,57 +187,77 @@ const Memories = () => {
                     />
                 </div>
 
-                {/* Display Memories */}
-                <div>
-                    <div className="flex flew-row justify-start align-center">
-                        <h2 className="text-xl font-semibold">Your Memories</h2>
-                        {/* Copy Data Button */}
-                        {filteredMemories.length > 0 && (
-                            <button
-                                className="flex justify-center items-center gap-2 p-2 cursor-pointer"
-                                onClick={handleCopyToClipboard}
-                                aria-label="Copy all user data"
-                            >
-                                <FaRegCopy className="text-gray-500 hover:text-gray-400 pb-1" size={20} />
-                                {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
-                            </button>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Your Memories</h2>
+                    <div className="flex items-center gap-2">
+                        <button
+                            className="p-2"
+                            onClick={toggleSelectAll}
+                            aria-label="Select All"
+                        >
+                            {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
+                        </button>
+                        {selectedMemories.size > 0 && (
+                            <>
+                                <button
+                                    className="p-2 text-black rounded-lg"
+                                    onClick={handleDeleteSelectedMemories}
+                                    aria-label="Delete Selected Memories"
+                                >
+                                    <FaTrash />
+                                </button>
+                                <button
+                                    className="p-2 text-black hover:text-gray-400"
+                                    onClick={handleCopyToClipboard}
+                                    aria-label="Copy all user data"
+                                >
+                                    <FaRegCopy />
+                                    {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
+                                </button>
+                            </>
                         )}
                     </div>
-                    <div className="space-y-4">
-                        {filteredMemories.length === 0 ? (
-                            <p>No memories found. Start creating some!</p>
-                        ) : (
-                            filteredMemories.map((memory: Memory) => (
-                                <div key={memory.id} className="border border-gray-300 bg-white p-4 rounded-lg">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="text-sm text-gray-500">
-                                            {new Date(memory.createdAt).toLocaleString()}
-                                        </div>
-                                        {memory.projectId && memory.project && (
-                                            <Link
-                                                href={`/dashboard/projects/${memory.projectId}`}
-                                                className="text-sm px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-1"
-                                            >
-                                                <span className="w-2 h-2 rounded-full bg-black"></span>
-                                                {memory.project.name}
-                                            </Link>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p>{memory.content}</p>
-                                        <div className="flex justify-end mt-4 space-x-4">
-                                            <button onClick={() => handleEditMemory(memory)}>
-                                                <FaPen className="text-black" />
-                                            </button>
-                                            <button onClick={() => handleDeleteMemory(memory.id)}>
-                                                <FaTrash className="text-black" />
-                                            </button>
-                                        </div>
+                </div>
+
+                <div className="space-y-4">
+                    {filteredMemories.length === 0 ? (
+                        <p>No memories found. Start creating some!</p>
+                    ) : (
+                        filteredMemories.map((memory: Memory) => (
+                            <div key={memory.id} className="border border-gray-300 bg-white p-4 rounded-lg relative">
+                                <div className="flex flex-row">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedMemories.has(memory.id)}
+                                        onChange={() => toggleSelection(memory.id)}
+                                        className="mr-2"
+                                    />
+                                    <div className="text-sm text-gray-500">
+                                        {new Date(memory.createdAt).toLocaleString()}
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                                <div className="flex justify-between items-start mb-2">
+                                    {memory.projectId && memory.project && (
+                                        <Link
+                                            href={`/dashboard/projects/${memory.projectId}`}
+                                            className="text-sm px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-1"
+                                        >
+                                            <span className="w-2 h-2 rounded-full bg-black"></span>
+                                            {memory.project.name}
+                                        </Link>
+                                    )}
+                                </div>
+                                <div>
+                                    <p>{memory.content}</p>
+                                    <div className="flex justify-end mt-4 space-x-4">
+                                        <button onClick={() => handleEditMemory(memory)}>
+                                            <FaPen className="text-black" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {isImport && (
@@ -215,9 +268,9 @@ const Memories = () => {
                             placeholder="Paste your memories here"
                             className="p-2 border rounded-lg w-full"
                         />
-
                     </div>
                 )}
+
                 <div className="flex flex-row gap-2 md:mt-4">
                     <button
                         className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm"
@@ -226,7 +279,6 @@ const Memories = () => {
                         Import memories
                     </button>
 
-                    {/* create a button that says Create a memory, that will redirect the user to /dashboard/memories/create */}
                     <Link href="/dashboard/memories/create">
                         <button className="mt-2 bg-black text-white py-2 px-3 rounded-lg h-10 text-sm">Create a memory</button>
                     </Link>

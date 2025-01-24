@@ -185,7 +185,7 @@ const Memories = () => {
                                 onClick={toggleSelectAll}
                                 aria-label="Select All"
                             >
-                                {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
+                                {selectedMemories.size === filteredMemories.length ? '' : 'Select All'}
                             </button>
                             {selectedMemories.size > 0 && (
                                 <>

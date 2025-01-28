@@ -3,6 +3,17 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../../prisma/prisma";
 
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            name: string | null;
+            email: string | null;
+            image: string | null;
+        };
+    }
+}
+
 const options: NextAuthOptions = {
     providers: [
         GoogleProvider({
@@ -37,6 +48,13 @@ const options: NextAuthOptions = {
 
             if (url.startsWith(baseUrl)) return url;
             return "/dashboard/projects";
+        },
+        async session({ session, user }) {
+            // Add user ID to the session
+            if (user) {
+                session.user.id = user.id; // Ensure user ID is included
+            }
+            return session;
         },
     },
 

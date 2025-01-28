@@ -1,8 +1,17 @@
+import { MouseEvent } from "react";
 import { signIn } from "next-auth/react";
 
-export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
+export const handleSignIn = async (e: MouseEvent<HTMLElement>, setLoading?: (loading: boolean) => void) => {
   e.preventDefault();
-  signIn("google", {
-    callbackUrl: "https://www.openskills.online/api/auth/callback/google",
-  });
+  if (setLoading) setLoading(true);
+
+  try {
+    await signIn("google", {
+      callbackUrl: "/dashboard/projects", // Redirect to /dashboard/projects after login
+    });
+  } catch (error) {
+    console.error("SignIn Error:", error);
+  } finally {
+    if (setLoading) setLoading(false);
+  }
 };

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { Plus } from 'lucide-react';
 import { useUser } from '@/app/Context';
+import { useSession } from 'next-auth/react'; // Import useSession hook
 
 interface Project {
     id: string;
@@ -23,10 +23,17 @@ interface ProjectWithCount extends Project {
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<ProjectWithCount[]>([]);
     const { userId } = useUser();
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            window.location.href = "/";
+        }
+    }, [status]);
 
     useEffect(() => {
         const fetchProjects = async () => {
-            if (!userId) return;
+            if (!userId && session) return;
 
             try {
                 const response = await fetch(`/api/projects?userId=${userId}`);

@@ -148,7 +148,7 @@ export default function CreateMemory() {
                     <div>
                         <h1 className="text-xl sm:text-2xl font-semibold">Create New Memory</h1>
                         <p className="text-sm sm:text-base text-gray-600 mt-2">
-                            Capture your thoughts, insights, and experiences
+                            Store your data, thoughts, and ideas in a memory. Memories can be standalone or associated with a project.
                         </p>
                     </div>
 

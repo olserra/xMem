@@ -52,7 +52,7 @@ export default function ProjectsPage() {
         };
 
         fetchProjects();
-    }, [userId]);
+    }, [session, userId]);
 
     return (
         <MaxWidthWrapper>

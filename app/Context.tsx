@@ -8,6 +8,8 @@ interface UserContextType {
     userEmail: string | null;
     userName: string | null;
     favorites: string[];
+    filterLabel: string; // Add filterLabel to the context
+    setFilterLabel: (label: string) => void; // Add function to update filter
     toggleFavorite: (projectId: string) => void;
 }
 
@@ -29,6 +31,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         return [];
     });
 
+    const [filterLabel, setFilterLabel] = useState<string>("");
+
     const toggleFavorite = (projectId: string) => {
         setFavorites((prevFavorites) => {
             const newFavorites = prevFavorites.includes(projectId)
@@ -47,8 +51,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         userEmail,
         userName,
         favorites,
+        filterLabel,
+        setFilterLabel, // Provide the function to update filter state
         toggleFavorite
-    }), [userId, userEmail, userName, favorites]);
+    }), [userId, userEmail, userName, favorites, filterLabel]);
 
     return (
         <UserContext.Provider value={userValue}>

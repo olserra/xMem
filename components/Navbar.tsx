@@ -14,12 +14,14 @@ import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { useState, useRef } from 'react';
 import Modal from "./ui/modal";
+import { useUser } from "@/app/Context";
 
 const Navbar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const avatarRef = useRef<HTMLImageElement>(null);
+  const { filterLabel, setFilterLabel } = useUser(); // Consume the filter from context
 
   const menuMainItems = [
     { label: 'Docs', href: '/docs' },
@@ -29,7 +31,6 @@ const Navbar = () => {
   const menuItems = [
     { label: 'Projects', href: '/dashboard/projects' },
     { label: 'Memories', href: '/dashboard/memories' },
-    { label: 'Create', href: '/dashboard/memories/create' },
   ];
 
   const isActive = (href: string) => {
@@ -90,7 +91,21 @@ const Navbar = () => {
               </div>
             </div>
 
+
             <div className="flex gap-1 sm:gap-4 items-center">
+              {/* Filter bar when authenticated */}
+              {session && (pathname === "/dashboard/projects" || pathname === "/dashboard/memories") && (
+                <div className="flex gap-4 items-center">
+                  <input
+                    type="text"
+                    value={filterLabel}
+                    onChange={(e) => setFilterLabel(e.target.value)}
+                    placeholder={pathname === "/dashboard/projects" ? "Search projects" : "Search memories"}
+                    className="p-2 border border-gray-300 rounded-lg md:w-[500px]" // Adjusted width
+                  />
+
+                </div>
+              )}
               {/* Mobile navigation menu */}
               <Sheet>
                 <SheetTrigger className="sm:hidden pr-4">

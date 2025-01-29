@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { useUser } from '@/app/Context';
@@ -12,9 +12,31 @@ export default function CreateProject() {
         name: '',
         description: '',
     });
+    const [bearerToken, setBearerToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchBearerToken = async () => {
+            const response = await fetch(`/api/bearer-token?userId=${userId}`);
+            const data = await response.json();
+            if (data.key) {
+                setBearerToken(data.key);
+            } else {
+                console.error('Error fetching bearer token:', data.error);
+            }
+        };
+
+        if (userId) {
+            fetchBearerToken();
+        }
+    }, [userId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!bearerToken) {
+            console.error('Bearer token is missing');
+            return;
+        }
 
         // Send the data to the API to create the project
         const response = await fetch(`/api/projects?userId=${userId}`, {
@@ -25,6 +47,7 @@ export default function CreateProject() {
             }),
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${bearerToken}`,
             },
         });
 
@@ -40,7 +63,6 @@ export default function CreateProject() {
                 }
             } catch (error) {
                 console.error('Failed to parse JSON response:', error);
-                // Handle non-JSON responses or empty responses
             }
         } else {
             console.error('Failed to create project:', response.statusText);

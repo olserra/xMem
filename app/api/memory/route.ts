@@ -1,14 +1,29 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
-export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-    const projectId = searchParams.get("projectId");
+// Function to validate the API key and extract the userId
+const getUserIdFromToken = async (token: string) => {
+    const apiKey = await prisma.apiKey.findUnique({
+        where: { key: token },
+        include: { user: true },
+    });
+    return apiKey ? apiKey.userId : null;
+};
 
-    if (!userId) {
-        return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+export async function GET(req: Request) {
+    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
+
+    if (!token) {
+        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
     }
+
+    const userId = await getUserIdFromToken(token);
+    if (!userId) {
+        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get('projectId');
 
     try {
         const memories = await prisma.memory.findMany({
@@ -21,13 +36,14 @@ export async function GET(req: Request) {
                     select: {
                         id: true,
                         name: true,
-                    }
-                }
+                    },
+                },
             },
             orderBy: {
-                createdAt: 'desc'
-            }
+                createdAt: 'desc',
+            },
         });
+
         return NextResponse.json(memories);
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch memories' }, { status: 500 });
@@ -35,23 +51,28 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { memories, content, type = "note", metadata = {}, projectId, userId } = await req.json();
+    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
-    if (!userId) {
-        return NextResponse.json({
-            error: 'User ID is required'
-        }, { status: 400 });
+    if (!token) {
+        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
     }
+
+    const userId = await getUserIdFromToken(token);
+    if (!userId) {
+        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+    }
+
+    const { memories, content, type = 'note', metadata = {}, projectId } = await req.json();
 
     try {
         if (memories && Array.isArray(memories)) {
             // Handle bulk import of memories
             await prisma.memory.createMany({
-                data: memories.map(memory => ({
+                data: memories.map((memory) => ({
                     ...memory,
                     userId,
                     projectId: memory.projectId || projectId,
-                    type: memory.type || "note", // Ensure type is provided
+                    type: memory.type || 'note',
                     isArchived: false,
                     version: 1,
                 })),
@@ -61,8 +82,8 @@ export async function POST(req: Request) {
             const createdMemories = await prisma.memory.findMany({
                 where: {
                     userId,
-                    content: { in: memories.map(memory => memory.content) }
-                }
+                    content: { in: memories.map((memory) => memory.content) },
+                },
             });
 
             return NextResponse.json(createdMemories, { status: 201 });
@@ -76,20 +97,18 @@ export async function POST(req: Request) {
                     userId,
                     ...(projectId && { projectId }),
                     isArchived: false,
-                    version: 1
+                    version: 1,
                 },
             });
 
             return NextResponse.json(newMemory, { status: 201 });
         } else {
-            return NextResponse.json({
-                error: 'Content is required for single memory creation'
-            }, { status: 400 });
+            return NextResponse.json({ error: 'Content is required for single memory creation' }, { status: 400 });
         }
     } catch (error) {
         console.error('Error creating memory:', error);
         return NextResponse.json({
-            error: 'Failed to create memory. Please ensure all required fields are provided.'
+            error: 'Failed to create memory. Please ensure all required fields are provided.',
         }, { status: 500 });
     }
 }

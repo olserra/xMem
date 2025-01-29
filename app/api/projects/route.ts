@@ -1,24 +1,42 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
 
-export async function POST(req: Request) {
-    const { name, description } = await req.json();
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
+// Function to validate the API key and extract the userId
+const getUserIdFromToken = async (token: string) => {
+    const apiKey = await prisma.apiKey.findUnique({
+        where: { key: token },
+        include: { user: true },
+    });
+    return apiKey ? apiKey.userId : null;
+};
 
-    if (!name || !description || !userId) {
+export async function POST(req: Request) {
+    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
+
+    if (!token) {
+        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
+    }
+
+    const userId = await getUserIdFromToken(token);
+    if (!userId) {
+        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+    }
+
+    const { name, description } = await req.json();
+
+    if (!name || !description) {
         return NextResponse.json({
-            error: 'Project name, description, and user ID are required'
+            error: 'Project name and description are required'
         }, { status: 400 });
     }
 
     try {
-        // Create the project
+        // Create the project associated with the userId from the token
         const project = await prisma.project.create({
             data: {
                 name,
                 description,
-                userId: userId as string,
+                userId: userId,  // Use userId from the validated token
                 visibility: 'private',
             },
         });
@@ -31,21 +49,26 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-    const projectId = searchParams.get("projectId");
+    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
-    if (!userId) {
-        return NextResponse.json({
-            error: 'User ID is required'
-        }, { status: 400 });
+    if (!token) {
+        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
     }
+
+    const userId = await getUserIdFromToken(token);
+    if (!userId) {
+        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get("projectId");
 
     try {
         if (projectId) {
             const project = await prisma.project.findUnique({
                 where: {
                     id: projectId,
+                    userId: userId, // Ensure the project belongs to the authenticated user
                 },
                 include: {
                     memories: true,
@@ -54,12 +77,17 @@ export async function GET(req: Request) {
                     }
                 }
             });
+
+            if (!project) {
+                return NextResponse.json({ error: 'Project not found or unauthorized' }, { status: 404 });
+            }
+
             return NextResponse.json(project);
         }
 
         const projects = await prisma.project.findMany({
             where: {
-                userId: userId as string,
+                userId: userId, // Fetch projects for the authenticated user
             },
             include: {
                 _count: {

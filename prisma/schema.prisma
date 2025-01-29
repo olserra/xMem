@@ -17,6 +17,7 @@ model User {
   sessions      Session[]
   role          Role      @default(USER)
   projects      Project[] // Only projects relation, no direct memories
+  ApiKey        ApiKey[]
 }
 
 model Project {
@@ -90,6 +91,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 enum Role {

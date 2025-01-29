@@ -1,22 +1,40 @@
 'use client';
 
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Eye, EyeOff } from 'lucide-react';
-import { FaRegCopy } from "react-icons/fa";
+import { FaRegCopy } from 'react-icons/fa';
+import { useUser } from '../Context';
 
 const ApiPage = () => {
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+    const { userId } = useUser(); // Extract userId from the context
 
-    const generateApiKey = () => {
-        // Logic to generate API key
-        const newApiKey = uuidv4(); // Generate a UUID as the API key
-        setApiKey(newApiKey);
+    const generateApiKey = async () => {
+        if (!userId) {
+            alert('User ID is required');
+            return;
+        }
+
+        // Call the backend API to generate the API key, passing userId in the query parameters
+        const response = await fetch(`/api/bearer-token?userId=${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            setApiKey(data.apiKey); // Set the returned API key to state
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.error}`);
+        }
     };
 
     const revokeApiKey = () => {
-        // Logic to revoke API key
+        // Logic to revoke the API key (for simplicity, just reset it here)
         setApiKey(null);
     };
 
@@ -44,7 +62,7 @@ const ApiPage = () => {
                                 value={apiKey}
                                 readOnly
                                 className="border border-gray-300 rounded-md p-2 w-full h-10 pr-10"
-                                style={{ minWidth: '500px' }} // Set a minimum width for the input
+                                style={{ minWidth: '500px' }}
                             />
                             <button
                                 onClick={toggleApiKeyVisibility}

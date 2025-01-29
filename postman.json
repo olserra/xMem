@@ -1,0 +1,237 @@
+{
+    "info": {
+        "_postman_id": "a1f8b80a-0175-467b-848b-cc41b4b94a75",
+        "name": "XMem API Test Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Project (POST)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"name\":\"New Project\",\"description\":\"Project description here\",\"visibility\":\"private\"}"
+                },
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "projects"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Projects (GET)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "projects"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Update Project (PUT)",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"name\":\"Updated Project\",\"description\":\"Updated description\",\"visibility\":\"public\"}"
+                },
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "projects",
+                        "{{projectId}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Delete Project (DELETE)",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "projects",
+                        "{{projectId}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Memory (POST)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"content\":\"This is a new memory\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
+                },
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "memory"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Memories (GET)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "memory"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Update Memory (PUT)",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"content\":\"Updated memory content\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
+                },
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "memory",
+                        "{{memoryId}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Delete Memory (DELETE)",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer 610b26a2-f5de-48e4-86ca-ed88fc42f264",
+                        "description": "API Key"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "memory",
+                        "{{memoryId}}"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}

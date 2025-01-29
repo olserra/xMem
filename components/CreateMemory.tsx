@@ -63,6 +63,24 @@ export default function CreateMemory() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [bearerToken, setBearerToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchBearerToken = async () => {
+            const response = await fetch(`/api/bearer-token?userId=${userId}`);
+            const data = await response.json();
+            if (data.key) {
+                setBearerToken(data.key);
+            } else {
+                console.error('Error fetching bearer token:', data.error);
+            }
+        };
+
+        if (userId) {
+            fetchBearerToken();
+        }
+    }, [userId]);
+
 
     useEffect(() => {
         const id = searchParams.get('id');
@@ -84,7 +102,11 @@ export default function CreateMemory() {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch(`/api/projects?userId=${userId}`);
+                const response = await fetch(`/api/projects?userId=${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${bearerToken}`,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setProjects(data);
@@ -94,8 +116,8 @@ export default function CreateMemory() {
             }
         };
 
-        if (userId) fetchProjects();
-    }, [userId]);
+        if (userId && bearerToken) fetchProjects();
+    }, [userId, bearerToken]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -114,7 +136,10 @@ export default function CreateMemory() {
         try {
             const response = await fetch(isEditing ? `/api/memory/${memoryId}` : '/api/memory', {
                 method: isEditing ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${bearerToken}`,
+                },
                 body: JSON.stringify({
                     content: formData.content,
                     type: "note",
@@ -146,9 +171,9 @@ export default function CreateMemory() {
             <div className="max-w-4xl mx-auto py-4 px-4 sm:py-8 sm:px-6">
                 <div className="space-y-6">
                     <div>
-                        <h1 className="text-xl sm:text-2xl font-semibold">Create New Memory</h1>
+                        <h1 className="text-xl sm:text-2xl font-semibold">{isEditing ? 'Edit Memory' : 'Create New Memory'}</h1>
                         <p className="text-sm sm:text-base text-gray-600 mt-2">
-                            Store your data, thoughts, and ideas in a memory. Memories can be standalone or associated with a project.
+                            {isEditing ? 'Edit your memory below' : 'Store your data, thoughts, and ideas in a memory. Memories can be standalone or associated with a project.'}
                         </p>
                     </div>
 

@@ -24,21 +24,37 @@ interface ProjectWithCount extends Project {
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<ProjectWithCount[]>([]);
     const { userId, favorites, filterLabel, toggleFavorite } = useUser();
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set());
+    const [bearerToken, setBearerToken] = useState<string | null>(null);
 
     useEffect(() => {
-        if (status === "unauthenticated") {
-            window.location.href = "/";
+        const fetchBearerToken = async () => {
+            const response = await fetch(`/api/bearer-token?userId=${userId}`);
+            const data = await response.json();
+            if (data.key) {
+                setBearerToken(data.key);
+            } else {
+                console.error('Error fetching bearer token:', data.error);
+            }
+        };
+
+        if (userId) {
+            fetchBearerToken();
         }
-    }, [status]);
+    }, [userId]);
 
     useEffect(() => {
         const fetchProjects = async () => {
-            if (!userId && session) return;
+            if (!userId || !bearerToken) return;
 
             try {
-                const response = await fetch(`/api/projects?userId=${userId}`);
+                const response = await fetch(`/api/projects?userId=${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                    },
+                });
                 if (!response.ok) {
                     throw new Error('Failed to fetch projects');
                 }
@@ -54,7 +70,34 @@ export default function ProjectsPage() {
         };
 
         fetchProjects();
-    }, [session, userId]);
+    }, [userId, bearerToken]);
+
+    const handleDeleteSelectedProjects = useCallback(async () => {
+        try {
+            const deletePromises = Array.from(selectedProjects).map((id) =>
+                fetch(`/api/projects/${id}?userId=${userId}`, {
+                    method: "DELETE",
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                    }
+                })
+            );
+            const responses = await Promise.all(deletePromises);
+
+            if (responses.every((response) => response.ok)) {
+                setProjects(projects.filter((p) => !selectedProjects.has(p.id)));
+                setSelectedProjects(new Set()); // Clear the selected projects after deleting
+            }
+        } catch (err) {
+            console.error("Failed to delete selected projects.");
+        }
+    }, [projects, selectedProjects, userId, bearerToken]);
+
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            window.location.href = "/";
+        }
+    }, [status]);
 
     // Apply the filter using the filterLabel from context
     const filteredProjects = useMemo(() => {
@@ -82,22 +125,6 @@ export default function ProjectsPage() {
             setSelectedProjects(new Set(filteredProjects.map((project) => project.id)));
         }
     }, [filteredProjects, selectedProjects]);
-
-    const handleDeleteSelectedProjects = useCallback(async () => {
-        try {
-            const deletePromises = Array.from(selectedProjects).map((id) =>
-                fetch(`/api/projects/${id}?userId=${userId}`, { method: "DELETE" })
-            );
-            const responses = await Promise.all(deletePromises);
-
-            if (responses.every((response) => response.ok)) {
-                setProjects(projects.filter((p) => !selectedProjects.has(p.id)));
-                setSelectedProjects(new Set()); // Clear the selected projects after deleting
-            }
-        } catch (err) {
-            console.error("Failed to delete selected projects.");
-        }
-    }, [projects, selectedProjects, userId]);
 
     return (
         <MaxWidthWrapper>

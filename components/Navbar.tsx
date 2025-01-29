@@ -186,12 +186,19 @@ const Navbar = () => {
                       {isModalOpen && (
                         <Modal onClose={() => setIsModalOpen(false)} position={getAvatarPosition()}>
                           <div className="flex flex-col space-y-2">
-                            <Link href="/api-page" className="text-sm text-gray-600 hover:text-black transition-colors">
+                            <Link
+                              href="/api-page"
+                              className="text-sm text-gray-600 hover:text-black transition-colors"
+                              onClick={() => setIsModalOpen(false)}  // Close the modal when clicked
+                            >
                               API settings
                             </Link>
                             <button
                               className="text-sm text-gray-600 hover:text-black transition-colors"
-                              onClick={handleSignOut}
+                              onClick={(e) => {
+                                handleSignOut(e);
+                                setIsModalOpen(false);  // Close the modal when signing out
+                              }}
                             >
                               Sign Out
                             </button>

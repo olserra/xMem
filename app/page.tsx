@@ -200,7 +200,7 @@ export default function Home() {
           <form
             id="email-form"
             onSubmit={handleSubmit}
-            className="mt-10 flex flex-col items-center space-y-3 w-full px-4"
+            className="my-10 flex flex-col items-center space-y-3 w-full px-4"
           >
             <h2 className="text-2xl font-semibold mb-4">Stay Updated</h2>
             <p className="text-zinc-600 mb-6">

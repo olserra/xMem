@@ -26,12 +26,11 @@ interface Memory {
 }
 
 const Memories = () => {
-    const { userId } = useUser();
+    const { userId, filterLabel } = useUser();
     const router = useRouter();
     const { data: session, status } = useSession();
     const [memory, setMemory] = useState<Memory[]>([]);
     const [loading, setLoading] = useState(false);
-    const [filterLabel, setFilterLabel] = useState<string>("");
     const [importedMemories, setImportedMemories] = useState<string>("");
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
@@ -206,51 +205,35 @@ const Memories = () => {
     return (
         <MaxWidthWrapper>
             <div className="p-8">
-                <div className="mb-6">
-                    <div className="flex justify-between">
-                        <h2 className="text-xl font-semibold mb-2">Filter Memories By Text</h2>
-                        <div className="flex items-center gap-2">
-                            <button
-                                className="p-2"
-                                onClick={toggleSelectAll}
-                                aria-label="Select All"
-                            >
-                                {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
-                            </button>
-                            {selectedMemories.size > 0 && (
-                                <>
-                                    <button
-                                        className="p-2 text-black rounded-lg"
-                                        onClick={handleDeleteSelectedMemories}
-                                        aria-label="Delete Selected Memories"
-                                    >
-                                        <FaTrash />
-                                    </button>
-                                    <button
-                                        className="p-2 text-black hover:text-gray-400"
-                                        onClick={handleCopyToClipboard}
-                                        aria-label="Copy all user data"
-                                    >
-                                        <FaRegCopy />
-                                        {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    <input
-                        type="text"
-                        value={filterLabel}
-                        onChange={(e) => setFilterLabel(e.target.value)}
-                        placeholder="Enter text to filter by"
-                        className="p-2 border border-gray-300 rounded-lg w-full"
-                    />
-                </div>
-
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-xl font-semibold">Your Memories</h2>
-
                     <div className="flex flex-row gap-2 items-center justify-between">
+                        {selectedMemories.size > 0 && (
+                            <>
+                                <button
+                                    className="mt-2 p-2 text-black rounded-lg"
+                                    onClick={handleDeleteSelectedMemories}
+                                    aria-label="Delete Selected Memories"
+                                >
+                                    <FaTrash />
+                                </button>
+                                <button
+                                    className="mt-2 p-2 text-black hover:text-gray-400"
+                                    onClick={handleCopyToClipboard}
+                                    aria-label="Copy all user data"
+                                >
+                                    <FaRegCopy />
+                                    {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
+                                </button>
+                            </>
+                        )}
+                        <button
+                            className="mt-2 text-black py-2 px-3 rounded-lg"
+                            onClick={toggleSelectAll}
+                            aria-label="Select All"
+                        >
+                            {selectedMemories.size === filteredMemories.length ? 'Deselect All' : 'Select All'}
+                        </button>
                         <button
                             className="mt-2 text-black py-2 px-3 rounded-lg"
                             onClick={() => setIsModalOpen(true)}

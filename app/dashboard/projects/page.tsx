@@ -155,7 +155,7 @@ export default function ProjectsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-start">
                     {filteredProjects.map((project) => (
-                        <div key={project.id} className="relative border border-gray-300 bg-white rounded-lg p-4">
+                        <Link href={`/dashboard/projects/${project.id}`} key={project.id} className="relative hover:cursor-pointer border border-gray-300 bg-white rounded-lg p-4">
                             <input
                                 type="checkbox"
                                 checked={selectedProjects.has(project.id)}
@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                                     <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>

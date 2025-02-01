@@ -7,15 +7,14 @@ import { cn } from "@/lib/utils";
 const sidebarItems = {
     "Getting Started": [
         { title: "Introduction", href: "/docs/getting-started/introduction" },
-        { title: "Installation", href: "/docs/getting-started/installation" },
-        { title: "Quick Start", href: "/docs/getting-started/quick-start" },
+        { title: "API Reference", href: "/docs/getting-started/api" },
+        { title: "Interface", href: "/docs/getting-started/interface" },
     ],
     "Core Concepts": [
         { title: "Projects", href: "/docs/core-concepts/projects" },
         { title: "Memories", href: "/docs/core-concepts/memories" },
     ],
     "Advanced Usage": [
-        { title: "API Reference", href: "/docs/advanced/api" },
         { title: "Customization", href: "/docs/advanced/customization" },
         { title: "Best Practices", href: "/docs/advanced/best-practices" },
     ],

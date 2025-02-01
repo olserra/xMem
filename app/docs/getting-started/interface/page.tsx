@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function QuickStartPage() {
     return (
         <div className="space-y-6">
-            <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Quick Start</h1>
+            <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Interface</h1>
 
             <div className="space-y-4">
                 <p className="leading-7">

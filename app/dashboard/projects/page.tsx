@@ -47,7 +47,7 @@ export default function ProjectsPage() {
                 const data = await response.json();
                 const projectsWithCounts = data.map((project: Project) => ({
                     ...project,
-                    memoryCount: project._count.memories
+                    memoryCount: project._count ? project._count.memories : 0
                 }));
                 setProjects(projectsWithCounts);
             } catch (error) {

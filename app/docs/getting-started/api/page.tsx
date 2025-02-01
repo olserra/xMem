@@ -23,6 +23,7 @@ export default function ApiReferencePage() {
                     Authorization: Bearer YOUR_API_KEY
                 </pre>
 
+
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">API Endpoints</h2>
                 <p className="leading-7">Below are the key API endpoints available:</p>
                 <ul className="list-disc list-inside space-y-2">

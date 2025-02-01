@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, ReactNode, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import useBearerToken from './hooks/useBearerToken';
 import useFetchData from './hooks/useFetchData';
@@ -42,7 +42,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     const [filterLabel, setFilterLabel] = useState<string>("");
 
-    const toggleFavorite = (projectId: string) => {
+    const toggleFavorite = useCallback((projectId: string) => {
         setFavorites((prevFavorites) => {
             const newFavorites = prevFavorites.includes(projectId)
                 ? prevFavorites.filter((id) => id !== projectId)
@@ -53,7 +53,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             }
             return newFavorites;
         });
-    };
+    }, [userId]);
 
     const userValue = useMemo(() => ({
         userId,

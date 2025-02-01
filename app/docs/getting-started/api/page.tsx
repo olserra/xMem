@@ -41,9 +41,15 @@ export default function ApiReferencePage() {
                         <ul className="list-disc list-inside ml-6">
                             <li><strong>GET /api/memories</strong>: Retrieve all memories accessible by the authenticated user.</li>
                             <li><strong>POST /api/memories</strong>: Create a new memory.</li>
-                            <li><strong>GET /api/memories/{'{memoryId}'}</strong>: Retrieve a specific memory by its ID.</li>
-                            <li><strong>PUT /api/memories/{'{memoryId}'}</strong>: Update a memory by its ID.</li>
-                            <li><strong>DELETE /api/memories/{'{memoryId}'}</strong>: Delete a memory by its ID.</li>
+                            <li>
+                                <strong>GET /api/memories/{"{"}memoryId{"}"}</strong>: Retrieve a specific memory by its ID.
+                            </li>
+                            <li>
+                                <strong>PUT /api/memories/{"{"}memoryId{"}"}</strong>: Update a memory by its ID.
+                            </li>
+                            <li>
+                                <strong>DELETE /api/memories/{"{"}memoryId{"}"}</strong>: Delete a memory by its ID.
+                            </li>
                         </ul>
                     </li>
                 </ul>

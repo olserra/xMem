@@ -1,11 +1,11 @@
-import { Sidebar } from "@/components/docs/Sidebar";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import { Sidebar } from "@/app/components/docs/Sidebar";
+import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 
 export default function DocsLayout({
     children,
-}: {
+}: Readonly<{
     children: React.ReactNode;
-}) {
+}>) {
     return (
         <div className="relative min-h-screen">
             <MaxWidthWrapper>

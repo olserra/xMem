@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useSession } from "next-auth/react";
 import { handleSignIn } from "@/app/helpers/handleSignIn";
 import { handleSignOut } from "@/app/helpers/handleSignOut";

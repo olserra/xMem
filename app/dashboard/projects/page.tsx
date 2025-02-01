@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from '@/app/Context';
 import { useSession } from 'next-auth/react';
 import { FaStar, FaRegStar, FaTrash } from 'react-icons/fa';

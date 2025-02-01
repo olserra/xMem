@@ -31,9 +31,9 @@ export default function ApiReferencePage() {
                         <ul className="list-disc list-inside ml-6">
                             <li><strong>GET /api/projects</strong>: Retrieve all projects accessible by the authenticated user.</li>
                             <li><strong>POST /api/projects</strong>: Create a new project.</li>
-                            <li><strong>GET /api/projects/{&#123;&#39;projectId&#39;&#125;}</strong>: Retrieve a specific project by its ID.</li>
-                            <li><strong>PUT /api/projects/{&#123;&#39;projectId&#39;&#125;}</strong>: Update a project by its ID.</li>
-                            <li><strong>DELETE /api/projects/{&#123;&#39;projectId&#39;&#125;}</strong>: Delete a project by its ID.</li>
+                            <li><strong>GET /api/projects/{"{"}projectId{"}"}</strong>: Retrieve a specific project by its ID.</li>
+                            <li><strong>PUT /api/projects/{"{"}projectId{"}"}</strong>: Update a project by its ID.</li>
+                            <li><strong>DELETE /api/projects/{"{"}projectId{"}"}</strong>: Delete a project by its ID.</li>
                         </ul>
                     </li>
                     <li>
@@ -41,9 +41,9 @@ export default function ApiReferencePage() {
                         <ul className="list-disc list-inside ml-6">
                             <li><strong>GET /api/memories</strong>: Retrieve all memories accessible by the authenticated user.</li>
                             <li><strong>POST /api/memories</strong>: Create a new memory.</li>
-                            <li><strong>GET /api/memories/{&#123;&#39;memoryId&#39;&#125;}</strong>: Retrieve a specific memory by its ID.</li>
-                            <li><strong>PUT /api/memories/{&#123;&#39;memoryId&#39;&#125;}</strong>: Update a memory by its ID.</li>
-                            <li><strong>DELETE /api/memories/{&#123;&#39;memoryId&#39;&#125;}</strong>: Delete a memory by its ID.</li>
+                            <li><strong>GET /api/memories/{"{"}memoryId{"}"}</strong>: Retrieve a specific memory by its ID.</li>
+                            <li><strong>PUT /api/memories/{"{"}memoryId{"}"}</strong>: Update a memory by its ID.</li>
+                            <li><strong>DELETE /api/memories/{"{"}memoryId{"}"}</strong>: Delete a memory by its ID.</li>
                         </ul>
                     </li>
                 </ul>

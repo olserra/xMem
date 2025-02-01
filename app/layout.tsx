@@ -3,10 +3,10 @@ import { GeistSans } from "geist/font/sans";
 
 import { cn } from "@/lib/utils";
 import "./globals.css";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import SessionWrapper from '../components/SessionWrapper';
+import Footer from "@/app/components/Footer";
+import Navbar from "@/app/components/Navbar";
 import { UserProvider } from "./Context";
+import SessionWrapper from "./components/SessionWrapper";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://xmem.xyz'),

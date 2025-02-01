@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import MaxWidthWrapper from '@/components/MaxWidthWrapper';
+import MaxWidthWrapper from '@/app/components/MaxWidthWrapper';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useUser } from '@/app/Context';

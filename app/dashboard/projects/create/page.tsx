@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from '@/app/Context';
 
 export default function CreateProject() {

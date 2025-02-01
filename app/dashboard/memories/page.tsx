@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "../../Context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

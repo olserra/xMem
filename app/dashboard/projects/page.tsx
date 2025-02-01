@@ -7,20 +7,6 @@ import { useUser } from '@/app/Context';
 import { useSession } from 'next-auth/react';
 import { FaStar, FaRegStar, FaTrash } from 'react-icons/fa';
 
-interface Project {
-    id: string;
-    name: string;
-    description: string;
-    updatedAt: string;
-    _count: {
-        memories: number;
-    };
-}
-
-interface ProjectWithCount extends Project {
-    memoryCount: number;
-}
-
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<ProjectWithCount[]>([]);
     const { userId, favorites, filterLabel, toggleFavorite } = useUser();

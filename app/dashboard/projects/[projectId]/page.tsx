@@ -7,27 +7,6 @@ import { FaSave, FaTimes } from 'react-icons/fa';
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useUser } from '@/app/Context';
 
-interface Project {
-    id: string;
-    name: string;
-    description: string;
-    type?: string;
-    visibility: string;
-    createdAt: string;
-    updatedAt: string;
-    memories: Memory[];
-    _count: {
-        memories: number;
-    };
-}
-
-interface Memory {
-    id: string;
-    content: string;
-    type: string;
-    createdAt: string;
-}
-
 export default function ProjectPage() {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Memories | xmem Documentation",
-    description: "Learn about memories in xmem, the core unit for capturing and organizing your knowledge.",
+    description: "Learn how to manage memories using the xmem API.",
 };
 
 export default function MemoriesPage() {
@@ -12,55 +12,50 @@ export default function MemoriesPage() {
 
             <div className="space-y-4">
                 <p className="leading-7">
-                    In xmem, memories are the core units of knowledge. They are used to capture thoughts, ideas, insights,
-                    and any other type of information you wish to store. Memories are versatile and can be organized,
-                    and searched to help you stay organized.
+                    Memories are the core units of data in xmem. Using the xmem API, you can create, retrieve, update, and delete memories within your projects, enabling efficient knowledge management.
                 </p>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">What Are Memories?</h2>
+                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Managing Memories via API</h2>
                 <p className="leading-7">
-                    Memories are individual pieces of knowledge you create within a project. A memory can be a simple note,
-                    an idea, or any piece of content you want to capture. Each memory contains the following elements:
+                    The xmem API provides endpoints for performing CRUD operations on memories. Below are examples demonstrating how to use these endpoints.
                 </p>
-                <ul className="list-disc list-inside space-y-2">
-                    <li><strong>Content:</strong> The main body of your memory, where you describe your thoughts or ideas.</li>
-                    <li><strong>Project:</strong> Memories belong to specific projects, making it easy to organize knowledge related to a particular theme.</li>
-                    <li><strong>Metadata:</strong> Additional details such as the creation date and any custom information relevant to the memory.</li>
-                </ul>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Creating Memories</h2>
-                <p className="leading-7">
-                    To create a memory in xmem, you first need to create a project. Once you have a project, you can add memories
-                    to it. Follow these steps to create a memory:
-                </p>
-                <ol className="list-decimal list-inside space-y-2">
-                    <li>Go to your project page.</li>
-                    <li>Click the <strong>&quot;Create Memory&quot;</strong> button.</li>
-                    <li>Enter the content of your memory.</li>
-                    <li>Click <strong>Save</strong> to add your memory to the project.</li>
-                </ol>
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Creating a Memory</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`POST /api/memories
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Managing Memories</h2>
-                <p className="leading-7">
-                    You can edit, delete, or organize your memories within a project. You can easily filter and
-                    search for specific memories. Here are some tips for managing your memories effectively:
-                </p>
-                <ul className="list-disc list-inside space-y-2">
-                    <li>Group related memories within the same project for easy access.</li>
-                    <li>Review and update your memories regularly to keep them relevant.</li>
-                </ul>
+{
+    "content": "This is a memory",
+    "type": "note",
+    "projectId": "your-project-id"
+}`}
+                </pre>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Importing Memories</h2>
-                <p className="leading-7">
-                    If you have a set of memories from another source, such as ChatGPT, you can import them into xmem. Here is how:
-                </p>
-                <ol className="list-decimal list-inside space-y-2">
-                    <li>Copy the desired memories from your source, such as ChatGPT.</li>
-                    <li>Go to your Memories page in xmem.</li>
-                    <li>Click the <strong>&quot;Import Memories&quot;</strong> button.</li>
-                    <li>Paste the copied content into the memory field.</li>
-                    <li>Click <strong>Save</strong> to add the imported memories to your project.</li>
-                </ol>
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Retrieving Memories</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`GET /api/memories
+Authorization: Bearer YOUR_API_KEY`}
+                </pre>
+
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Updating a Memory</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`PUT /api/memories/{memoryId}
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+{
+    "content": "Updated memory content",
+    "type": "updated-type"
+}`}
+                </pre>
+
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Deleting a Memory</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`DELETE /api/memories/{memoryId}
+Authorization: Bearer YOUR_API_KEY`}
+                </pre>
             </div>
         </div>
     );

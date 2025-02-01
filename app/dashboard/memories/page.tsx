@@ -1,86 +1,26 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useMemo, useCallback } from "react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "../../Context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Skeleton from "react-loading-skeleton";
-
-interface Project {
-    id: string;
-    name: string;
-}
-
-interface Memory {
-    id: string;
-    content: string;
-    type: string;
-    userId: string;
-    projectId?: string;
-    project?: Project;
-    createdAt: string;
-    updatedAt: string;
-}
 
 const Memories = () => {
-    const { userId, filterLabel } = useUser();
+    const {
+        memories: memory,
+        filterLabel,
+        bearerToken,
+        userId,
+        updateMemories,
+    } = useUser();
     const router = useRouter();
-    const { data: session, status } = useSession();
-    const [memory, setMemory] = useState<Memory[]>([]);
-    const [loading, setLoading] = useState(false);
     const [importedMemories, setImportedMemories] = useState<string>("");
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [importSuccess, setImportSuccess] = useState(false);
-    const [bearerToken, setBearerToken] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchBearerToken = async () => {
-            const response = await fetch(`/api/bearer-token?userId=${userId}`);
-            const data = await response.json();
-            if (data.key) {
-                setBearerToken(data.key);
-            } else {
-                console.error('Error fetching bearer token:', data.error);
-            }
-        };
-
-        if (userId) {
-            fetchBearerToken();
-        }
-    }, [userId]);
-
-    useEffect(() => {
-        if (!session || status !== "authenticated") return;
-
-        const fetchMemory = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(`/api/memory?userId=${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${bearerToken}`,
-                    },
-                });
-                const data = await response.json();
-
-                if (Array.isArray(data)) {
-                    setMemory(data);
-                } else {
-                    setMemory([]);
-                }
-            } catch (err) {
-                setMemory([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMemory();
-    }, [session, status, userId, importSuccess, bearerToken]);
 
     const handleCopyToClipboard = useCallback(() => {
         setIsCopied(true);
@@ -104,12 +44,12 @@ const Memories = () => {
             });
 
             if (response.ok) {
-                setMemory(memory.filter((m) => m.id !== id)); // Remove the deleted memory from the state
+                updateMemories(memory.filter((m) => m.id !== id));
             }
         } catch (err) {
             console.error("Failed to delete memory.");
         }
-    }, [memory, userId, bearerToken]);
+    }, [memory, userId, bearerToken, updateMemories]);
 
     const handleDeleteSelectedMemories = useCallback(async () => {
         try {
@@ -124,13 +64,13 @@ const Memories = () => {
             const responses = await Promise.all(deletePromises);
 
             if (responses.every((response) => response.ok)) {
-                setMemory(memory.filter((m) => !selectedMemories.has(m.id)));
+                updateMemories(memory.filter((m) => !selectedMemories.has(m.id)));
                 setSelectedMemories(new Set()); // Clear the selected memories after deleting
             }
         } catch (err) {
             console.error("Failed to delete selected memories.");
         }
-    }, [memory, selectedMemories, userId, bearerToken]);
+    }, [memory, selectedMemories, userId, bearerToken, updateMemories]);
 
     const handleImportMemories = useCallback(async () => {
         setIsModalOpen(false);
@@ -149,14 +89,14 @@ const Memories = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setMemory(prevMemory => [...prevMemory, ...data]);
+                updateMemories([...memory, ...data]);
                 setImportedMemories("");
                 setImportSuccess(true);
             }
         } catch (err) {
             console.error("Failed to import memories.");
         }
-    }, [importedMemories, userId, bearerToken]);
+    }, [importedMemories, userId, bearerToken, memory, updateMemories]);
 
     const handleEditMemory = useCallback((memory: Memory) => {
         const queryParams = new URLSearchParams({
@@ -193,14 +133,6 @@ const Memories = () => {
             setSelectedMemories(new Set(filteredMemories.map((memory) => memory.id)));
         }
     }, [filteredMemories, selectedMemories]);
-
-    if (loading) {
-        return (
-            <div className="space-y-4">
-                <Skeleton count={5} height={80} />
-            </div>
-        );
-    }
 
     return (
         <MaxWidthWrapper>
@@ -319,7 +251,7 @@ const Memories = () => {
                                         </button>
                                         <button
                                             className="p-2 text-black rounded-lg"
-                                            onClick={() => handleDeleteMemory(memory.id)} // This should work now
+                                            onClick={() => handleDeleteMemory(memory.id)}
                                             aria-label="Delete Memory"
                                         >
                                             <FaTrash />

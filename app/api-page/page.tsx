@@ -1,53 +1,92 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { FaRegCopy } from 'react-icons/fa';
+import { FaRegCopy } from "react-icons/fa";
 import { useUser } from '../Context';
+import { v4 as uuidv4 } from 'uuid';
 
 const ApiPage = () => {
+    const { userId } = useUser();
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
-    const { userId } = useUser(); // Extract userId from the context
 
-    const generateApiKey = async () => {
-        if (!userId) {
-            alert('User ID is required');
-            return;
-        }
+    useEffect(() => {
+        const fetchApiKey = async () => {
+            if (!userId) return;
+            try {
+                const response = await fetch(`/api/api-key?userId=${userId}`);
+                const data = await response.json();
 
-        // Call the backend API to generate the API key, passing userId in the query parameters
-        const response = await fetch(`/api/bearer-token?userId=${userId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+                if (response.ok && data.apiKey) {
+                    setApiKey(data.apiKey);
+                } else {
+                    setApiKey(null);
+                }
+            } catch (error) {
+                console.error('Error fetching API key:', error);
+            }
+        };
 
-        if (response.ok) {
+        fetchApiKey();
+    }, [userId]);
+
+    const generateApiKey = useCallback(async () => {
+        if (!userId) return;
+
+        const newApiKey = uuidv4();
+        try {
+            const response = await fetch('/api/api-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, apiKey: newApiKey }),
+            });
+
             const data = await response.json();
-            setApiKey(data.apiKey); // Set the returned API key to state
-        } else {
-            const error = await response.json();
-            alert(`Error: ${error.error}`);
+
+            if (response.ok) {
+                setApiKey(newApiKey);
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error creating API key:', error);
         }
-    };
+    }, [userId]);
 
-    const revokeApiKey = () => {
-        // Logic to revoke the API key (for simplicity, just reset it here)
-        setApiKey(null);
-    };
+    const revokeApiKey = useCallback(async () => {
+        if (!userId) return;
 
-    const copyToClipboard = () => {
+        try {
+            const response = await fetch('/api/api-key', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setApiKey(null);
+            } else {
+                console.error('Error deleting API key:', data.error);
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error deleting API key:', error);
+        }
+    }, [userId]);
+
+    const copyToClipboard = useCallback(() => {
         if (apiKey) {
             navigator.clipboard.writeText(apiKey);
             alert('API Key copied to clipboard');
         }
-    };
+    }, [apiKey]);
 
-    const toggleApiKeyVisibility = () => {
-        setIsApiKeyVisible(!isApiKeyVisible);
-    };
+    const toggleApiKeyVisibility = useCallback(() => {
+        setIsApiKeyVisible((prev) => !prev);
+    }, []);
 
     return (
         <div className="flex flex-col max-w-2xl mx-auto p-4">

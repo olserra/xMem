@@ -2,15 +2,21 @@
 
 import { createContext, useContext, ReactNode, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import useBearerToken from './hooks/useBearerToken';
+import useFetchData from './hooks/useFetchData';
 
 interface UserContextType {
     userId: string | null;
     userEmail: string | null;
     userName: string | null;
+    bearerToken: string | null;
+    projects: Project[];
+    memories: Memory[];
     favorites: string[];
     filterLabel: string; // Add filterLabel to the context
     setFilterLabel: (label: string) => void; // Add function to update filter
     toggleFavorite: (projectId: string) => void;
+    updateMemories: (memories: Memory[]) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,6 +27,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const userId = session?.user?.id ?? null;
     const userEmail = session?.user?.email ?? null;
     const userName = session?.user?.name ?? null;
+
+    const bearerToken = useBearerToken(userId);
+    const { projects, memories, setMemories } = useFetchData(userId, bearerToken);
 
     // Initialize favorites from local storage or default to an empty array
     const [favorites, setFavorites] = useState<string[]>(() => {
@@ -50,11 +59,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         userId,
         userEmail,
         userName,
+        bearerToken,
+        projects,
+        memories,
         favorites,
         filterLabel,
-        setFilterLabel, // Provide the function to update filter state
-        toggleFavorite
-    }), [userId, userEmail, userName, favorites, filterLabel]);
+        setFilterLabel,
+        toggleFavorite,
+        updateMemories: setMemories,
+    }), [
+        userId,
+        userEmail,
+        userName,
+        bearerToken,
+        projects,
+        memories,
+        favorites,
+        filterLabel,
+        setFilterLabel,
+        toggleFavorite,
+        setMemories,
+    ]);
 
     return (
         <UserContext.Provider value={userValue}>

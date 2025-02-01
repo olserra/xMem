@@ -23,7 +23,6 @@ export default function ApiReferencePage() {
                     Authorization: Bearer YOUR_API_KEY
                 </pre>
 
-
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">API Endpoints</h2>
                 <p className="leading-7">Below are the key API endpoints available:</p>
                 <ul className="list-disc list-inside space-y-2">
@@ -54,42 +53,107 @@ export default function ApiReferencePage() {
                 <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Creating a Project</h3>
                 <pre className="bg-black text-white p-2 rounded mt-2">
                     {`POST /api/projects
-Authorization: Bearer YOUR_API_KEY
+Authorization: Bearer fake-api-key-1234-5678-9876
 Content-Type: application/json
 
 {
-    "name": "My New Project",
-    "description": "A description of my new project"
+    "name": "AI Agent Training",
+    "description": "A project for training AI agents on memory management."
+}`}
+                </pre>
+
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Retrieving Projects</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`GET /api/projects?userId=fake-user-id-1234-5678
+Authorization: Bearer fake-api-key-1234-5678-9876`}
+                </pre>
+                <h4 className="scroll-m-20 text-lg font-semibold tracking-tight pt-2">Sample Response:</h4>
+                <pre className="bg-gray-100 p-2 rounded mt-2">
+                    {`[
+    {
+        "id": "fake-project-id-1",
+        "name": "AI Agent Training",
+        "description": "A project for training AI agents on memory management.",
+        "visibility": "private",
+        "userId": "fake-user-id-1234-5678",
+        "createdAt": "2025-01-29T22:12:53.970Z",
+        "updatedAt": "2025-01-31T19:26:10.496Z",
+        "_count": {
+            "memories": 0
+        }
+    },
+    {
+        "id": "fake-project-id-2",
+        "name": "AI Ethics Research",
+        "description": "Research on ethical AI frameworks.",
+        "visibility": "private",
+        "userId": "fake-user-id-1234-5678",
+        "createdAt": "2025-01-29T12:10:28.197Z",
+        "updatedAt": "2025-01-29T12:10:28.197Z",
+        "_count": {
+            "memories": 1
+        }
+    }
+]`}
+                </pre>
+
+                <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Creating a Memory</h3>
+                <pre className="bg-black text-white p-2 rounded mt-2">
+                    {`POST /api/memories
+Authorization: Bearer fake-api-key-1234-5678-9876
+Content-Type: application/json
+
+{
+    "content": "Training data on memory management for AI agents.",
+    "type": "training_data",
+    "projectId": "fake-project-id-1"
 }`}
                 </pre>
 
                 <h3 className="scroll-m-20 text-xl font-semibold tracking-tight pt-2">Retrieving Memories</h3>
                 <pre className="bg-black text-white p-2 rounded mt-2">
-                    {`GET /api/memories
-Authorization: Bearer YOUR_API_KEY`}
+                    {`GET /api/memories?userId=fake-user-id-1234-5678
+Authorization: Bearer fake-api-key-1234-5678-9876`}
+                </pre>
+                <h4 className="scroll-m-20 text-lg font-semibold tracking-tight pt-2">Sample Response:</h4>
+                <pre className="bg-gray-100 p-2 rounded mt-2">
+                    {`[
+    {
+        "id": "fake-memory-id-1",
+        "content": "Training data on memory management for AI agents.",
+        "type": "training_data",
+        "projectId": "fake-project-id-1",
+        "createdAt": "2025-01-29T22:12:53.970Z",
+        "updatedAt": "2025-01-29T22:12:53.970Z"
+    },
+    {
+        "id": "fake-memory-id-2",
+        "content": "Ethical guidelines for training AI.",
+        "type": "research_notes",
+        "projectId": "fake-project-id-2",
+        "createdAt": "2025-01-29T12:10:28.197Z",
+        "updatedAt": "2025-01-29T12:10:28.197Z"
+    }
+]`}
                 </pre>
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Response Format</h2>
                 <p className="leading-7">
-                    All responses are returned in JSON format. Here's an example response for retrieving memories:
+                    All responses are returned in JSON format. Here's an example response for retrieving projects and memories:
                 </p>
                 <pre className="bg-gray-100 p-2 rounded mt-2">
                     {`[
     {
-        "id": "memoryId1",
-        "content": "This is a memory",
-        "type": "note",
-        "projectId": "projectId1",
-        "createdAt": "2023-01-01T10:00:00Z",
-        "updatedAt": "2023-01-01T10:00:00Z"
-    },
-    {
-        "id": "memoryId2",
-        "content": "Another memory",
-        "type": "idea",
-        "projectId": "projectId2",
-        "createdAt": "2023-01-02T10:00:00Z",
-        "updatedAt": "2023-01-02T10:00:00Z"
+        "id": "fake-project-id-1",
+        "name": "AI Agent Training",
+        "description": "A project for training AI agents on memory management.",
+        "visibility": "private",
+        "userId": "fake-user-id-1234-5678",
+        "createdAt": "2025-01-29T22:12:53.970Z",
+        "updatedAt": "2025-01-31T19:26:10.496Z",
+        "_count": {
+            "memories": 1
+        }
     }
 ]`}
                 </pre>

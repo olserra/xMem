@@ -184,7 +184,7 @@ export function removeCachedMemory(memoryId: string): void {
 }
 
 export function validateMemoryAccess(memory: Memory, userId: string): boolean {
-    return memory.userId === userId || memory.metadata?.shared?.includes(userId);
+    return memory.userId === userId || (memory.metadata?.shared ?? []).includes(userId);
 }
 
 export function enrichMemoryWithMetadata(

@@ -124,15 +124,9 @@ export function validateType<T>(
     }
 }
 
-export function validateEnum<T>(
-    value: any,
-    enumValues: T[],
-    fieldName: string
-): void {
-    if (!enumValues.includes(value)) {
-        throw new ValidationError(
-            `Invalid value for ${fieldName}. Must be one of: ${enumValues.join(', ')}`
-        );
+export function validateEnum<T>(value: T, allowedValues: readonly T[] | T[], fieldName: string): void {
+    if (!allowedValues.includes(value)) {
+        throw new Error(`Invalid ${fieldName}. Must be one of: ${allowedValues.join(', ')}`);
     }
 }
 

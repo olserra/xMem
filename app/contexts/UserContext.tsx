@@ -20,10 +20,8 @@ import {
     ApiResponse
 } from '../types';
 import {
-    API_BASE_URL,
     MCP_CONFIG,
     FEATURES,
-    ERROR_MESSAGES
 } from '../constants';
 import { useMcpClient } from '../hooks/useMcpClient';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -94,9 +92,41 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
     const { data: session } = useSession();
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { get, post } = useApi();
+    const { get } = useApi();
     const mcpClient = useMcpClient();
     const { getItem, setItem } = useLocalStorage();
+
+    const refreshProjects = useCallback(async () => {
+        if (!state.user?.id || !state.bearerToken) return;
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+        try {
+            const response = await get<ApiResponse<Project[]>>('/projects');
+            if (response.success && Array.isArray(response.data)) {
+                dispatch({ type: 'SET_PROJECTS', payload: response.data });
+            }
+        } catch (error) {
+            dispatch({ type: 'SET_ERROR', payload: error as Error });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
+    }, [state.user?.id, state.bearerToken, get]);
+
+    const refreshMemories = useCallback(async () => {
+        if (!state.user?.id || !state.bearerToken) return;
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+        try {
+            const response = await get<ApiResponse<Memory[]>>('/memories');
+            if (response.success && Array.isArray(response.data)) {
+                dispatch({ type: 'SET_MEMORIES', payload: response.data });
+            }
+        } catch (error) {
+            dispatch({ type: 'SET_ERROR', payload: error as Error });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
+    }, [state.user?.id, state.bearerToken, get]);
 
     // Initialize favorites from local storage
     useEffect(() => {
@@ -128,7 +158,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             refreshProjects();
             refreshMemories();
         }
-    }, [state.user?.id, state.bearerToken]);
+    }, [state.user?.id, state.bearerToken, refreshProjects, refreshMemories]);
 
     // Actions
     const setFilterLabel = useCallback((label: string) => {
@@ -149,38 +179,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const updateMemories = useCallback((memories: Memory[]) => {
         dispatch({ type: 'UPDATE_MEMORIES', payload: memories });
     }, []);
-
-    const refreshProjects = useCallback(async () => {
-        if (!state.user?.id || !state.bearerToken) return;
-
-        dispatch({ type: 'SET_LOADING', payload: true });
-        try {
-            const response = await get<ApiResponse<Project[]>>('/projects');
-            if (response.success && response.data) {
-                dispatch({ type: 'SET_PROJECTS', payload: response.data });
-            }
-        } catch (error) {
-            dispatch({ type: 'SET_ERROR', payload: error as Error });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, [state.user?.id, state.bearerToken, get]);
-
-    const refreshMemories = useCallback(async () => {
-        if (!state.user?.id || !state.bearerToken) return;
-
-        dispatch({ type: 'SET_LOADING', payload: true });
-        try {
-            const response = await get<ApiResponse<Memory[]>>('/memories');
-            if (response.success && response.data) {
-                dispatch({ type: 'SET_MEMORIES', payload: response.data });
-            }
-        } catch (error) {
-            dispatch({ type: 'SET_ERROR', payload: error as Error });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, [state.user?.id, state.bearerToken, get]);
 
     // MCP Integration
     useEffect(() => {
@@ -217,4 +215,4 @@ export function useUser() {
         throw new Error('useUser must be used within a UserProvider');
     }
     return context;
-} 
+}

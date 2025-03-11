@@ -31,12 +31,14 @@ const Navbar = () => {
   const menuItems = [
     { label: 'Projects', href: '/dashboard/projects' },
     { label: 'Memories', href: '/dashboard/memories' },
+    { label: 'MCP', href: '/dashboard/mcp' },
   ];
 
   const isActive = (href: string) => {
     if (pathname === href) return true;
     if (href === '/dashboard/projects' && pathname.startsWith('/dashboard/projects/')) return true;
     if (href === '/dashboard/memories' && pathname.startsWith('/dashboard/memories/') && !pathname.includes('/create')) return true;
+    if (href === '/dashboard/mcp' && pathname.startsWith('/dashboard/mcp/')) return true;
     return false;
   };
 

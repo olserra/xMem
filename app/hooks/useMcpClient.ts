@@ -21,6 +21,21 @@ export function useMcpClient(): McpClient {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
+    const handleMessage = useCallback((message: McpMessage) => {
+        switch (message.type) {
+            case 'CONTEXT_UPDATE':
+                // Handle context updates from the MCP server
+                console.log('Received context update:', message.payload);
+                break;
+            case 'SUGGESTION':
+                // Handle AI suggestions
+                console.log('Received suggestion:', message.payload);
+                break;
+            default:
+                console.warn('Unknown message type:', message.type);
+        }
+    }, []);
+
     const connect = useCallback(() => {
         if (!MCP_CONFIG.ENABLED) return;
 
@@ -59,22 +74,7 @@ export function useMcpClient(): McpClient {
         } catch (error) {
             console.error('Error connecting to MCP:', error);
         }
-    }, []);
-
-    const handleMessage = useCallback((message: McpMessage) => {
-        switch (message.type) {
-            case 'CONTEXT_UPDATE':
-                // Handle context updates from the MCP server
-                console.log('Received context update:', message.payload);
-                break;
-            case 'SUGGESTION':
-                // Handle AI suggestions
-                console.log('Received suggestion:', message.payload);
-                break;
-            default:
-                console.warn('Unknown message type:', message.type);
-        }
-    }, []);
+    }, [handleMessage]);
 
     const sendMessage = useCallback((type: string, payload: any) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {

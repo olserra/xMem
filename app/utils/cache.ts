@@ -41,7 +41,7 @@ class Cache<T> {
         });
     }
 
-    get<R = T>(key: string): R | null {
+    get<R extends T = T>(key: string): R | null {
         this.cleanup();
 
         const entry = this.cache.get(key);

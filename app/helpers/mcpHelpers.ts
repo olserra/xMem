@@ -51,7 +51,7 @@ export function findRelevantMemories(
 export function enrichContextWithMetadata(context: McpContext): McpContext {
     return {
         ...context,
-        metadata: {
+        currentContext: {
             timestamp: new Date().toISOString(),
             memoryCount: context.memories.length,
             projectCount: context.projects.length,

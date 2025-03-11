@@ -21,6 +21,7 @@ export interface Project {
     updatedAt: string;
     _count?: { memories: number };
     memoryCount?: number;
+    metadata?: any;
 }
 
 export interface Memory {
@@ -99,6 +100,11 @@ export interface MemoryMetadata {
     };
     embedding_model?: string;
     tokens?: number;
+    shared?: string[];
+    projectName?: string;
+    projectType?: string;
+    lastAccessed?: string;
+    createdAt?: string;
 }
 
 // Form Types

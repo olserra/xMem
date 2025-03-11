@@ -6,9 +6,6 @@ import { AiOutlineApi } from "react-icons/ai";
 import Image from "next/image";
 import IMG1 from "@/public/home1.png";
 import { TypeAnimation } from 'react-type-animation';
-import { McpStatus } from './components/mcp/McpStatus';
-import { AiSuggestions } from './components/mcp/AiSuggestions';
-import { ContextViewer } from './components/mcp/ContextViewer';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -46,7 +43,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <McpStatus />
+        {/* Removed McpStatus */}
       </div>
 
       <div className="relative flex place-items-center">
@@ -206,12 +203,10 @@ export default function Home() {
       </div>
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left gap-4">
-        <div className="col-span-2">
-          <ContextViewer />
-        </div>
+        {/* Removed ContextViewer */}
       </div>
 
-      <AiSuggestions />
+      {/* Removed AiSuggestions */}
 
       {/* Email Collection Form */}
       {!submitted ? (

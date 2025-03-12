@@ -19,9 +19,7 @@ export async function POST(request: Request) {
             const config = await prisma.sourceConfig.findFirst({
                 where: {
                     source,
-                    user: {
-                        email: session.user.email,
-                    },
+                    userId: session.user.id,
                 },
             });
 

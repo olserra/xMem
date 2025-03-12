@@ -68,15 +68,6 @@ export const FEATURES = {
     REAL_TIME_COLLAB: process.env.NEXT_PUBLIC_FEATURE_REAL_TIME_COLLAB === 'true',
 } as const;
 
-// MCP Integration Constants
-export const MCP_CONFIG = {
-    ENABLED: process.env.NEXT_PUBLIC_MCP_ENABLED === 'true',
-    HOST: process.env.NEXT_PUBLIC_MCP_HOST || 'https://mcp.anthropic.com',
-    VERSION: process.env.NEXT_PUBLIC_MCP_VERSION || 'v1',
-    MAX_RETRIES: 3,
-    TIMEOUT: 10000,
-} as const;
-
 // Memory Storage Options
 export const STORAGE_OPTIONS = {
     LOCAL: 'local',

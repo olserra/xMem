@@ -16,14 +16,8 @@ import {
     Memory,
     UserContextType,
     UserContextState,
-    UserContextActions,
     ApiResponse
 } from '../types';
-import {
-    MCP_CONFIG,
-    FEATURES,
-} from '../constants';
-import { useMcpClient } from '../hooks/useMcpClient';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
 
@@ -93,7 +87,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const { data: session } = useSession();
     const [state, dispatch] = useReducer(reducer, initialState);
     const { get } = useApi();
-    const mcpClient = useMcpClient();
     const { getItem, setItem } = useLocalStorage();
 
     const refreshProjects = useCallback(async () => {
@@ -179,14 +172,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const updateMemories = useCallback((memories: Memory[]) => {
         dispatch({ type: 'UPDATE_MEMORIES', payload: memories });
     }, []);
-
-    // MCP Integration
-    useEffect(() => {
-        if (FEATURES.AI_SUGGESTIONS && MCP_CONFIG.ENABLED && mcpClient) {
-            mcpClient.initialize();
-            return () => mcpClient.cleanup();
-        }
-    }, [mcpClient]);
 
     // Context value
     const value = useMemo(

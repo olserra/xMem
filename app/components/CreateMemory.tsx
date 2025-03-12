@@ -102,21 +102,30 @@ export default function CreateMemory() {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
+                const headers: Record<string, string> = {
+                    'Content-Type': 'application/json'
+                };
+
+                if (bearerToken) {
+                    headers.Authorization = `Bearer ${bearerToken}`;
+                }
+
                 const response = await fetch(`/api/projects?userId=${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${bearerToken}`,
-                    },
+                    headers
                 });
+
                 if (response.ok) {
                     const data = await response.json();
                     setProjects(data);
+                } else {
+                    console.error('Failed to fetch projects:', await response.text());
                 }
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
         };
 
-        if (userId && bearerToken) fetchProjects();
+        if (userId) fetchProjects();
     }, [userId, bearerToken]);
 
     const handleSubmit = async (e: React.FormEvent) => {

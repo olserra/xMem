@@ -96,64 +96,6 @@ export default function ContentAnalysis() {
 
     return (
         <div className="space-y-8">
-            {/* Content Type Distribution */}
-            <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Content Type Distribution</h3>
-                <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={typeDistribution}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="type" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="count" fill="#3b82f6" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                    {typeDistribution.map(({ type, count, percentage }) => (
-                        <Badge key={type} variant="secondary">
-                            {type}: {percentage}% ({count})
-                        </Badge>
-                    ))}
-                </div>
-            </Card>
-
-            {/* Project Activity */}
-            <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Project Activity</h3>
-                <div className="space-y-4">
-                    {projectActivity.map(project => (
-                        <div key={project.name} className="flex justify-between items-center">
-                            <div>
-                                <h4 className="font-medium">{project.name}</h4>
-                                <p className="text-sm text-gray-500">
-                                    Last activity: {project.lastActivity.toLocaleDateString()}
-                                </p>
-                            </div>
-                            <Badge variant="secondary">
-                                {project.memoryCount} memories
-                            </Badge>
-                        </div>
-                    ))}
-                </div>
-            </Card>
-
-            {/* Content Growth */}
-            <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Content Growth</h3>
-                <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={contentGrowth}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="count" fill="#3b82f6" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </Card>
 
             {/* Content Metrics */}
             <Card className="p-6">
@@ -181,6 +123,66 @@ export default function ContentAnalysis() {
                     </div>
                 </div>
             </Card>
+
+            {/* Project Activity */}
+            <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Project Activity</h3>
+                <div className="space-y-4">
+                    {projectActivity.map(project => (
+                        <div key={project.name} className="flex justify-between items-center">
+                            <div>
+                                <h4 className="font-medium">{project.name}</h4>
+                                <p className="text-sm text-gray-500">
+                                    Last activity: {project.lastActivity.toLocaleDateString()}
+                                </p>
+                            </div>
+                            <Badge variant="secondary">
+                                {project.memoryCount} memories
+                            </Badge>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+
+            {/* Content Type Distribution */}
+            <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Content Type Distribution</h3>
+                <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={typeDistribution}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="type" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="count" fill="#3b82f6" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {typeDistribution.map(({ type, count, percentage }) => (
+                        <Badge key={type} variant="secondary">
+                            {type}: {percentage}% ({count})
+                        </Badge>
+                    ))}
+                </div>
+            </Card>
+
+            {/* Content Growth */}
+            <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Content Growth</h3>
+                <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={contentGrowth}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="count" fill="#3b82f6" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </Card>
+
         </div>
     );
 } 

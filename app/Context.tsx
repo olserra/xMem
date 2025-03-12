@@ -23,7 +23,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [memories, setMemories] = useState<Memory[]>([]);
@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // Initialize favorites from local storage with useMemo
     const [favorites, setFavorites] = useState<string[]>(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && userId) {
             const storedFavorites = localStorage.getItem(`favorites-${userId}`);
             return storedFavorites ? JSON.parse(storedFavorites) : [];
         }
@@ -49,14 +49,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(true);
 
         try {
+            // First get the bearer token
+            const tokenResponse = await fetch(`/api/bearer-token?userId=${userId}`);
+            const tokenData = await tokenResponse.json();
+
+            if (!tokenData.key) {
+                console.error('No bearer token available');
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${tokenData.key}`,
+                'Content-Type': 'application/json'
+            };
+
             const [projectsRes, memoriesRes] = await Promise.all([
-                fetch(`/api/projects?userId=${userId}`, {
-                    headers: { Authorization: `Bearer ${bearerToken}` },
+                fetch('/api/projects', {
+                    headers
                 }),
-                fetch(`/api/memory?userId=${userId}`, {
-                    headers: { Authorization: `Bearer ${bearerToken}` },
+                fetch('/api/memory', {
+                    headers
                 }),
             ]);
+
+            if (!projectsRes.ok || !memoriesRes.ok) {
+                throw new Error('Failed to fetch data');
+            }
 
             const projectsData = await projectsRes.json();
             const memoriesData = await memoriesRes.json();
@@ -76,9 +94,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`/api/memory?userId=${userId}`, {
-                headers: { Authorization: `Bearer ${bearerToken}` },
+            const tokenResponse = await fetch(`/api/bearer-token?userId=${userId}`);
+            const tokenData = await tokenResponse.json();
+
+            if (!tokenData.key) {
+                console.error('No bearer token available');
+                return;
+            }
+
+            const response = await fetch('/api/memory', {
+                headers: {
+                    'Authorization': `Bearer ${tokenData.key}`,
+                    'Content-Type': 'application/json'
+                },
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch memories');
+            }
+
             const data = await response.json();
             setMemories(data.memories || []);
         } catch (error) {
@@ -106,8 +140,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             const newFavorites = prevFavorites.includes(projectId)
                 ? prevFavorites.filter(id => id !== projectId)
                 : [...prevFavorites, projectId];
-            
-            if (typeof window !== 'undefined') {
+
+            if (typeof window !== 'undefined' && userId) {
                 localStorage.setItem(`favorites-${userId}`, JSON.stringify(newFavorites));
             }
             return newFavorites;

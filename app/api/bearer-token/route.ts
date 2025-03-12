@@ -35,31 +35,27 @@ export async function POST(req: Request) {
   const userId = url.searchParams.get('userId');
 
   if (!userId) {
-    return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-  }
-
-  const { name, description } = await req.json();
-
-  if (!name || !description) {
-    return NextResponse.json({
-      error: 'Project name and description are required'
-    }, { status: 400 });
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
   try {
-    const project = await prisma.project.create({
-      data: {
-        name,
-        description,
-        userId: userId, // Use userId from the validated token
-        visibility: 'private',
+    // Generate a new API key
+    const key = crypto.randomUUID();
+
+    // Create or update the API key for the user
+    const apiKey = await prisma.apiKey.upsert({
+      where: { userId: userId },
+      update: { key: key },
+      create: {
+        userId: userId,
+        key: key,
       },
     });
 
-    return NextResponse.json(project, { status: 201 });
+    return NextResponse.json({ key: apiKey.key }, { status: 201 });
   } catch (error) {
-    console.error('Error creating project:', error);
-    return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
+    console.error('Error creating/updating API key:', error);
+    return NextResponse.json({ error: 'Failed to create/update API key' }, { status: 500 });
   }
 }
 

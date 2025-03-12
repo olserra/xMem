@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 // Function to validate the API key and extract the userId
 const getUserIdFromToken = async (token: string) => {
@@ -11,19 +13,30 @@ const getUserIdFromToken = async (token: string) => {
 };
 
 export async function POST(req: Request) {
-    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
-
-    if (!token) {
-        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
-    }
-
-    const userId = await getUserIdFromToken(token);
-    if (!userId) {
-        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-    }
-
+    let userId: string | null = null;
     const { name, description } = await req.json();
 
+    // Check if this is an API request with a bearer token
+    const token = req.headers.get('Authorization')?.split(' ')[1];
+    if (token) {
+        userId = await getUserIdFromToken(token);
+    } else {
+        // For web requests, get the session
+        const session = await getServerSession(authOptions);
+        if (session?.user?.email) {
+            const user = await prisma.user.findUnique({
+                where: { email: session.user.email },
+            });
+            userId = user?.id || null;
+        }
+    }
+
+    // Handle unauthorized access
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Validate required fields
     if (!name || !description) {
         return NextResponse.json({
             error: 'Project name and description are required'
@@ -31,12 +44,12 @@ export async function POST(req: Request) {
     }
 
     try {
-        // Create the project associated with the userId from the token
+        // Create the project
         const project = await prisma.project.create({
             data: {
                 name,
                 description,
-                userId: userId,  // Use userId from the validated token
+                userId,
                 visibility: 'private',
             },
         });
@@ -49,15 +62,26 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
+    let userId: string | null = null;
 
-    if (!token) {
-        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
+    // Check if this is an API request with a bearer token
+    const token = req.headers.get('Authorization')?.split(' ')[1];
+    if (token) {
+        userId = await getUserIdFromToken(token);
+    } else {
+        // For web requests, get the session
+        const session = await getServerSession(authOptions);
+        if (session?.user?.email) {
+            const user = await prisma.user.findUnique({
+                where: { email: session.user.email },
+            });
+            userId = user?.id || null;
+        }
     }
 
-    const userId = await getUserIdFromToken(token);
+    // Handle unauthorized access
     if (!userId) {
-        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -68,7 +92,7 @@ export async function GET(req: Request) {
             const project = await prisma.project.findUnique({
                 where: {
                     id: projectId,
-                    userId: userId, // Ensure the project belongs to the authenticated user
+                    userId,
                 },
                 include: {
                     memories: true,
@@ -87,7 +111,7 @@ export async function GET(req: Request) {
 
         const projects = await prisma.project.findMany({
             where: {
-                userId: userId, // Fetch projects for the authenticated user
+                userId,
             },
             include: {
                 _count: {

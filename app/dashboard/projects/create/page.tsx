@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from '@/app/Context';
@@ -12,60 +12,48 @@ export default function CreateProject() {
         name: '',
         description: '',
     });
-    const [bearerToken, setBearerToken] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchBearerToken = async () => {
-            const response = await fetch(`/api/bearer-token?userId=${userId}`);
-            const data = await response.json();
-            if (data.key) {
-                setBearerToken(data.key);
-            } else {
-                console.error('Error fetching bearer token:', data.error);
-            }
-        };
-
-        if (userId) {
-            fetchBearerToken();
-        }
-    }, [userId]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
+        setIsLoading(true);
 
-        if (!bearerToken) {
-            console.error('Bearer token is missing');
+        if (!userId) {
+            setError('You must be logged in to create a project.');
+            setIsLoading(false);
             return;
         }
 
-        // Send the data to the API to create the project
-        const response = await fetch(`/api/projects?userId=${userId}`, {
-            method: 'POST',
-            body: JSON.stringify({
-                name: formData.name,
-                description: formData.description,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearerToken}`,
-            },
-        });
+        try {
+            // Send the data to the API to create the project
+            const response = await fetch(`/api/projects`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: formData.name,
+                    description: formData.description,
+                    userId: userId
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        // Check if the response is a valid JSON
-        if (response.ok) {
-            try {
-                const data = await response.json();
-                if (data.id) {
-                    // Redirect to the projects page after successful creation
-                    router.push(`/dashboard/projects`);
-                } else {
-                    console.error('Error creating project', data.error);
-                }
-            } catch (error) {
-                console.error('Failed to parse JSON response:', error);
+            const data = await response.json();
+
+            if (response.ok && data.id) {
+                // Redirect to the projects page after successful creation
+                router.push(`/dashboard/projects`);
+            } else {
+                setError(data.error || 'Failed to create project. Please try again.');
+                console.error('Error creating project:', data.error);
             }
-        } else {
-            console.error('Failed to create project:', response.statusText);
+        } catch (error) {
+            setError('An unexpected error occurred. Please try again.');
+            console.error('Failed to create project:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -73,6 +61,12 @@ export default function CreateProject() {
         <MaxWidthWrapper>
             <div className="py-6 max-w-2xl mx-auto">
                 <h1 className="text-2xl font-semibold mb-6">Create New Project</h1>
+
+                {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -83,6 +77,7 @@ export default function CreateProject() {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full p-2 border rounded-lg"
                             required
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -94,14 +89,16 @@ export default function CreateProject() {
                             className="w-full p-2 border rounded-lg"
                             rows={4}
                             required
+                            disabled={isLoading}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+                        className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isLoading}
                     >
-                        Create Project
+                        {isLoading ? 'Creating Project...' : 'Create Project'}
                     </button>
                 </form>
             </div>

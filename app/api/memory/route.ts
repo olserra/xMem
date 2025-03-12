@@ -45,7 +45,8 @@ export async function GET(request: Request) {
                 where,
                 include: {
                     subjects: true,
-                    relatedMemories: {
+                    project: true,
+                    Memory_B: {
                         select: {
                             id: true,
                             content: true,
@@ -110,7 +111,6 @@ export async function POST(request: Request) {
             data: {
                 content,
                 type,
-                projectId,
                 userId: user.id,
                 source,
                 sourceId,
@@ -119,16 +119,19 @@ export async function POST(request: Request) {
                 language,
                 tags,
                 metadata,
+                project: projectId ? {
+                    connect: { id: projectId }
+                } : undefined,
                 subjects: {
                     connect: subjects?.map((id: string) => ({ id })) || [],
                 },
-                relatedMemories: {
+                Memory_B: {
                     connect: relatedMemoryIds?.map((id: string) => ({ id })) || [],
                 },
             },
             include: {
                 subjects: true,
-                relatedMemories: {
+                Memory_B: {
                     select: {
                         id: true,
                         content: true,
@@ -172,22 +175,26 @@ export async function PUT(request: Request) {
             data: {
                 content,
                 type,
-                projectId,
                 confidence,
                 sentiment,
                 language,
                 tags,
                 metadata,
+                project: projectId ? {
+                    connect: { id: projectId }
+                } : {
+                    disconnect: true
+                },
                 subjects: {
                     set: subjects?.map((id: string) => ({ id })) || [],
                 },
-                relatedMemories: {
+                Memory_B: {
                     set: relatedMemoryIds?.map((id: string) => ({ id })) || [],
                 },
             },
             include: {
                 subjects: true,
-                relatedMemories: {
+                Memory_B: {
                     select: {
                         id: true,
                         content: true,

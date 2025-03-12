@@ -1,10 +1,9 @@
 import { Memory, Project, MemoryType } from '../types';
-import { getEmbedding, chunkText, findMostSimilar } from '../utils/embeddings';
+import { getEmbedding, findMostSimilar } from '../utils/embeddings';
 import { validateRequired, validateEnum, validateLength } from '../utils/errors';
 import { MAX_MEMORY_CONTENT_LENGTH, SUPPORTED_MEMORY_TYPES } from '../constants';
 import { analytics } from '../utils/analytics';
 import { memoryCache } from '../utils/cache';
-import { prepareMemoryForMcp } from './mcpHelpers';
 
 export async function createMemory(
     content: string,
@@ -37,13 +36,10 @@ export async function createMemory(
         updatedAt: new Date().toISOString(),
     };
 
-    // Prepare for MCP if enabled
-    const mcpMemory = await prepareMemoryForMcp(memory);
-
     // Track analytics
     await analytics.trackMemoryCreated(memory, userId);
 
-    return mcpMemory;
+    return memory;
 }
 
 export async function searchMemories(

@@ -1,30 +1,37 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from "../../Context";
+import { useUser } from "@/app/Context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const Memories = () => {
     const {
-        memories: memory,
+        memories,
         filterLabel,
         bearerToken,
         userId,
         updateMemories,
+        refreshMemories,
+        isLoading
     } = useUser();
+
     const router = useRouter();
     const [importedMemories, setImportedMemories] = useState<string>("");
     const [isCopied, setIsCopied] = useState(false);
     const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [importSuccess, setImportSuccess] = useState(false);
+
+    // Fetch memories on mount
+    useEffect(() => {
+        refreshMemories();
+    }, [refreshMemories]);
 
     const handleCopyToClipboard = useCallback(() => {
         setIsCopied(true);
-        const allUserMemory = JSON.stringify(memory);
+        const allUserMemory = JSON.stringify(memories);
         navigator.clipboard.writeText(allUserMemory)
             .then(() => console.log('User data copied to clipboard'))
             .catch(err => console.error('Failed to copy user data:', err));
@@ -32,7 +39,7 @@ const Memories = () => {
         setTimeout(() => {
             setIsCopied(false);
         }, 1000);
-    }, [memory]);
+    }, [memories]);
 
     const handleDeleteMemory = useCallback(async (id: string) => {
         try {
@@ -44,12 +51,14 @@ const Memories = () => {
             });
 
             if (response.ok) {
-                updateMemories(memory.filter((m) => m.id !== id));
+                // Update local state and trigger refresh
+                updateMemories(memories.filter((m) => m.id !== id));
+                refreshMemories();
             }
         } catch (err) {
             console.error("Failed to delete memory.");
         }
-    }, [memory, userId, bearerToken, updateMemories]);
+    }, [memories, userId, bearerToken, updateMemories, refreshMemories]);
 
     const handleDeleteSelectedMemories = useCallback(async () => {
         try {
@@ -64,18 +73,20 @@ const Memories = () => {
             const responses = await Promise.all(deletePromises);
 
             if (responses.every((response) => response.ok)) {
-                updateMemories(memory.filter((m) => !selectedMemories.has(m.id)));
-                setSelectedMemories(new Set()); // Clear the selected memories after deleting
+                // Update local state and trigger refresh
+                updateMemories(memories.filter((m) => !selectedMemories.has(m.id)));
+                setSelectedMemories(new Set());
+                refreshMemories();
             }
         } catch (err) {
             console.error("Failed to delete selected memories.");
         }
-    }, [memory, selectedMemories, userId, bearerToken, updateMemories]);
+    }, [memories, selectedMemories, userId, bearerToken, updateMemories, refreshMemories]);
 
     const handleImportMemories = useCallback(async () => {
         setIsModalOpen(false);
-        const memories = importedMemories.split("\n").filter(Boolean);
-        const newMemories = memories.map((content: string) => ({ content }));
+        const memoriesToImport = importedMemories.split("\n").filter(Boolean);
+        const newMemories = memoriesToImport.map((content: string) => ({ content }));
 
         try {
             const response = await fetch("/api/memory", {
@@ -89,14 +100,14 @@ const Memories = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                updateMemories([...memory, ...data]);
+                updateMemories([...memories, ...data]);
                 setImportedMemories("");
-                setImportSuccess(true);
+                refreshMemories();
             }
         } catch (err) {
             console.error("Failed to import memories.");
         }
-    }, [importedMemories, userId, bearerToken, memory, updateMemories]);
+    }, [importedMemories, userId, bearerToken, memories, updateMemories, refreshMemories]);
 
     const handleEditMemory = useCallback((memory: Memory) => {
         const queryParams = new URLSearchParams({
@@ -109,11 +120,11 @@ const Memories = () => {
     }, [router]);
 
     const filteredMemories = useMemo(() => {
-        if (!Array.isArray(memory)) return [];
-        return memory.filter(m =>
+        if (!Array.isArray(memories)) return [];
+        return memories.filter(m =>
             filterLabel ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
         );
-    }, [memory, filterLabel]);
+    }, [memories, filterLabel]);
 
     const toggleSelection = useCallback((id: string) => {
         setSelectedMemories(prev => {
@@ -131,7 +142,7 @@ const Memories = () => {
         if (selectedMemories.size === filteredMemories.length) {
             setSelectedMemories(new Set());
         } else {
-            setSelectedMemories(new Set(filteredMemories.map((memory) => memory.id)));
+            setSelectedMemories(new Set(filteredMemories.map(memory => memory.id)));
         }
     }, [filteredMemories, selectedMemories]);
 
@@ -156,7 +167,7 @@ const Memories = () => {
                                     aria-label="Copy all user data"
                                 >
                                     <FaRegCopy />
-                                    {isCopied ? <span className="text-sm pb-1 italic text-gray-500">Copied</span> : ""}
+                                    {isCopied && <span className="text-sm pb-1 italic text-gray-500">Copied</span>}
                                 </button>
                             </>
                         )}
@@ -180,45 +191,15 @@ const Memories = () => {
                     </div>
                 </div>
 
-                {/* Modal for importing memories */}
-                {isModalOpen && (
-                    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-                        <div className="bg-white p-8 rounded-lg w-96">
-                            <div className="flex flex-row items-center gap-4">
-                                <h3 className="text-xl font-semibold mb-4">Import Memories</h3>
-                                <Link href="/docs/core-concepts/memories" className="text-blue-500 underline mb-4">
-                                    <span className="text-sm">Read more</span>
-                                </Link>
-                            </div>
-                            <textarea
-                                value={importedMemories}
-                                onChange={(e) => setImportedMemories(e.target.value)}
-                                placeholder="Paste your memories here"
-                                className="p-2 border rounded-lg w-full mb-4"
-                            />
-                            <div className="flex justify-between">
-                                <button
-                                    className="bg-gray-300 text-black py-2 px-3 rounded-lg"
-                                    onClick={() => setIsModalOpen(false)} // Close the modal
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="bg-black text-white py-2 px-3 rounded-lg"
-                                    onClick={handleImportMemories}
-                                >
-                                    Import
-                                </button>
-                            </div>
-                        </div>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-32">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
                     </div>
-                )}
-
-                <div className="space-y-4">
-                    {filteredMemories.length === 0 ? (
-                        <p>No memories found. Start creating some!</p>
-                    ) : (
-                        filteredMemories.map((memory: Memory) => (
+                ) : filteredMemories.length === 0 ? (
+                    <p>No memories found. Start creating some!</p>
+                ) : (
+                    <div className="space-y-4">
+                        {filteredMemories.map((memory: Memory) => (
                             <div key={memory.id} className="border border-gray-300 bg-white p-4 rounded-lg relative">
                                 <div className="flex flex-row items-center justify-between">
                                     <div className="flex">
@@ -260,9 +241,43 @@ const Memories = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Modal for importing memories */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+                        <div className="bg-white p-8 rounded-lg w-96">
+                            <div className="flex flex-row items-center gap-4">
+                                <h3 className="text-xl font-semibold mb-4">Import Memories</h3>
+                                <Link href="/docs/core-concepts/memories" className="text-blue-500 underline mb-4">
+                                    <span className="text-sm">Read more</span>
+                                </Link>
+                            </div>
+                            <textarea
+                                value={importedMemories}
+                                onChange={(e) => setImportedMemories(e.target.value)}
+                                placeholder="Paste your memories here"
+                                className="p-2 border rounded-lg w-full mb-4"
+                            />
+                            <div className="flex justify-between">
+                                <button
+                                    className="bg-gray-300 text-black py-2 px-3 rounded-lg"
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="bg-black text-white py-2 px-3 rounded-lg"
+                                    onClick={handleImportMemories}
+                                >
+                                    Import
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </MaxWidthWrapper>
     );

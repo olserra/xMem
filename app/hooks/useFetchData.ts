@@ -21,7 +21,7 @@ const useFetchData = (userId: string | null, bearerToken: string | null) => {
             const memoriesData = await memoriesRes.json();
 
             setProjects(projectsData);
-            setMemories(memoriesData);
+            setMemories(memoriesData.memories || []);
         } catch (error) {
             console.error("Error fetching projects and memories:", error);
         }

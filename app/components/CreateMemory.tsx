@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "@/app/Context";
@@ -27,7 +27,7 @@ interface Memory {
     updatedAt: string;
 }
 
-interface CreateMemoryForm {
+interface FormData {
     content: string;
     projectId?: string;
 }
@@ -50,54 +50,18 @@ function useWindowSize() {
 }
 
 export default function CreateMemory() {
-    const { userId } = useUser();
+    const { userId, bearerToken, refreshMemories } = useUser();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialProjectId = searchParams.get('projectId');
     const isMobile = useWindowSize();
-
-    const [formData, setFormData] = useState<CreateMemoryForm>({
-        content: "",
-        projectId: initialProjectId || undefined
-    });
-    const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [bearerToken, setBearerToken] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchBearerToken = async () => {
-            const response = await fetch(`/api/bearer-token?userId=${userId}`);
-            const data = await response.json();
-            if (data.key) {
-                setBearerToken(data.key);
-            } else {
-                console.error('Error fetching bearer token:', data.error);
-            }
-        };
-
-        if (userId) {
-            fetchBearerToken();
-        }
-    }, [userId]);
-
-
-    useEffect(() => {
-        const id = searchParams.get('id');
-        const content = searchParams.get('content');
-        const projectId = searchParams.get('projectId');
-
-        if (id && content) {
-            setFormData({
-                content,
-                projectId: projectId || undefined  // Ensure projectId is properly set
-            });
-        }
-    }, [searchParams]);
-
-
-    const memoryId = searchParams.get('id');
-    const isEditing = Boolean(memoryId);
+    const [formData, setFormData] = useState<FormData>({
+        content: searchParams.get('content') || '',
+        projectId: searchParams.get('projectId') || undefined,
+    });
+    const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -128,7 +92,7 @@ export default function CreateMemory() {
         if (userId) fetchProjects();
     }, [userId, bearerToken]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -153,7 +117,7 @@ export default function CreateMemory() {
                     content: formData.content,
                     type: "note",
                     metadata: {},
-                    projectId: formData.projectId !== undefined ? formData.projectId : null,  // Explicitly handle null
+                    projectId: formData.projectId !== undefined ? formData.projectId : null,
                     userId: userId,
                     isArchived: false,
                     version: 1
@@ -165,24 +129,26 @@ export default function CreateMemory() {
                 throw new Error(errorData.error || (isEditing ? 'Failed to update memory' : 'Failed to create memory'));
             }
 
+            // Refresh memories in context
+            await refreshMemories();
+
             // Redirect after saving
             router.push('/dashboard/memories');
-
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to save memory. Please try again.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId, bearerToken, formData, searchParams, router, refreshMemories]);
 
     return (
         <MaxWidthWrapper>
             <div className="max-w-4xl mx-auto py-4 px-4 sm:py-8 sm:px-6">
                 <div className="space-y-6">
                     <div>
-                        <h1 className="text-xl sm:text-2xl font-semibold">{isEditing ? 'Edit Memory' : 'Create New Memory'}</h1>
+                        <h1 className="text-xl sm:text-2xl font-semibold">{searchParams.get('id') ? 'Edit Memory' : 'Create New Memory'}</h1>
                         <p className="text-sm sm:text-base text-gray-600 mt-2">
-                            {isEditing ? 'Edit your memory below' : 'Store your data, thoughts, and ideas in a memory. Memories can be standalone or associated with a project.'}
+                            {searchParams.get('id') ? 'Edit your memory below' : 'Store your data, thoughts, and ideas in a memory. Memories can be standalone or associated with a project.'}
                         </p>
                     </div>
 
@@ -248,7 +214,7 @@ export default function CreateMemory() {
                             disabled={loading}
                             className="w-full bg-black text-white py-2.5 sm:py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 text-sm sm:text-base"
                         >
-                            {loading ? (isEditing ? 'Saving...' : 'Creating...') : (isEditing ? 'Save' : 'Create Memory')}
+                            {loading ? 'Saving...' : 'Save Memory'}
                         </button>
 
                     </form>

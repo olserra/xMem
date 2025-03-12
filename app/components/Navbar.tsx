@@ -31,8 +31,8 @@ const Navbar = () => {
   const menuItems = [
     { label: 'Projects', href: '/dashboard/projects' },
     { label: 'Memories', href: '/dashboard/memories' },
-    { label: 'MCP', href: '/dashboard/mcp' },
     { label: 'Sources', href: '/dashboard/sources' },
+    { label: 'Analysis', href: '/dashboard/analysis' },
   ];
 
   const isActive = (href: string) => {
@@ -41,6 +41,7 @@ const Navbar = () => {
     if (href === '/dashboard/memories' && pathname.startsWith('/dashboard/memories/') && !pathname.includes('/create')) return true;
     if (href === '/dashboard/mcp' && pathname.startsWith('/dashboard/mcp/')) return true;
     if (href === '/dashboard/sources' && pathname.startsWith('/dashboard/sources/')) return true;
+    if (href === '/dashboard/analysis' && pathname.startsWith('/dashboard/analysis/')) return true;
     return false;
   };
 

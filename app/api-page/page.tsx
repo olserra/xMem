@@ -4,48 +4,52 @@ import { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { FaRegCopy } from "react-icons/fa";
 import { useUser } from '../Context';
-import { v4 as uuidv4 } from 'uuid';
+
+interface ApiKey {
+    id: string;
+    key: string;
+    createdAt: string;
+}
 
 const ApiPage = () => {
     const { userId } = useUser();
-    const [apiKey, setApiKey] = useState<string | null>(null);
-    const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+    const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+    const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
+    const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
-        const fetchApiKey = async () => {
+        const fetchApiKeys = async () => {
             if (!userId) return;
             try {
                 const response = await fetch(`/api/api-key?userId=${userId}`);
                 const data = await response.json();
 
-                if (response.ok && data.apiKey) {
-                    setApiKey(data.apiKey);
-                } else {
-                    setApiKey(null);
+                if (response.ok && data.apiKeys) {
+                    setApiKeys(data.apiKeys);
                 }
             } catch (error) {
-                console.error('Error fetching API key:', error);
+                console.error('Error fetching API keys:', error);
             }
         };
 
-        fetchApiKey();
+        fetchApiKeys();
     }, [userId]);
 
     const generateApiKey = useCallback(async () => {
         if (!userId) return;
 
-        const newApiKey = uuidv4();
         try {
             const response = await fetch('/api/api-key', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, apiKey: newApiKey }),
+                body: JSON.stringify({ userId }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                setApiKey(newApiKey);
+                setApiKeys(prev => [...prev, data.apiKey]);
+                setIsCreating(false);
             } else {
                 alert(`Error: ${data.error}`);
             }
@@ -54,84 +58,124 @@ const ApiPage = () => {
         }
     }, [userId]);
 
-    const revokeApiKey = useCallback(async () => {
-        if (!userId) return;
+    const revokeApiKey = useCallback(async (keyId: string) => {
+        if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+            return;
+        }
 
         try {
             const response = await fetch('/api/api-key', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId }),
+                body: JSON.stringify({ keyId }),
             });
 
-            const data = await response.json();
-
             if (response.ok) {
-                setApiKey(null);
+                setApiKeys(prev => prev.filter(key => key.id !== keyId));
             } else {
-                console.error('Error deleting API key:', data.error);
+                const data = await response.json();
                 alert(`Error: ${data.error}`);
             }
         } catch (error) {
-            console.error('Error deleting API key:', error);
+            console.error('Error revoking API key:', error);
         }
-    }, [userId]);
-
-    const copyToClipboard = useCallback(() => {
-        if (apiKey) {
-            navigator.clipboard.writeText(apiKey);
-            alert('API Key copied to clipboard');
-        }
-    }, [apiKey]);
-
-    const toggleApiKeyVisibility = useCallback(() => {
-        setIsApiKeyVisible((prev) => !prev);
     }, []);
 
+    const toggleKeyVisibility = useCallback((keyId: string) => {
+        setVisibleKeys(prev => ({
+            ...prev,
+            [keyId]: !prev[keyId]
+        }));
+    }, []);
+
+    const copyToClipboard = useCallback((key: string) => {
+        navigator.clipboard.writeText(key);
+        alert('API Key copied to clipboard');
+    }, []);
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleString();
+    };
+
     return (
-        <div className="flex flex-col max-w-2xl mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">API Management</h1>
-            {apiKey ? (
-                <div>
-                    <p className="mb-2">Your API Key:</p>
-                    <div className="flex items-center mb-4 gap-2">
-                        <div className="relative flex-1">
-                            <input
-                                type={isApiKeyVisible ? 'text' : 'password'}
-                                value={apiKey}
-                                readOnly
-                                className="border border-gray-300 rounded-md p-2 w-full h-10 pr-10"
-                                style={{ minWidth: '500px' }}
-                            />
-                            <button
-                                onClick={toggleApiKeyVisibility}
-                                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                            >
-                                {isApiKeyVisible ? <EyeOff /> : <Eye />}
-                            </button>
-                        </div>
+        <div className="flex flex-col max-w-4xl mx-auto p-4">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">API Keys</h1>
+                {!isCreating && (
+                    <button
+                        onClick={() => setIsCreating(true)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Create New API Key
+                    </button>
+                )}
+            </div>
+
+            {isCreating && (
+                <div className="mb-6 p-4 border rounded-lg">
+                    <h2 className="text-lg font-semibold mb-3">Create New API Key</h2>
+                    <div className="flex gap-3">
                         <button
-                            onClick={copyToClipboard}
-                            className="border p-2 border-gray-300 rounded-md h-10 w-10 flex items-center justify-center"
+                            onClick={generateApiKey}
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                         >
-                            <FaRegCopy className="text-black" size={15} />
+                            Generate
                         </button>
                         <button
-                            onClick={revokeApiKey}
-                            className="text-md border p-2 border-gray-300 rounded-md h-10 flex items-center justify-center"
+                            onClick={() => setIsCreating(false)}
+                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
                         >
-                            Revoke
+                            Cancel
                         </button>
                     </div>
                 </div>
-            ) : (
-                <button
-                    onClick={generateApiKey}
-                    className="border p-2 border-gray-300 rounded-md h-10"
-                >
-                    Generate API Key
-                </button>
             )}
+
+            <div className="space-y-4">
+                {apiKeys.map((apiKey) => (
+                    <div key={apiKey.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                            <div>
+                                <p className="text-sm text-gray-500">Created: {formatDate(apiKey.createdAt)}</p>
+                            </div>
+                            <button
+                                onClick={() => revokeApiKey(apiKey.id)}
+                                className="text-red-500 hover:text-red-600"
+                            >
+                                Revoke
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="relative flex-1">
+                                <input
+                                    type={visibleKeys[apiKey.id] ? 'text' : 'password'}
+                                    value={apiKey.key}
+                                    readOnly
+                                    className="border border-gray-300 rounded-md p-2 w-full pr-10"
+                                />
+                                <button
+                                    onClick={() => toggleKeyVisibility(apiKey.id)}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                >
+                                    {visibleKeys[apiKey.id] ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
+                            </div>
+                            <button
+                                onClick={() => copyToClipboard(apiKey.key)}
+                                className="border p-2 border-gray-300 rounded-md h-10 w-10 flex items-center justify-center"
+                            >
+                                <FaRegCopy className="text-black" size={15} />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+
+                {apiKeys.length === 0 && !isCreating && (
+                    <div className="text-center py-8 text-gray-500">
+                        No API keys yet. Click "Create New API Key" to get started.
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

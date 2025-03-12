@@ -13,24 +13,24 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
   role          Role      @default(USER)
-  projects      Project[] // Only projects relation, no direct memories
-  apiKey        ApiKey?
+  accounts      Account[]
+  apiKeys       ApiKey[]
+  projects      Project[]
+  sessions      Session[]
 }
 
 model Project {
   id          String   @id @default(cuid())
   name        String
   description String
-  type        String? // Make type optional
+  type        String?
   visibility  String   @default("private")
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   memories    Memory[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
@@ -38,28 +38,26 @@ model Project {
 }
 
 model Memory {
-  id         String   @id @default(cuid())
-  content    String   @db.Text
-  metadata   Json?    // Additional metadata about the memory
-  type       String   // Type of memory (e.g., "fact", "conversation", "note")
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  content    String
+  isArchived Boolean   @default(false)
+  metadata   Json?
   projectId  String?
+  type       String
   userId     String
-  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  isArchived Boolean  @default(false)
-  version    Int      @default(1)
-  
-  // New fields for source tracking and organization
-  source     String?   // e.g., "cursorAI", "bolt.new", "lovable", "chatGPT", "claude"
-  sourceId   String?  // Original ID from the source system
-  subjects   Subject[] // Many-to-many relationship with subjects
-  relatedMemories Memory[] @relation("MemoryRelations")
-  relatedTo  Memory[] @relation("MemoryRelations")
-  confidence Float?   // AI confidence score if applicable
-  sentiment  String?  // Sentiment analysis if available
-  language   String?  // Language of the content
-  tags       String[] // Array of tags for better organization
+  version    Int       @default(1)
+  confidence Float?
+  language   String?
+  sentiment  String?
+  source     String?
+  sourceId   String?
+  tags       String[]
+  project    Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  Memory_A   Memory[]  @relation("MemoryRelations")
+  Memory_B   Memory[]  @relation("MemoryRelations")
+  subjects   Subject[] @relation("MemoryToSubject")
 
   @@index([projectId])
   @@index([type])
@@ -73,23 +71,23 @@ model Subject {
   id          String   @id @default(cuid())
   name        String   @unique
   description String?
-  memories    Memory[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  memories    Memory[] @relation("MemoryToSubject")
 }
 
 model SourceConfig {
-  id            String   @id @default(cuid())
-  userId        String
-  source        String   // e.g., "cursorAI", "bolt.new", etc.
-  apiKey        String?
-  apiSecret     String?
-  webhookUrl    String?
-  isEnabled     Boolean  @default(true)
-  lastSync      DateTime?
-  syncInterval  Int?     // in minutes
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String    @id @default(cuid())
+  userId       String
+  source       String
+  apiKey       String?
+  apiSecret    String?
+  webhookUrl   String?
+  isEnabled    Boolean   @default(true)
+  lastSync     DateTime?
+  syncInterval Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@unique([userId, source])
   @@index([userId])
@@ -111,8 +109,7 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -135,11 +132,17 @@ model VerificationToken {
 }
 
 model ApiKey {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
+  id        String    @id @default(cuid())
+  key       String    @unique
+  userId    String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  isEnabled Boolean   @default(true)
+  lastUsed  DateTime?
+  name      String?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum Role {

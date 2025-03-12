@@ -109,6 +109,7 @@ const Memories = () => {
     }, [router]);
 
     const filteredMemories = useMemo(() => {
+        if (!Array.isArray(memory)) return [];
         return memory.filter(m =>
             filterLabel ? m.content.toLowerCase().includes(filterLabel.toLowerCase()) : true
         );

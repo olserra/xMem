@@ -12,34 +12,18 @@ export default function ProjectsPage() {
     const { userId, favorites, filterLabel, toggleFavorite } = useUser();
     const { status } = useSession();
     const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set());
-    const [bearerToken, setBearerToken] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchBearerToken = async () => {
-            const response = await fetch(`/api/bearer-token?userId=${userId}`);
-            const data = await response.json();
-            if (data.key) {
-                setBearerToken(data.key);
-            } else {
-                console.error('Error fetching bearer token:', data.error);
-            }
-        };
-
-        if (userId) {
-            fetchBearerToken();
-        }
-    }, [userId]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProjects = async () => {
-            if (!userId || !bearerToken) return;
+            if (!userId) return;
+            setIsLoading(true);
+            setError(null);
 
             try {
-                const response = await fetch(`/api/projects?userId=${userId}`, {
+                const response = await fetch(`/api/projects`, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${bearerToken}`,
-                    },
                 });
                 if (!response.ok) {
                     throw new Error('Failed to fetch projects');
@@ -52,20 +36,20 @@ export default function ProjectsPage() {
                 setProjects(projectsWithCounts);
             } catch (error) {
                 console.error('Error fetching projects:', error);
+                setError('Failed to load projects. Please try again.');
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchProjects();
-    }, [userId, bearerToken]);
+    }, [userId]);
 
     const handleDeleteSelectedProjects = useCallback(async () => {
         try {
             const deletePromises = Array.from(selectedProjects).map((id) =>
-                fetch(`/api/projects/${id}?userId=${userId}`, {
-                    method: "DELETE",
-                    headers: {
-                        'Authorization': `Bearer ${bearerToken}`,
-                    }
+                fetch(`/api/projects/${id}`, {
+                    method: "DELETE"
                 })
             );
             const responses = await Promise.all(deletePromises);
@@ -77,7 +61,7 @@ export default function ProjectsPage() {
         } catch (err) {
             console.error("Failed to delete selected projects.");
         }
-    }, [projects, selectedProjects, userId, bearerToken]);
+    }, [projects, selectedProjects]);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -112,6 +96,27 @@ export default function ProjectsPage() {
         }
     }, [filteredProjects, selectedProjects]);
 
+    if (isLoading) {
+        return (
+            <MaxWidthWrapper>
+                <div className="py-6">
+                    <div className="animate-pulse space-y-4">
+                        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="border border-gray-300 rounded-lg p-4">
+                                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </MaxWidthWrapper>
+        );
+    }
+
     return (
         <MaxWidthWrapper>
             <div className="py-6">
@@ -126,12 +131,13 @@ export default function ProjectsPage() {
                         </button>
                         <Link
                             href="/dashboard/projects/create"
+                            className="text-black py-2 px-3 rounded-lg hover:bg-gray-100"
                         >
-                            <span>New Project</span>
+                            New Project
                         </Link>
                         {selectedProjects.size > 0 && (
                             <button
-                                className="text-black py-2 px-3 rounded-lg"
+                                className="text-black py-2 px-3 rounded-lg hover:text-red-600"
                                 onClick={handleDeleteSelectedProjects}
                             >
                                 <FaTrash />
@@ -139,6 +145,13 @@ export default function ProjectsPage() {
                         )}
                     </div>
                 </div>
+
+                {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+                        {error}
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-start">
                     {filteredProjects.map((project) => (
                         <Link href={`/dashboard/projects/${project.id}`} key={project.id} className="relative hover:cursor-pointer border border-gray-300 bg-white rounded-lg p-4">
@@ -150,7 +163,10 @@ export default function ProjectsPage() {
                             />
                             <button
                                 className="absolute top-5 right-6 cursor-pointer"
-                                onClick={() => toggleFavorite(project.id)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleFavorite(project.id);
+                                }}
                             >
                                 {favorites.includes(project.id) ? (
                                     <FaStar className="text-gray-700" />

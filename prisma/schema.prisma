@@ -39,20 +39,61 @@ model Project {
 
 model Memory {
   id         String   @id @default(cuid())
-  content    String   @db.Text // The actual memory content
-  metadata   Json? // Additional metadata about the memory
-  type       String // Type of memory (e.g., "fact", "conversation", "note")
+  content    String   @db.Text
+  metadata   Json?    // Additional metadata about the memory
+  type       String   // Type of memory (e.g., "fact", "conversation", "note")
   projectId  String?
   userId     String
   project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   isArchived Boolean  @default(false)
-  version    Int      @default(1) // For tracking memory versions
+  version    Int      @default(1)
+  
+  // New fields for source tracking and organization
+  source     String?   // e.g., "cursorAI", "bolt.new", "lovable", "chatGPT", "claude"
+  sourceId   String?  // Original ID from the source system
+  subjects   Subject[] // Many-to-many relationship with subjects
+  relatedMemories Memory[] @relation("MemoryRelations")
+  relatedTo  Memory[] @relation("MemoryRelations")
+  confidence Float?   // AI confidence score if applicable
+  sentiment  String?  // Sentiment analysis if available
+  language   String?  // Language of the content
+  tags       String[] // Array of tags for better organization
 
   @@index([projectId])
   @@index([type])
   @@index([userId])
+  @@index([source])
+  @@index([sourceId])
+  @@index([language])
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  memories    Memory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SourceConfig {
+  id            String   @id @default(cuid())
+  userId        String
+  source        String   // e.g., "cursorAI", "bolt.new", etc.
+  apiKey        String?
+  apiSecret     String?
+  webhookUrl    String?
+  isEnabled     Boolean  @default(true)
+  lastSync      DateTime?
+  syncInterval  Int?     // in minutes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, source])
+  @@index([userId])
+  @@index([source])
 }
 
 model Account {

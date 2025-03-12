@@ -32,6 +32,7 @@ const Navbar = () => {
     { label: 'Projects', href: '/dashboard/projects' },
     { label: 'Memories', href: '/dashboard/memories' },
     { label: 'MCP', href: '/dashboard/mcp' },
+    { label: 'Sources', href: '/dashboard/sources' },
   ];
 
   const isActive = (href: string) => {
@@ -39,6 +40,7 @@ const Navbar = () => {
     if (href === '/dashboard/projects' && pathname.startsWith('/dashboard/projects/')) return true;
     if (href === '/dashboard/memories' && pathname.startsWith('/dashboard/memories/') && !pathname.includes('/create')) return true;
     if (href === '/dashboard/mcp' && pathname.startsWith('/dashboard/mcp/')) return true;
+    if (href === '/dashboard/sources' && pathname.startsWith('/dashboard/sources/')) return true;
     return false;
   };
 

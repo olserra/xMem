@@ -1,114 +1,231 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/prisma/prisma';
 
-// Function to validate the API key and extract the userId
-const getUserIdFromToken = async (token: string) => {
-    const apiKey = await prisma.apiKey.findUnique({
-        where: { key: token },
-        include: { user: true },
-    });
-    return apiKey ? apiKey.userId : null;
-};
 
-export async function GET(req: Request) {
-    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
-    if (!token) {
-        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
+export async function GET(request: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const userId = await getUserIdFromToken(token);
-    if (!userId) {
-        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const projectId = searchParams.get('projectId');
 
     try {
-        const memories = await prisma.memory.findMany({
-            where: {
-                userId,
-                ...(projectId && { projectId }),
+        const { searchParams } = new URL(request.url);
+        const source = searchParams.get('source');
+        const subject = searchParams.get('subject');
+        const projectId = searchParams.get('projectId');
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '10');
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        const where = {
+            userId: user.id,
+            ...(source && { source }),
+            ...(projectId && { projectId }),
+            ...(subject && {
+                subjects: {
+                    some: {
+                        id: subject,
+                    },
+                },
+            }),
+        };
+
+        const [memories, total] = await Promise.all([
+            prisma.memory.findMany({
+                where,
+                include: {
+                    subjects: true,
+                    relatedMemories: {
+                        select: {
+                            id: true,
+                            content: true,
+                            source: true,
+                        },
+                    },
+                },
+                orderBy: { createdAt: 'desc' },
+                skip: (page - 1) * limit,
+                take: limit,
+            }),
+            prisma.memory.count({ where }),
+        ]);
+
+        return NextResponse.json({
+            memories,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        });
+    } catch (error) {
+        console.error('Error fetching memories:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
+
+export async function POST(request: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        const body = await request.json();
+        const {
+            content,
+            type,
+            projectId,
+            source,
+            sourceId,
+            subjects,
+            relatedMemoryIds,
+            confidence,
+            sentiment,
+            language,
+            tags,
+            metadata,
+        } = body;
+
+        const memory = await prisma.memory.create({
+            data: {
+                content,
+                type,
+                projectId,
+                userId: user.id,
+                source,
+                sourceId,
+                confidence,
+                sentiment,
+                language,
+                tags,
+                metadata,
+                subjects: {
+                    connect: subjects?.map((id: string) => ({ id })) || [],
+                },
+                relatedMemories: {
+                    connect: relatedMemoryIds?.map((id: string) => ({ id })) || [],
+                },
             },
             include: {
-                project: {
+                subjects: true,
+                relatedMemories: {
                     select: {
                         id: true,
-                        name: true,
+                        content: true,
+                        source: true,
                     },
                 },
             },
-            orderBy: {
-                createdAt: 'desc',
+        });
+
+        return NextResponse.json(memory);
+    } catch (error) {
+        console.error('Error creating memory:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
+
+export async function PUT(request: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const body = await request.json();
+        const {
+            id,
+            content,
+            type,
+            projectId,
+            subjects,
+            relatedMemoryIds,
+            confidence,
+            sentiment,
+            language,
+            tags,
+            metadata,
+        } = body;
+
+        const memory = await prisma.memory.update({
+            where: { id },
+            data: {
+                content,
+                type,
+                projectId,
+                confidence,
+                sentiment,
+                language,
+                tags,
+                metadata,
+                subjects: {
+                    set: subjects?.map((id: string) => ({ id })) || [],
+                },
+                relatedMemories: {
+                    set: relatedMemoryIds?.map((id: string) => ({ id })) || [],
+                },
+            },
+            include: {
+                subjects: true,
+                relatedMemories: {
+                    select: {
+                        id: true,
+                        content: true,
+                        source: true,
+                    },
+                },
             },
         });
 
-        return NextResponse.json(memories);
+        return NextResponse.json(memory);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch memories' }, { status: 500 });
+        console.error('Error updating memory:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
 
-export async function POST(req: Request) {
-    const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
-
-    if (!token) {
-        return NextResponse.json({ error: 'Authorization token is required' }, { status: 401 });
+export async function DELETE(request: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const userId = await getUserIdFromToken(token);
-    if (!userId) {
-        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
-    }
-
-    const { memories, content, type = 'note', metadata = {}, projectId } = await req.json();
 
     try {
-        if (memories && Array.isArray(memories)) {
-            // Handle bulk import of memories
-            await prisma.memory.createMany({
-                data: memories.map((memory) => ({
-                    ...memory,
-                    userId,
-                    projectId: memory.projectId || projectId,
-                    type: memory.type || 'note',
-                    isArchived: false,
-                    version: 1,
-                })),
-            });
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
 
-            // Fetch the newly created memories
-            const createdMemories = await prisma.memory.findMany({
-                where: {
-                    userId,
-                    content: { in: memories.map((memory) => memory.content) },
-                },
-            });
-
-            return NextResponse.json(createdMemories, { status: 201 });
-        } else if (content) {
-            // Handle single memory creation
-            const newMemory = await prisma.memory.create({
-                data: {
-                    content,
-                    type,
-                    metadata,
-                    userId,
-                    ...(projectId && { projectId }),
-                    isArchived: false,
-                    version: 1,
-                },
-            });
-
-            return NextResponse.json(newMemory, { status: 201 });
-        } else {
-            return NextResponse.json({ error: 'Content is required for single memory creation' }, { status: 400 });
+        if (!id) {
+            return NextResponse.json({ error: 'Memory ID is required' }, { status: 400 });
         }
+
+        await prisma.memory.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error creating memory:', error);
-        return NextResponse.json({
-            error: 'Failed to create memory. Please ensure all required fields are provided.',
-        }, { status: 500 });
+        console.error('Error deleting memory:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+

@@ -24,9 +24,15 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const { data: session, status } = useSession();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [memories, setMemories] = useState<Memory[]>([]);
+    const [memories, setMemories] = useState<Memory[]>(() => {
+        if (typeof window !== 'undefined' && session?.user?.id) {
+            const cachedMemories = localStorage.getItem(`memories-${session.user.id}`);
+            return cachedMemories ? JSON.parse(cachedMemories) : [];
+        }
+        return [];
+    });
     const [filterLabel, setFilterLabel] = useState<string>("");
 
     const userId = session?.user?.id ?? null;
@@ -46,7 +52,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // Memoized fetch function
     const fetchData = useCallback(async () => {
         if (!userId || !bearerToken) return;
-        setIsLoading(true);
 
         try {
             // First get the bearer token
@@ -80,7 +85,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             const memoriesData = await memoriesRes.json();
 
             setProjects(projectsData);
-            setMemories(memoriesData.memories || []);
+            const newMemories = memoriesData.memories || [];
+            setMemories(newMemories);
+
+            // Update cache
+            if (typeof window !== 'undefined' && userId) {
+                localStorage.setItem(`memories-${userId}`, JSON.stringify(newMemories));
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -114,7 +125,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             }
 
             const data = await response.json();
-            setMemories(data.memories || []);
+            const newMemories = data.memories || [];
+            setMemories(newMemories);
+
+            // Update cache
+            if (typeof window !== 'undefined' && userId) {
+                localStorage.setItem(`memories-${userId}`, JSON.stringify(newMemories));
+            }
         } catch (error) {
             console.error("Error refreshing memories:", error);
         } finally {
@@ -130,9 +147,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 refreshMemories();
                 return prev;
             }
+
+            // Update cache
+            if (typeof window !== 'undefined' && userId) {
+                localStorage.setItem(`memories-${userId}`, JSON.stringify(newMemories));
+            }
+
             return newMemories;
         });
-    }, [refreshMemories]);
+    }, [refreshMemories, userId]);
 
     // Memoized toggle favorite function
     const toggleFavorite = useCallback((projectId: string) => {
@@ -152,6 +175,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (userId && bearerToken) {
             fetchData();
+        } else {
+            setIsLoading(false);
         }
     }, [userId, bearerToken, fetchData]);
 

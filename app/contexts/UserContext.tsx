@@ -159,10 +159,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 bearerToken: state.bearerToken
             });
             const response = await get<ApiPaginatedResponse<Memory>>('/memory');
-            console.log('Raw memories response:', response);
+            console.log('Raw memories response:', JSON.stringify(response, null, 2));
 
-            if (response?.memories && Array.isArray(response.memories)) {
-                dispatch({ type: 'SET_MEMORIES', payload: response.memories });
+            if (response?.success && response?.data?.memories && Array.isArray(response.data.memories)) {
+                console.log('Setting memories:', response.data.memories);
+                dispatch({ type: 'SET_MEMORIES', payload: response.data.memories });
+            } else {
+                console.error('Invalid memories response:', response);
             }
         } catch (error) {
             console.error('Error fetching memories:', error);

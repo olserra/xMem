@@ -54,7 +54,11 @@ export function useApi(bearerToken: string | null) {
                 data,
                 bearerToken: bearerToken ? 'present' : 'missing'
             });
-            return data;
+            return {
+                success: true,
+                data,
+                error: undefined
+            };
         } catch (error) {
             if (error instanceof Error) {
                 if (error.name === 'AbortError') {

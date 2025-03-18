@@ -9,8 +9,7 @@ export interface BaseEntity<T = string> {
     updatedAt: string;
 }
 
-export interface User {
-    id: string;
+export interface User extends BaseEntity {
     email: string;
     name: string;
     apiKeys?: ApiKey[];
@@ -34,8 +33,7 @@ export interface Project {
     metadata?: any;
 }
 
-export interface Memory {
-    id: string;
+export interface Memory extends BaseEntity {
     content: string;
     type: MemoryType;
     metadata?: MemoryMetadata;
@@ -44,8 +42,6 @@ export interface Memory {
     projectId?: string;
     project?: Project;
     user?: User;
-    createdAt: string;
-    updatedAt: string;
 }
 
 export interface MemoryMetadata {

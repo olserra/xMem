@@ -1,4 +1,6 @@
-import { User, Project, Memory } from './core';
+import { User } from './core';
+import { Project } from './project';
+import { Memory } from './core';
 
 export interface UserContextState {
     user: User | null;

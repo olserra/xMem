@@ -40,7 +40,7 @@ export interface DataInsight {
     description: string;
     severity: 'low' | 'medium' | 'high';
     timestamp: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
 }
 
 export interface ContentAnalysis {
@@ -87,7 +87,7 @@ export interface OrganizationSuggestion {
     confidence: number;
     action: {
         type: string;
-        payload: any;
+        payload: unknown;
     };
     metadata: {
         affectedContent: string[];

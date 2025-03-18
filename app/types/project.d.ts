@@ -1,20 +1,18 @@
+import { BaseEntity } from './core';
 import { Memory } from './core';
 import { User } from './core';
 
 export type ProjectType = 'PERSONAL' | 'TEAM' | 'ORGANIZATION';
-export type ProjectVisibility = 'PRIVATE' | 'PUBLIC' | 'SHARED';
+export type ProjectVisibility = 'PUBLIC' | 'PRIVATE' | 'SHARED';
 
-export interface Project {
-    id: string;
+export interface Project extends BaseEntity {
     name: string;
     description: string;
-    type: ProjectType | null;
+    type: ProjectType;
     visibility: ProjectVisibility;
     userId: string;
-    createdAt: string;
-    updatedAt: string;
-    memories?: Memory[];
     user?: User;
+    memories?: Memory[];
     _count?: { memories: number };
     memoryCount?: number;
     metadata?: Record<string, unknown>;

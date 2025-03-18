@@ -1,5 +1,6 @@
 // Re-export all types
 export * from './core';
+export * from './project';
 export * from './userContext';
 export * from './api';
 export * from './forms';

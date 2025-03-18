@@ -42,11 +42,9 @@ export async function POST(req: Request) {
     // Generate a new API key
     const key = crypto.randomUUID();
 
-    // Create or update the API key for the user
-    const apiKey = await prisma.apiKey.upsert({
-      where: { userId: userId },
-      update: { key: key },
-      create: {
+    // Create a new API key for the user
+    const apiKey = await prisma.apiKey.create({
+      data: {
         userId: userId,
         key: key,
       },
@@ -54,8 +52,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ key: apiKey.key }, { status: 201 });
   } catch (error) {
-    console.error('Error creating/updating API key:', error);
-    return NextResponse.json({ error: 'Failed to create/update API key' }, { status: 500 });
+    console.error('Error creating API key:', error);
+    return NextResponse.json({ error: 'Failed to create API key' }, { status: 500 });
   }
 }
 

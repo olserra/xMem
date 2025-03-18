@@ -28,12 +28,11 @@ export async function createMemory(
         userId,
         projectId,
         embedding,
-        metadata: {
-            ...metadata,
-            createdAt: new Date().toISOString(),
-        },
+        metadata,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        version: 1,
+        isArchived: false
     };
 
     // Track analytics

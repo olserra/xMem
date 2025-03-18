@@ -88,7 +88,7 @@ export async function GET(request: Request) {
                 page,
                 limit,
                 totalPages: Math.ceil(total / limit),
-            },
+            }
         });
     } catch (error) {
         console.error('Error fetching memories:', error);

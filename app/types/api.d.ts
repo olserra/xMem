@@ -1,4 +1,5 @@
 import { Memory } from './memory';
+import { Project } from './project';
 
 export interface User {
     id: string;

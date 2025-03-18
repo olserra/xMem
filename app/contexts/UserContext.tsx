@@ -160,10 +160,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
             const response = await get<{ memories: Memory[], pagination: any }>('/memory');
             console.log('Memories response:', {
                 hasData: !!response,
-                memoriesLength: response?.memories?.length || 0
+                memoriesLength: response?.data?.memories?.length || 0
             });
-            if (response?.memories) {
-                dispatch({ type: 'SET_MEMORIES', payload: response.memories });
+            if (response?.data?.memories) {
+                dispatch({ type: 'SET_MEMORIES', payload: response.data.memories });
             }
         } catch (error) {
             console.error('Error fetching memories:', error);

@@ -10,7 +10,18 @@ export async function getAuthenticatedUser(): Promise<User> {
         throw new AuthenticationError();
     }
 
-    return session.user as User;
+    // Convert session user to our User type
+    const user: User = {
+        id: session.user.id,
+        email: session.user.email || '',
+        name: session.user.name || '',
+        role: session.user.role,
+        apiKeys: [],
+        projects: [],
+        memories: []
+    };
+
+    return user;
 }
 
 export function checkProjectAccess(

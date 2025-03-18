@@ -20,7 +20,7 @@ export async function createProject(
     );
     validateLength(name, 1, MAX_PROJECT_NAME_LENGTH, 'name');
     validateLength(description, 1, MAX_PROJECT_DESCRIPTION_LENGTH, 'description');
-    validateEnum(type, ['PERSONAL', 'TEAM', 'ORGANIZATION'], 'type');
+    validateEnum(type, ['MEMORY', 'COLLECTION', 'WORKSPACE'], 'type');
     validateEnum(visibility, ['PUBLIC', 'PRIVATE', 'SHARED'], 'visibility');
 
     // Create project object

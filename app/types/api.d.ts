@@ -49,6 +49,7 @@ export interface UserContextState {
 }
 
 export interface UserContextType extends UserContextState {
+    userId: string | null;
     setFilterLabel: (label: string) => void;
     toggleFavorite: (projectId: string) => void;
     updateMemories: (memories: Memory[]) => void;

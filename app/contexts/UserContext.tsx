@@ -236,6 +236,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const value = useMemo(
         () => ({
             ...state,
+            userId: state.user?.id || null,
             setFilterLabel,
             toggleFavorite,
             updateMemories,

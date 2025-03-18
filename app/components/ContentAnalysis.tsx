@@ -15,20 +15,6 @@ import {
 export default function ContentAnalysis() {
     const { memories, projects } = useUser();
 
-    // Handle empty state
-    if (memories.length === 0) {
-        return (
-            <div className="space-y-8">
-                <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">No Content to Analyze</h3>
-                    <p className="text-gray-500">
-                        Start adding memories to see insights and patterns in your content.
-                    </p>
-                </Card>
-            </div>
-        );
-    }
-
     // Analyze content types distribution
     const typeDistribution = useMemo(() => {
         const distribution = memories.reduce((acc, memory) => {
@@ -93,6 +79,20 @@ export default function ContentAnalysis() {
             totalCharacters: lengths.reduce((a, b) => a + b, 0),
         };
     }, [memories]);
+
+    // Handle empty state
+    if (memories.length === 0) {
+        return (
+            <div className="space-y-8">
+                <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">No Content to Analyze</h3>
+                    <p className="text-gray-500">
+                        Start adding memories to see insights and patterns in your content.
+                    </p>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">

@@ -12,7 +12,6 @@ import {
 import { useSession } from 'next-auth/react';
 import {
     User,
-    Project,
     UserContextType,
     UserContextState,
     ApiResponse,
@@ -22,6 +21,7 @@ import { Memory } from '../types/memory';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
 import useBearerToken from '../hooks/useBearerToken';
+import { Project } from '../types/project';
 
 // Action Types
 type Action =

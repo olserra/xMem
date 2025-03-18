@@ -2,7 +2,7 @@ import { BaseEntity } from './core';
 import { Memory } from './memory';
 import { User } from './core';
 
-export type ProjectType = 'MEMORY' | 'COLLECTION' | 'WORKSPACE';
+export type ProjectType = 'PERSONAL' | 'TEAM' | 'ORGANIZATION';
 export type ProjectVisibility = 'PUBLIC' | 'PRIVATE' | 'SHARED';
 
 export interface Project extends BaseEntity {

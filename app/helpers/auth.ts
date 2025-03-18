@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth/next';
 import { AuthenticationError, AuthorizationError } from '../utils/errors';
-import { User, Project } from '../types';
+import { User, Project, ProjectType } from '../types';
 import { authOptions } from '@/lib/auth';
 
 export async function getAuthenticatedUser(): Promise<User> {
@@ -79,15 +79,14 @@ export function canManageUsers(user: User): boolean {
     return isAdmin(user);
 }
 
-export function canCreateProject(user: User, projectType: string): boolean {
+export function canCreateProject(user: User, projectType: ProjectType): boolean {
     switch (projectType) {
         case 'PERSONAL':
             return true;
         case 'TEAM':
-            // TODO: Check team membership
-            return false;
+            return user.role === 'ADMIN' || user.role === 'MANAGER';
         case 'ORGANIZATION':
-            return isAdmin(user);
+            return user.role === 'ADMIN';
         default:
             return false;
     }

@@ -7,6 +7,7 @@ import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "@/app/contexts/UserContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { Memory } from "@/app/types/memory";
 
 const Memories = () => {
     const {

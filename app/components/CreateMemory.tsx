@@ -4,28 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "@/app/contexts/UserContext";
-
-interface Project {
-    id: string;
-    name: string;
-    description: string;
-    type?: string;
-    visibility: string;
-    userId: string;
-    createdAt: string;
-    updatedAt: string;
-    memories?: Memory[];
-}
-
-interface Memory {
-    id: string;
-    content: string;
-    type: string;
-    metadata?: any;
-    projectId: string;
-    createdAt: string;
-    updatedAt: string;
-}
+import type { Project, Memory } from "@/app/types/memory";
+import type { MemoryType } from "@/app/types/memory";
 
 interface FormData {
     content: string;

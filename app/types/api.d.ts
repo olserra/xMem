@@ -1,3 +1,5 @@
+import { Memory } from './memory';
+
 export interface User {
     id: string;
     email: string;
@@ -13,28 +15,6 @@ export interface Project {
     userId: string;
     createdAt: Date;
     updatedAt: Date;
-}
-
-export interface Memory {
-    id: string;
-    content: string;
-    type: string;
-    userId: string;
-    projectId?: string;
-    source?: string;
-    sourceId?: string;
-    confidence?: number;
-    sentiment?: string;
-    language?: string;
-    tags?: string[];
-    metadata?: Record<string, any>;
-    createdAt: Date;
-    updatedAt: Date;
-    version: number;
-    isArchived: boolean;
-    subjects?: any[];
-    project?: Project;
-    Memory_B?: Memory[];
 }
 
 export interface UserContextState {

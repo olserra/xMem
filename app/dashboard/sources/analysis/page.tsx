@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import MaxWidthWrapper from '@/app/components/MaxWidthWrapper';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import OrganizationSuggestions from '@/app/components/OrganizationSuggestions';
 import ContentAnalysis from '@/app/components/ContentAnalysis';
 import { useUser } from '@/app/contexts/UserContext';
 
@@ -49,23 +48,8 @@ export default function AnalysisPage() {
 
                 <Tabs defaultValue="organization" value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="mb-4">
-                        <TabsTrigger value="organization">Organization</TabsTrigger>
                         <TabsTrigger value="analysis">Analysis</TabsTrigger>
-                        <TabsTrigger value="clustering">Clustering</TabsTrigger>
                     </TabsList>
-
-                    <TabsContent value="organization" className="space-y-4">
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold mb-4">
-                                Smart Organization
-                            </h2>
-                            <p className="text-gray-500 mb-6">
-                                Get AI-powered suggestions for organizing your content into projects,
-                                adding relevant tags, and discovering content clusters.
-                            </p>
-                            <OrganizationSuggestions />
-                        </Card>
-                    </TabsContent>
 
                     <TabsContent value="analysis" className="mt-6">
                         <Card className="p-6">
@@ -79,20 +63,6 @@ export default function AnalysisPage() {
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="clustering" className="mt-6">
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold mb-4">
-                                Content Clustering
-                            </h2>
-                            <p className="text-gray-500 mb-6">
-                                Discover groups of related content automatically
-                            </p>
-                            {/* Content clustering will be implemented later */}
-                            <p className="text-center text-gray-500 py-4">
-                                Content clustering coming soon...
-                            </p>
-                        </Card>
-                    </TabsContent>
                 </Tabs>
             </div>
         </MaxWidthWrapper>

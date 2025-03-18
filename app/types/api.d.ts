@@ -60,6 +60,11 @@ export interface ApiResponse<T> {
     success: boolean;
     data: T;
     error?: string;
+    metadata?: {
+        count?: number;
+        page?: number;
+        totalPages?: number;
+    };
 }
 
 export interface ApiPagination {
@@ -72,15 +77,4 @@ export interface ApiPagination {
 export interface ApiPaginatedResponse<T> {
     memories: T[];
     pagination: ApiPagination;
-}
-
-export interface ApiResponse<T> {
-    success: boolean;
-    data?: T;
-    error?: string;
-    metadata?: {
-        count?: number;
-        page?: number;
-        totalPages?: number;
-    };
 } 

@@ -3,16 +3,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { FaRegCopy } from "react-icons/fa";
-import { useUser } from '../Context';
+import { useUser } from '@/app/contexts/UserContext';
 
 interface ApiKey {
     id: string;
     key: string;
     createdAt: string;
 }
-
 const ApiPage = () => {
-    const { userId } = useUser();
+    const { user } = useUser();
+    const userId = user?.id;
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
     const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
     const [isCreating, setIsCreating] = useState(false);

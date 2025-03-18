@@ -20,6 +20,7 @@ import {
 } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
+import useBearerToken from '../hooks/useBearerToken';
 
 // Action Types
 type Action =
@@ -69,7 +70,7 @@ function reducer(state: UserContextState, action: Action): UserContextState {
             return {
                 ...state,
                 favorites: state.favorites.includes(action.payload)
-                    ? state.favorites.filter(id => id !== action.payload)
+                    ? state.favorites.filter((id: string) => id !== action.payload)
                     : [...state.favorites, action.payload]
             };
         case 'UPDATE_MEMORIES':
@@ -86,19 +87,51 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
     const { data: session } = useSession();
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { get } = useApi();
     const { getItem, setItem } = useLocalStorage();
+    const bearerToken = useBearerToken(state.user?.id || null);
+    const { get } = useApi(bearerToken);
+
+    // Debug logging for session and user state
+    useEffect(() => {
+        console.log('Session State:', {
+            hasSession: !!session,
+            sessionUser: session?.user,
+            stateUser: state.user,
+            bearerToken: bearerToken ? 'present' : 'missing',
+            stateBearerToken: state.bearerToken ? 'present' : 'missing'
+        });
+    }, [session, state.user, bearerToken, state.bearerToken]);
 
     const refreshProjects = useCallback(async () => {
-        if (!state.user?.id || !state.bearerToken) return;
+        if (!state.user?.id || !state.bearerToken) {
+            console.log('Skipping projects refresh:', {
+                userId: state.user?.id,
+                bearerToken: state.bearerToken,
+                state: {
+                    user: state.user,
+                    bearerToken: state.bearerToken
+                }
+            });
+            return;
+        }
 
         dispatch({ type: 'SET_LOADING', payload: true });
         try {
+            console.log('Fetching projects with:', {
+                userId: state.user.id,
+                bearerToken: state.bearerToken
+            });
             const response = await get<ApiResponse<Project[]>>('/projects');
+            console.log('Projects response:', {
+                success: response.success,
+                hasData: !!response.data,
+                dataLength: Array.isArray(response.data) ? response.data.length : 'not an array'
+            });
             if (response.success && Array.isArray(response.data)) {
                 dispatch({ type: 'SET_PROJECTS', payload: response.data });
             }
         } catch (error) {
+            console.error('Error fetching projects:', error);
             dispatch({ type: 'SET_ERROR', payload: error as Error });
         } finally {
             dispatch({ type: 'SET_LOADING', payload: false });
@@ -106,15 +139,35 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }, [state.user?.id, state.bearerToken, get]);
 
     const refreshMemories = useCallback(async () => {
-        if (!state.user?.id || !state.bearerToken) return;
+        if (!state.user?.id || !state.bearerToken) {
+            console.log('Skipping memories refresh:', {
+                userId: state.user?.id,
+                bearerToken: state.bearerToken,
+                state: {
+                    user: state.user,
+                    bearerToken: state.bearerToken
+                }
+            });
+            return;
+        }
 
         dispatch({ type: 'SET_LOADING', payload: true });
         try {
+            console.log('Fetching memories with:', {
+                userId: state.user.id,
+                bearerToken: state.bearerToken
+            });
             const response = await get<ApiResponse<Memory[]>>('/memories');
+            console.log('Memories response:', {
+                success: response.success,
+                hasData: !!response.data,
+                dataLength: Array.isArray(response.data) ? response.data.length : 'not an array'
+            });
             if (response.success && Array.isArray(response.data)) {
                 dispatch({ type: 'SET_MEMORIES', payload: response.data });
             }
         } catch (error) {
+            console.error('Error fetching memories:', error);
             dispatch({ type: 'SET_ERROR', payload: error as Error });
         } finally {
             dispatch({ type: 'SET_LOADING', payload: false });
@@ -145,6 +198,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
         }
     }, [session]);
 
+    // Update bearer token when it changes
+    useEffect(() => {
+        dispatch({ type: 'SET_BEARER_TOKEN', payload: bearerToken });
+    }, [bearerToken]);
+
     // Fetch projects and memories when user changes
     useEffect(() => {
         if (state.user?.id && state.bearerToken) {
@@ -163,7 +221,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         if (state.user?.id) {
             setItem(`favorites-${state.user.id}`,
                 state.favorites.includes(projectId)
-                    ? state.favorites.filter(id => id !== projectId)
+                    ? state.favorites.filter((id: string) => id !== projectId)
                     : [...state.favorites, projectId]
             );
         }

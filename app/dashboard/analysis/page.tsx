@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from "@/app/Context";
+import { useUser } from "@/app/contexts/UserContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import ContentAnalysis from "@/app/components/ContentAnalysis";
 

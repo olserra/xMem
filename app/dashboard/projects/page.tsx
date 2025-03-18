@@ -3,13 +3,16 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from '@/app/Context';
+import { useUser } from '@/app/contexts/UserContext';
 import { useSession } from 'next-auth/react';
 import { FaStar, FaRegStar, FaTrash } from 'react-icons/fa';
+import { Project } from '@/app/types';
+import { ProjectWithCount } from '@/app/types/project';
 
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<ProjectWithCount[]>([]);
-    const { userId, favorites, filterLabel, toggleFavorite } = useUser();
+    const { user, favorites, filterLabel, toggleFavorite } = useUser();
+    const userId = user?.id;
     const { status } = useSession();
     const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(false);

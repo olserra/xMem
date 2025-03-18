@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
 import { Loader2 } from "lucide-react";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from "@/app/Context";
+import { useUser } from "@/app/contexts/UserContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

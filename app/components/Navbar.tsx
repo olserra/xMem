@@ -14,7 +14,7 @@ import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import Modal from "./ui/modal";
-import { useUser } from "@/app/Context";
+import { useUser } from "@/app/contexts/UserContext";
 
 const Navbar = () => {
   const { data: session, status } = useSession();

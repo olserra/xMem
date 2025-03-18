@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from '@/app/Context';
+import { useUser } from '@/app/contexts/UserContext';
 
 export default function CreateProject() {
-    const { userId } = useUser();
+    const { user } = useUser();
+    const userId = user?.id;
     const router = useRouter();
     const [formData, setFormData] = useState({
         name: '',

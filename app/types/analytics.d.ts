@@ -1,3 +1,11 @@
+export interface UsageMetrics {
+    totalMemories: number;
+    totalProjects: number;
+    storageUsed: number;
+    apiCalls: number;
+    lastActive: string;
+}
+
 export interface DataSourceMetrics {
     sourceId: string;
     sourceName: string;
@@ -86,4 +94,11 @@ export interface OrganizationSuggestion {
         reasoning: string;
         preview?: string;
     };
+}
+
+export interface SyncResult {
+    success: boolean;
+    message: string;
+    source: string;
+    itemsSynced?: number;
 } 

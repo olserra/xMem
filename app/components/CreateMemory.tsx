@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
-import { useUser } from "@/app/Context";
+import { useUser } from "@/app/contexts/UserContext";
 
 interface Project {
     id: string;
@@ -50,7 +50,8 @@ function useWindowSize() {
 }
 
 export default function CreateMemory() {
-    const { userId, bearerToken, refreshMemories } = useUser();
+    const { user, bearerToken, refreshMemories } = useUser();
+    const userId = user?.id;
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialProjectId = searchParams.get('projectId');

@@ -6,10 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import OrganizationSuggestions from '@/app/components/OrganizationSuggestions';
 import ContentAnalysis from '@/app/components/ContentAnalysis';
-import { useUser } from '@/app/Context';
+import { useUser } from '@/app/contexts/UserContext';
 
 export default function AnalysisPage() {
-    const { memories, projects, bearerToken, userId } = useUser();
+    const { user, memories, projects, bearerToken } = useUser();
+    const userId = user?.id;
     const [activeTab, setActiveTab] = useState('organization');
 
     // Debug logs

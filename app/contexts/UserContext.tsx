@@ -13,12 +13,12 @@ import { useSession } from 'next-auth/react';
 import {
     User,
     Project,
-    Memory,
     UserContextType,
     UserContextState,
     ApiResponse,
     ApiPaginatedResponse
 } from '../types/api';
+import { Memory } from '../types/memory';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
 import useBearerToken from '../hooks/useBearerToken';

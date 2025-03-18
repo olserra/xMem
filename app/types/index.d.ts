@@ -1,3 +1,5 @@
+import { Role } from './auth';
+
 // Re-export all types
 export * from './core';
 export * from './project';
@@ -12,6 +14,7 @@ export interface User {
     id: string;
     email: string;
     name: string;
+    role: Role;
     apiKeys?: ApiKey[];
     projects?: Project[];
     memories?: Memory[];

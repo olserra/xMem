@@ -6,6 +6,7 @@ import MaxWidthWrapper from '@/app/components/MaxWidthWrapper';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useUser } from '@/app/contexts/UserContext';
+import { Project } from '@/app/types/project';
 
 export default function ProjectPage() {
     const { projectId } = useParams();
@@ -19,7 +20,7 @@ export default function ProjectPage() {
     const [editedProject, setEditedProject] = useState<Partial<Project>>({
         name: '',
         description: '',
-        visibility: 'private'
+        visibility: 'PRIVATE'
     });
     const [bearerToken, setBearerToken] = useState<string | null>(null);
 

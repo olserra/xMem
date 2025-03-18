@@ -1,12 +1,9 @@
 import { Project } from './project';
 import { ApiKey } from './auth';
-import { MemoryType } from './memory';
+import { Memory, MemoryType, MemoryMetadata } from './memory';
 
-export type ProjectType = 'PERSONAL' | 'TEAM' | 'ORGANIZATION';
-export type ProjectVisibility = 'PUBLIC' | 'PRIVATE' | 'SHARED';
-
-export interface BaseEntity<T = string> {
-    id: T;
+export interface BaseEntity {
+    id: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -26,22 +23,6 @@ export interface ApiKey extends BaseEntity {
     user?: User;
     lastUsed?: string;
     expiresAt?: string;
-}
-
-export interface Project {
-    id: string;
-    name: string;
-    description: string;
-    type: ProjectType;
-    visibility: ProjectVisibility;
-    userId: string;
-    user?: User;
-    memories?: Memory[];
-    createdAt: string;
-    updatedAt: string;
-    _count?: { memories: number };
-    memoryCount?: number;
-    metadata?: any;
 }
 
 export interface MemoryFormData {

@@ -1,7 +1,15 @@
-export interface BaseEntity<T = string> {
-    id: T;
+import { Project } from './project';
+import { ApiKey } from './auth';
+import { Memory, MemoryType, MemoryMetadata } from './memory';
+
+export interface BaseEntity {
+    id: string;
     createdAt: string;
     updatedAt: string;
+    userId: string;
+    user?: User;
+    lastUsed?: string;
+    expiresAt?: string;
 }
 
 export interface User extends BaseEntity {

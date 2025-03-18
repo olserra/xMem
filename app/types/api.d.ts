@@ -1,20 +1,10 @@
 import { Memory } from './memory';
+import { Project } from './project';
 
 export interface User {
     id: string;
     email: string;
     name: string;
-}
-
-export interface Project {
-    id: string;
-    name: string;
-    description: string;
-    type: string | null;
-    visibility: 'private' | 'public';
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
 }
 
 export interface UserContextState {

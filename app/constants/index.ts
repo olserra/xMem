@@ -14,7 +14,7 @@ export const MAX_LOGIN_ATTEMPTS = 5;
 export const MAX_PROJECTS_PER_USER = 50;
 export const MAX_PROJECT_NAME_LENGTH = 100;
 export const MAX_PROJECT_DESCRIPTION_LENGTH = 500;
-export const DEFAULT_PROJECT_TYPE = 'PERSONAL';
+export const DEFAULT_PROJECT_TYPE = 'MEMORY';
 export const DEFAULT_PROJECT_VISIBILITY = 'PRIVATE';
 
 // Memory Constants

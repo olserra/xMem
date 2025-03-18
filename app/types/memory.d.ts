@@ -1,6 +1,8 @@
-import { BaseEntity, User } from './base';
+import { Project } from './project';
+import { BaseEntity } from './core';
+import { User } from './core';
 
-export type MemoryType = 'TEXT' | 'CODE' | 'IMAGE' | 'AUDIO' | 'VIDEO';
+export type MemoryType = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'FILE';
 
 export interface MemoryMetadata {
     source?: string;
@@ -21,15 +23,6 @@ export interface MemoryMetadata {
     projectType?: string;
     lastAccessed?: string;
     createdAt?: string;
-}
-
-export interface Project extends BaseEntity {
-    name: string;
-    description: string;
-    type: string | null;
-    visibility: 'private' | 'public';
-    userId: string;
-    memories?: Memory[];
 }
 
 export interface Memory extends BaseEntity {

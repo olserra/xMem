@@ -17,21 +17,8 @@ export interface User {
     memories?: Memory[];
 }
 
-export interface Project {
-    id: string;
-    name: string;
-    description: string;
-    type: ProjectType;
-    visibility: ProjectVisibility;
-    userId: string;
-    user?: User;
-    memories?: Memory[];
-    createdAt: string;
-    updatedAt: string;
-    _count?: { memories: number };
-    memoryCount?: number;
-    metadata?: any;
-}
+// Export Project types from the main project types file
+export { Project, ProjectType, ProjectVisibility, ProjectWithCount, ProjectFormData } from './project';
 
 export interface ApiKey {
     id: string;
@@ -80,14 +67,6 @@ export interface ApiResponse<T> {
         page?: number;
         totalPages?: number;
     };
-}
-
-// Form Types
-export interface ProjectFormData {
-    name: string;
-    description: string;
-    type: ProjectType;
-    visibility: ProjectVisibility;
 }
 
 // Settings and Configuration Types

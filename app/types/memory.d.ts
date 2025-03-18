@@ -1,4 +1,3 @@
-import { Project } from './project';
 import { BaseEntity } from './core';
 import { User } from './core';
 
@@ -32,7 +31,7 @@ export interface Memory extends BaseEntity {
     embedding?: number[];
     userId: string;
     projectId?: string;
-    project?: Project;
+    project?: import('./project').Project;
     user?: User;
     version: number;
     isArchived: boolean;

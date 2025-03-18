@@ -16,8 +16,9 @@ import {
     Memory,
     UserContextType,
     UserContextState,
-    ApiResponse
-} from '../types';
+    ApiResponse,
+    ApiPaginatedResponse
+} from '../types/api';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
 import useBearerToken from '../hooks/useBearerToken';
@@ -157,13 +158,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 userId: state.user.id,
                 bearerToken: state.bearerToken
             });
-            const response = await get<{ memories: Memory[], pagination: any }>('/memory');
-            console.log('Memories response:', {
-                hasData: !!response,
-                memoriesLength: response?.data?.memories?.length || 0
-            });
-            if (response?.data?.memories) {
-                dispatch({ type: 'SET_MEMORIES', payload: response.data.memories });
+            const response = await get<ApiPaginatedResponse<Memory>>('/memory');
+            console.log('Raw memories response:', response);
+
+            if (response?.memories && Array.isArray(response.memories)) {
+                dispatch({ type: 'SET_MEMORIES', payload: response.memories });
             }
         } catch (error) {
             console.error('Error fetching memories:', error);

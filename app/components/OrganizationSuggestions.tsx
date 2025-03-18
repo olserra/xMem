@@ -46,27 +46,6 @@ export default function OrganizationSuggestions() {
     console.log('Memories:', memories);
     console.log('Projects:', projects);
 
-    // Add loading state
-    if (!memories || !projects) {
-        return (
-            <div className="flex items-center justify-center p-8">
-                <p className="text-gray-500">Loading organization suggestions...</p>
-            </div>
-        );
-    }
-
-    // Add empty state
-    if (memories.length === 0 || projects.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center p-8 space-y-4">
-                <p className="text-gray-500">No content available for organization.</p>
-                <p className="text-sm text-gray-400">
-                    Add some memories and projects to get organization suggestions.
-                </p>
-            </div>
-        );
-    }
-
     // Generate project suggestions based on content similarity
     const projectSuggestions = useMemo(() => {
         const suggestions: Suggestion[] = [];
@@ -208,6 +187,27 @@ export default function OrganizationSuggestions() {
 
         generateClusters();
     }, [memories]);
+
+    // Add loading state
+    if (!memories || !projects) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <p className="text-gray-500">Loading organization suggestions...</p>
+            </div>
+        );
+    }
+
+    // Add empty state
+    if (memories.length === 0 || projects.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 space-y-4">
+                <p className="text-gray-500">No content available for organization.</p>
+                <p className="text-sm text-gray-400">
+                    Add some memories and projects to get organization suggestions.
+                </p>
+            </div>
+        );
+    }
 
     // Function to assign memory to suggested project
     const handleAssignProject = async (suggestion: Suggestion) => {

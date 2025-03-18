@@ -1,5 +1,4 @@
 import { Memory } from './memory';
-import { Project } from './project';
 
 export interface User {
     id: string;
@@ -10,7 +9,7 @@ export interface User {
 export interface UserContextState {
     user: User | null;
     bearerToken: string | null;
-    projects: Project[];
+    projects: import('./project').Project[];
     memories: Memory[];
     favorites: string[];
     filterLabel: string;

@@ -1,5 +1,5 @@
 import { ProjectType, ProjectVisibility, MemoryType } from './core';
-import { MemoryMetadata } from './metadata';
+import { MemoryMetadata } from './core';
 
 export interface ProjectFormData {
     name: string;

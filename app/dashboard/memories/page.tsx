@@ -151,8 +151,27 @@ const Memories = () => {
         <MaxWidthWrapper>
             <div className="p-8">
                 {isLoading ? (
-                    <div className="flex items-center justify-center p-8">
-                        <Loader2 className="w-6 h-6 animate-spin" />
+                    <div className="animate-pulse space-y-4">
+                        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                        <div className="space-y-4">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="border border-gray-300 bg-white p-4 rounded-lg">
+                                    <div className="flex flex-row items-center justify-between mb-4">
+                                        <div className="flex">
+                                            <div className="h-4 w-4 bg-gray-200 rounded mr-2"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-32"></div>
+                                        </div>
+                                        <div className="h-6 bg-gray-200 rounded w-24"></div>
+                                    </div>
+                                    <div className="h-4 bg-gray-200 rounded w-full mb-4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                    <div className="flex justify-end mt-4 space-x-4">
+                                        <div className="h-6 w-6 bg-gray-200 rounded"></div>
+                                        <div className="h-6 w-6 bg-gray-200 rounded"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     <>

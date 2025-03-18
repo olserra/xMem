@@ -157,14 +157,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 userId: state.user.id,
                 bearerToken: state.bearerToken
             });
-            const response = await get<ApiResponse<Memory[]>>('/memories');
+            const response = await get<{ memories: Memory[], pagination: any }>('/memory');
             console.log('Memories response:', {
-                success: response.success,
-                hasData: !!response.data,
-                dataLength: Array.isArray(response.data) ? response.data.length : 'not an array'
+                hasData: !!response,
+                memoriesLength: response?.memories?.length || 0
             });
-            if (response.success && Array.isArray(response.data)) {
-                dispatch({ type: 'SET_MEMORIES', payload: response.data });
+            if (response?.memories) {
+                dispatch({ type: 'SET_MEMORIES', payload: response.memories });
             }
         } catch (error) {
             console.error('Error fetching memories:', error);

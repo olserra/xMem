@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useUser } from '@/app/Context';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,6 +10,7 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
+import { useUser } from '@/app/contexts/UserContext';
 
 export default function ContentAnalysis() {
     const { memories, projects } = useUser();

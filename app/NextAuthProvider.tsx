@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { UserProvider } from "./Context";
+import { UserProvider } from "@/app/contexts/UserContext";
 
 type Props = {
     children?: React.ReactNode;

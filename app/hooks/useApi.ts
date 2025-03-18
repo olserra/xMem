@@ -9,7 +9,7 @@ interface RequestOptions {
     timeout?: number;
 }
 
-export function useApi() {
+export function useApi(bearerToken: string | null) {
     const fetchWithTimeout = useCallback(async (
         url: string,
         options: RequestOptions = {}
@@ -19,23 +19,42 @@ export function useApi() {
         const id = setTimeout(() => controller.abort(), timeout);
 
         try {
+            // Include bearer token in headers if available
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(bearerToken && { 'Authorization': `Bearer ${bearerToken}` }),
+                ...options.headers,
+            };
+
+            console.log('Making API request to:', url, 'with options:', {
+                ...options,
+                headers,
+            });
+
             const response = await fetch(url, {
                 ...options,
                 signal: controller.signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers,
-                },
+                headers,
             });
 
             clearTimeout(id);
 
             if (!response.ok) {
                 const error = await response.json();
+                console.error('API request failed:', {
+                    status: response.status,
+                    error,
+                    bearerToken: bearerToken ? 'present' : 'missing'
+                });
                 throw new Error(error.message || ERROR_MESSAGES.SERVER_ERROR);
             }
 
-            return await response.json();
+            const data = await response.json();
+            console.log('API request successful:', {
+                data,
+                bearerToken: bearerToken ? 'present' : 'missing'
+            });
+            return data;
         } catch (error) {
             if (error instanceof Error) {
                 if (error.name === 'AbortError') {
@@ -45,7 +64,7 @@ export function useApi() {
             }
             throw new Error(ERROR_MESSAGES.SERVER_ERROR);
         }
-    }, []);
+    }, [bearerToken]);
 
     const get = useCallback(async <T>(
         endpoint: string,

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import MaxWidthWrapper from '@/app/components/MaxWidthWrapper';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import { MdDelete, MdEdit } from "react-icons/md";
-import { useUser } from '@/app/Context';
+import { useUser } from '@/app/contexts/UserContext';
 
 export default function ProjectPage() {
     const { projectId } = useParams();
@@ -13,7 +13,8 @@ export default function ProjectPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    const { userId } = useUser();
+    const { user } = useUser();
+    const userId = user?.id;
 
     const [editedProject, setEditedProject] = useState<Partial<Project>>({
         name: '',

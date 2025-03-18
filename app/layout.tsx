@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import Footer from "@/app/components/Footer";
 import Navbar from "@/app/components/Navbar";
-import { UserProvider } from "./Context";
+import { UserProvider } from "@/app/contexts/UserContext";
 import SessionWrapper from "./components/SessionWrapper";
 
 export const metadata: Metadata = {

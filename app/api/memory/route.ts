@@ -3,11 +3,39 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/prisma/prisma';
 
+// Function to validate the API key and extract the userId
+const getUserIdFromToken = async (token: string) => {
+    const apiKey = await prisma.apiKey.findUnique({
+        where: { key: token },
+        include: { user: true },
+    });
+    return apiKey ? apiKey.userId : null;
+};
 
+// Function to get userId from either bearer token or session
+const getUserId = async (request: Request) => {
+    // Check if this is an API request with a bearer token
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+    if (token) {
+        const userId = await getUserIdFromToken(token);
+        if (userId) return userId;
+    }
+
+    // For web requests, get the session
+    const session = await getServerSession(authOptions);
+    if (session?.user?.email) {
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
+        return user?.id || null;
+    }
+
+    return null;
+};
 
 export async function GET(request: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userId = await getUserId(request);
+    if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -19,16 +47,8 @@ export async function GET(request: Request) {
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '10');
 
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
         const where = {
-            userId: user.id,
+            userId,
             ...(source && { source }),
             ...(projectId && { projectId }),
             ...(subject && {
@@ -77,20 +97,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userId = await getUserId(request);
+    if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
         const body = await request.json();
         const {
             content,
@@ -111,7 +123,7 @@ export async function POST(request: Request) {
             data: {
                 content,
                 type,
-                userId: user.id,
+                userId,
                 source,
                 sourceId,
                 confidence,
@@ -149,8 +161,8 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userId = await getUserId(request);
+    if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -169,6 +181,15 @@ export async function PUT(request: Request) {
             tags,
             metadata,
         } = body;
+
+        // Verify the memory belongs to the user
+        const existingMemory = await prisma.memory.findUnique({
+            where: { id },
+        });
+
+        if (!existingMemory || existingMemory.userId !== userId) {
+            return NextResponse.json({ error: 'Memory not found or unauthorized' }, { status: 404 });
+        }
 
         const memory = await prisma.memory.update({
             where: { id },
@@ -212,8 +233,8 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const userId = await getUserId(request);
+    if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -223,6 +244,15 @@ export async function DELETE(request: Request) {
 
         if (!id) {
             return NextResponse.json({ error: 'Memory ID is required' }, { status: 400 });
+        }
+
+        // Verify the memory belongs to the user
+        const memory = await prisma.memory.findUnique({
+            where: { id },
+        });
+
+        if (!memory || memory.userId !== userId) {
+            return NextResponse.json({ error: 'Memory not found or unauthorized' }, { status: 404 });
         }
 
         await prisma.memory.delete({

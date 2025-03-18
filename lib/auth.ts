@@ -25,51 +25,66 @@ export const authOptions: NextAuthOptions = {
       console.log("SignIn Attempt:", { user, account, profile });
       return true;
     },
-    async session({ session, token }) {
+    async session({ session, user }) {
+      console.log("Session Callback - Initial session:", session);
+      console.log("Session Callback - User:", user);
+
       if (!session.user) {
         return session;
       }
 
-      // Ensure token exists and has required properties
-      if (!token) {
-        return session;
-      }
+      try {
+        // Get the user from the database
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email || '' },
+        });
 
-      // Set basic user properties
-      session.user.id = token.sub || '';
-      session.user.name = token.name || '';
-      session.user.email = token.email || '';
-      session.user.image = token.picture || '';
+        console.log("Session Callback - DB User:", dbUser);
 
-      // Only try to get/create user if we have a valid ID
-      if (token.sub) {
-        try {
-          const dbUser = await prisma.user.upsert({
-            where: { id: token.sub },
-            update: {
-              name: token.name || '',
-              email: token.email || '',
-              image: token.picture || '',
-            },
-            create: {
-              id: token.sub,
-              name: token.name || '',
-              email: token.email || '',
-              image: token.picture || '',
+        if (dbUser) {
+          // Update session with database user data
+          session.user.id = dbUser.id;
+          session.user.name = dbUser.name || session.user.name;
+          session.user.email = dbUser.email || session.user.email;
+          session.user.image = dbUser.image || session.user.image;
+        } else {
+          // Create new user if they don't exist
+          const newUser = await prisma.user.create({
+            data: {
+              email: session.user.email || '',
+              name: session.user.name || '',
+              image: session.user.image || '',
             },
           });
-
-        } catch (error) {
-          console.error('Error updating user:', error);
+          console.log("Session Callback - Created new user:", newUser);
+          session.user.id = newUser.id;
         }
-      }
 
-      return session;
+        console.log("Session Callback - Final session:", {
+          userId: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+        });
+
+        return session;
+      } catch (error) {
+        console.error('Error in session callback:', error);
+        return session;
+      }
     },
     async jwt({ token, user, account }) {
+      console.log("JWT Callback - Initial token:", token);
+      console.log("JWT Callback - User:", user);
+      console.log("JWT Callback - Account:", account);
+
       if (user) {
         token.sub = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.picture = user.image;
       }
+
+      console.log("JWT Callback - Final token:", token);
       return token;
     },
     async redirect() {

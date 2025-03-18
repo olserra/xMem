@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useUser } from '@/app/Context';
-import { Memory, Project } from '@/app/types';
+import { useUser } from '@/app/contexts/UserContext';
+import { Memory } from '@/app/types/core';
+import { Project } from '@/app/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

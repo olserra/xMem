@@ -4,7 +4,6 @@ export * from './project';
 export * from './userContext';
 export * from './api';
 export * from './forms';
-export * from './metadata';
 export * from './analytics';
 
 // Core Types

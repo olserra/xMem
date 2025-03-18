@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Project, Memory } from "../types";
 
 const useFetchData = (userId: string | null, bearerToken: string | null) => {
     const [projects, setProjects] = useState<Project[]>([]);

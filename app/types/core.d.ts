@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { ApiKey } from './auth';
+import { ApiKey, Role } from './auth';
 import { Memory, MemoryType, MemoryMetadata } from './memory';
 
 export interface BaseEntity {
@@ -11,6 +11,7 @@ export interface BaseEntity {
 export interface User extends BaseEntity {
     email: string;
     name: string;
+    role: Role;
     apiKeys?: ApiKey[];
     projects?: Project[];
     memories?: Memory[];

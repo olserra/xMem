@@ -1,3 +1,9 @@
+export enum Role {
+    USER = 'USER',
+    ADMIN = 'ADMIN',
+    MANAGER = 'MANAGER'
+}
+
 export interface ApiKey {
     id: string;
     name: string;
@@ -12,4 +18,5 @@ export interface AuthUser {
     email: string;
     name: string;
     image?: string;
+    role: Role;
 } 

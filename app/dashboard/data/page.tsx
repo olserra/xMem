@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
-import { Loader2, Plus, Upload, Copy, Trash2 } from "lucide-react";
+import { Plus, Upload, Trash2 } from "lucide-react";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "@/app/contexts/UserContext";
 import Link from "next/link";
@@ -10,8 +9,6 @@ import { useRouter } from "next/navigation";
 import type { Data, DataType } from "@/app/types/_data";
 import { useSession } from 'next-auth/react';
 import DataCard from '@/app/components/DataCard';
-import { Badge } from '@/app/components/ui/badge';
-import { Input } from '@/app/components/ui/input';
 import DataImportDropzone from '@/app/components/DataImportDropzone';
 import { Button } from '@/app/components/ui/button';
 
@@ -22,7 +19,6 @@ const Data = () => {
         bearerToken,
         userId,
         updateData,
-        refreshData,
         isLoading
     } = useUser();
 
@@ -34,7 +30,6 @@ const Data = () => {
     const { status } = useSession();
     const router = useRouter();
     const [importedData, setImportedData] = useState<string>("");
-    const [isCopied, setIsCopied] = useState(false);
     const [selectedData, setSelectedData] = useState<Set<string>>(new Set());
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
@@ -52,18 +47,6 @@ const Data = () => {
             });
         }
         setAllTags(Array.from(tags));
-    }, [data]);
-
-    const handleCopyToClipboard = useCallback(() => {
-        setIsCopied(true);
-        const allUserData = JSON.stringify(data);
-        navigator.clipboard.writeText(allUserData)
-            .then(() => console.log('User data copied to clipboard'))
-            .catch(err => console.error('Failed to copy user data:', err));
-
-        setTimeout(() => {
-            setIsCopied(false);
-        }, 1000);
     }, [data]);
 
     const handleDeleteData = useCallback(async (id: string) => {
@@ -133,7 +116,7 @@ const Data = () => {
 
             const newData = await Promise.all(importPromises);
 
-            const response = await fetch("/api/_data", {
+            const response = await fetch("/api/csv/upload", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -262,14 +245,6 @@ const Data = () => {
                         >
                             <Upload className="mr-2 h-4 w-4" />
                             Import Data
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={handleCopyToClipboard}
-                            title="Copy all data to clipboard"
-                        >
-                            <Copy className="mr-2 h-4 w-4" />
-                            {isCopied ? 'Copied!' : 'Copy'}
                         </Button>
                         {selectedData.size > 0 && (
                             <Button

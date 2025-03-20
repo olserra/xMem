@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { FaRegCopy } from "react-icons/fa";
 import { useUser } from '@/app/contexts/UserContext';
 
 interface ApiKey {
@@ -88,11 +87,6 @@ const ApiPage = () => {
         }));
     }, []);
 
-    const copyToClipboard = useCallback((key: string) => {
-        navigator.clipboard.writeText(key);
-        alert('API Key copied to clipboard');
-    }, []);
-
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleString();
     };
@@ -160,12 +154,6 @@ const ApiPage = () => {
                                     {visibleKeys[apiKey.id] ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                 </button>
                             </div>
-                            <button
-                                onClick={() => copyToClipboard(apiKey.key)}
-                                className="border p-2 border-gray-300 rounded-md h-10 w-10 flex items-center justify-center"
-                            >
-                                <FaRegCopy className="text-black" size={15} />
-                            </button>
                         </div>
                     </div>
                 ))}

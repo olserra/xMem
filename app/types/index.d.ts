@@ -7,7 +7,7 @@ export * from './userContext';
 export * from './api';
 export * from './forms';
 export * from './analytics';
-export * from './memory';
+export * from './_data';
 
 // Core Types
 export interface User {
@@ -17,7 +17,7 @@ export interface User {
     role: Role;
     apiKeys?: ApiKey[];
     projects?: Project[];
-    memories?: Memory[];
+    data?: Memory[];
 }
 
 // Export Project types from the main project types file
@@ -43,7 +43,7 @@ export interface UserContextState {
     user: User | null;
     bearerToken: string | null;
     projects: Project[];
-    memories: Memory[];
+    data: Memory[];
     favorites: string[];
     filterLabel: string;
     isLoading: boolean;
@@ -53,9 +53,9 @@ export interface UserContextState {
 export interface UserContextActions {
     setFilterLabel: (label: string) => void;
     toggleFavorite: (projectId: string) => void;
-    updateMemories: (memories: Memory[]) => void;
+    updateData: (data: Memory[]) => void;
     refreshProjects: () => Promise<void>;
-    refreshMemories: () => Promise<void>;
+    refreshData: () => Promise<void>;
 }
 
 export type UserContextType = UserContextState & UserContextActions;
@@ -85,7 +85,7 @@ export interface UserSettings {
 
 // Analytics and Metrics Types
 export interface UsageMetrics {
-    totalMemories: number;
+    totalData: number;
     totalProjects: number;
     storageUsed: number;
     apiCalls: number;

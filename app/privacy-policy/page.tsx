@@ -22,7 +22,7 @@ const PrivacyPolicyPage: React.FC = () => {
             <ul className="list-disc list-inside">
                 <li><strong>Personal Information:</strong> When you sign up for our services, we may collect personal information such as your name, email address, and any other information you provide.</li>
                 <li><strong>Usage Data:</strong> We may collect information about how you access and use our website and services, including your IP address, browser type, pages visited, and the time and date of your visits.</li>
-                <li><strong>Memory Data:</strong> If you use our memory storage API, we may collect and store data you provide, such as text, metadata, or other digital content.</li>
+                <li><strong>Memory Data:</strong> If you use our _data storage API, we may collect and store data you provide, such as text, metadata, or other digital content.</li>
                 <li><strong>Cookies:</strong> Our website may use cookies to enhance user experience. You can choose to accept or decline cookies.</li>
             </ul>
 
@@ -31,7 +31,7 @@ const PrivacyPolicyPage: React.FC = () => {
                 We may use the information we collect for various purposes, including:
             </p>
             <ul className="list-disc list-inside">
-                <li>To provide and maintain our services, including the memory storage API and integrations.</li>
+                <li>To provide and maintain our services, including the _data storage API and integrations.</li>
                 <li>To notify you about updates or changes to our services.</li>
                 <li>To enable seamless integrations with platforms like OpenAI, Copilot, or others you connect to our services.</li>
                 <li>To provide customer support.</li>
@@ -41,7 +41,7 @@ const PrivacyPolicyPage: React.FC = () => {
 
             <h2 className="text-xl mt-6">Data Security</h2>
             <p>
-                We take the security of your personal and memory data seriously and use appropriate measures to protect it. However, no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security.
+                We take the security of your personal and _data data seriously and use appropriate measures to protect it. However, no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security.
             </p>
 
             <h2 className="text-xl mt-6">Third-Party Services</h2>

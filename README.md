@@ -1,21 +1,21 @@
 
 # xmem.xyz - Memory Management for LLMs
 
-Welcome to xmem.xyz! This is a simple, open-source tool designed to help you manage context and memory for large language models (LLMs). It allows you to store and persist multiple memory entries, tagged with relevant labels, which can then be copied and used as context for new conversations. This is perfect for improving LLM interactions by reducing hallucinations and increasing performance.
+Welcome to xmem.xyz! This is a simple, open-source tool designed to help you manage context and _data for large language models (LLMs). It allows you to store and persist multiple _data entries, tagged with relevant labels, which can then be copied and used as context for new conversations. This is perfect for improving LLM interactions by reducing hallucinations and increasing performance.
 
 ## How it Works
 
 The core functionality is simple yet powerful:
 - **Create Memory Entries**: Add your thoughts, experiences, or facts to the system. Each entry can be tagged with up to 3 relevant tags (e.g., Technology, Skills, Learning).
-- **Persist the Memories**: Each entry is saved so that you can retain context for future interactions.
-- **Copy Your Data**: With one click, you can copy all of your saved memories into your clipboard in JSON format. This can then be used as input to any LLM for context.
+- **Persist the Data**: Each entry is saved so that you can retain context for future interactions.
+- **Copy Your Data**: With one click, you can copy all of your saved data into your clipboard in JSON format. This can then be used as input to any LLM for context.
 
 ## Key Features
 
-- **Add Memories**: Enter your thoughts and tag them with categories such as Technology, Learning, or Hobbies.
-- **Memory Persistence**: Store your memories across sessions to carry context for ongoing conversations.
-- **Copy All Data**: Copy your entire set of memories into a JSON format and use it to inject context into new LLM conversations.
-- **Filter Memories**: Filter stored memories by text or tags to quickly find the context you need.
+- **Add Data**: Enter your thoughts and tag them with categories such as Technology, Learning, or Hobbies.
+- **Memory Persistence**: Store your data across sessions to carry context for ongoing conversations.
+- **Copy All Data**: Copy your entire set of data into a JSON format and use it to inject context into new LLM conversations.
+- **Filter Data**: Filter stored data by text or tags to quickly find the context you need.
 
 ## Use Cases and Practical Examples
 
@@ -47,22 +47,22 @@ The core functionality is simple yet powerful:
 ## How to Get Started
 
 1. **Create New Memory**: Enter your thoughts or notes into the input box and tag them with appropriate labels.
-2. **Save Your Memories**: Once you've added your memories, they will be automatically saved for future use.
-3. **Copy All Data**: Click the "Copy all user data" button to copy your entire set of memories in JSON format.
-4. **Use in LLM Conversations**: Paste the copied JSON data as context in your preferred LLM (e.g., ChatGPT, Gemini, Claude, etc.), allowing the model to use the memories to improve the conversation.
+2. **Save Your Data**: Once you've added your data, they will be automatically saved for future use.
+3. **Copy All Data**: Click the "Copy all user data" button to copy your entire set of data in JSON format.
+4. **Use in LLM Conversations**: Paste the copied JSON data as context in your preferred LLM (e.g., ChatGPT, Gemini, Claude, etc.), allowing the model to use the data to improve the conversation.
 
 ## Roadmap
 
 ### **Q1 2025**
-- Implement advanced filtering options for memories.
-- Enable import/export of memory data to and from other platforms.
+- Implement advanced filtering options for data.
+- Enable import/export of _data data to and from other platforms.
 
 ### **Q2 2025**
-- Expand memory tagging system with custom tag creation.
-- Enhance user interface for easier navigation and memory management.
+- Expand _data tagging system with custom tag creation.
+- Enhance user interface for easier navigation and _data management.
 
 ### **Q3 2025**
-- Introduce memory sharing options for collaborative work.
+- Introduce _data sharing options for collaborative work.
 - Begin integrations with popular LLM APIs for automatic context injection.
 
 ## Contributing

@@ -1,6 +1,6 @@
 import { Project } from './project';
 import { ApiKey } from './auth';
-import { Memory, MemoryType, MemoryMetadata } from './memory';
+import { Data, DataType, DataMetadata } from './_data';
 
 export interface BaseEntity {
     id: string;
@@ -17,7 +17,7 @@ export interface User extends BaseEntity {
     name: string;
     apiKeys?: ApiKey[];
     projects?: Project[];
-    memories?: Memory[];
+    data?: Data[];
 }
 
 export interface ApiKey extends BaseEntity {
@@ -36,9 +36,9 @@ export interface Project extends BaseEntity {
     visibility: ProjectVisibility;
     userId: string;
     user?: User;
-    memories?: Memory[];
-    _count?: { memories: number };
-    memoryCount?: number;
+    data?: Data[];
+    _count?: { data: number };
+    _dataCount?: number;
     metadata?: any;
 }
 

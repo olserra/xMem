@@ -1,157 +1,109 @@
-import { ANALYTICS_ENABLED, ANALYTICS_ID } from '../constants';
-import { Memory, Project, UsageMetrics } from '../types';
+import { Memory, UsageMetrics } from '../types';
+import { Data } from '../types/_data';
 
-interface AnalyticsEvent {
-    type: string;
-    userId?: string;
-    timestamp: string;
-    data: any;
-}
-
-class Analytics {
+export class Analytics {
     private static instance: Analytics;
-    private events: AnalyticsEvent[] = [];
-    private isEnabled: boolean;
+    private userId?: string;
 
-    private constructor() {
-        this.isEnabled = ANALYTICS_ENABLED && !!ANALYTICS_ID;
-    }
+    private constructor() { }
 
-    public static getInstance(): Analytics {
+    static getInstance(): Analytics {
         if (!Analytics.instance) {
             Analytics.instance = new Analytics();
         }
         return Analytics.instance;
     }
 
-    private async trackEvent(event: AnalyticsEvent): Promise<void> {
-        if (!this.isEnabled) return;
+    setUserId(userId: string) {
+        this.userId = userId;
+    }
 
-        this.events.push(event);
-
+    private async trackEvent(event: {
+        type: string;
+        userId?: string;
+        dataId?: string;
+        metadata?: Record<string, any>;
+    }): Promise<void> {
         try {
-            await fetch('/api/analytics/track', {
+            const response = await fetch('/api/analytics', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(event),
+                body: JSON.stringify({
+                    ...event,
+                    userId: event.userId || this.userId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to track analytics event');
+            }
+        } catch (error) {
+            console.error('Error tracking analytics event:', error);
+        }
+    }
+
+    public async trackDataCreated(data: Data, userId: string): Promise<void> {
+        try {
+            // Track data creation event
+            await this.trackEvent({
+                type: 'DATA_CREATED',
+                userId,
+                dataId: data.id,
+                metadata: {
+                    dataType: data.type,
+                    projectId: data.projectId,
+                    timestamp: new Date().toISOString(),
+                    contentLength: data.content.length,
+                    hasEmbedding: !!data.embedding,
+                    tags: data.metadata?.tags?.length || 0
+                }
+            });
+
+            // Update usage metrics
+            await this.trackUsage({
+                userId,
+                totalData: 1,
+                storageUsed: data.content.length
             });
         } catch (error) {
-            console.error('Failed to track analytics event:', error);
+            console.error('Failed to track data creation:', error);
         }
     }
 
-    public async trackMemoryCreated(memory: Memory, userId?: string): Promise<void> {
+    public async trackDataUpdated(_data: Memory, userId?: string): Promise<void> {
         await this.trackEvent({
-            type: 'MEMORY_CREATED',
+            type: 'DATA_UPDATED',
             userId,
-            timestamp: new Date().toISOString(),
-            data: {
-                memoryId: memory.id,
-                projectId: memory.projectId,
-                type: memory.type,
-                contentLength: memory.content.length,
+            dataId: _data.id,
+            metadata: {
+                type: _data.type,
+                contentLength: _data.content.length,
+                metadata: _data.metadata,
             },
         });
     }
 
-    public async trackMemoryAccessed(memory: Memory, userId?: string): Promise<void> {
+    public async trackDataDeleted(dataId: string, userId?: string): Promise<void> {
         await this.trackEvent({
-            type: 'MEMORY_ACCESSED',
+            type: 'DATA_DELETED',
             userId,
-            timestamp: new Date().toISOString(),
-            data: {
-                memoryId: memory.id,
-                projectId: memory.projectId,
-                type: memory.type,
+            dataId,
+        });
+    }
+
+    public async trackUsage(metrics: UsageMetrics): Promise<void> {
+        await this.trackEvent({
+            type: 'USAGE_METRICS',
+            userId: metrics.userId,
+            metadata: {
+                totalData: metrics.totalData,
+                totalCharacters: metrics.totalCharacters,
+                averageLength: metrics.averageLength,
+                typeDistribution: metrics.typeDistribution,
             },
         });
-    }
-
-    public async trackProjectCreated(project: Project, userId?: string): Promise<void> {
-        await this.trackEvent({
-            type: 'PROJECT_CREATED',
-            userId,
-            timestamp: new Date().toISOString(),
-            data: {
-                projectId: project.id,
-                type: project.type,
-                visibility: project.visibility,
-            },
-        });
-    }
-
-    public async trackSearch(query: string, resultCount: number, userId?: string): Promise<void> {
-        await this.trackEvent({
-            type: 'SEARCH_PERFORMED',
-            userId,
-            timestamp: new Date().toISOString(),
-            data: {
-                query,
-                resultCount,
-            },
-        });
-    }
-
-    public async trackError(error: Error, context: any = {}, userId?: string): Promise<void> {
-        await this.trackEvent({
-            type: 'ERROR',
-            userId,
-            timestamp: new Date().toISOString(),
-            data: {
-                error: {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack,
-                },
-                context,
-            },
-        });
-    }
-
-    public async trackMcpInteraction(
-        type: 'QUERY' | 'UPDATE' | 'ERROR',
-        details: any,
-        userId?: string
-    ): Promise<void> {
-        await this.trackEvent({
-            type: `MCP_${type}`,
-            userId,
-            timestamp: new Date().toISOString(),
-            data: details,
-        });
-    }
-
-    public async getUsageMetrics(userId: string): Promise<UsageMetrics> {
-        if (!this.isEnabled) {
-            return {
-                totalMemories: 0,
-                totalProjects: 0,
-                storageUsed: 0,
-                apiCalls: 0,
-                lastActive: new Date().toISOString(),
-            };
-        }
-
-        try {
-            const response = await fetch(`/api/analytics/metrics/${userId}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Failed to fetch usage metrics:', error);
-            throw error;
-        }
-    }
-
-    public getRecentEvents(userId: string, limit: number = 100): AnalyticsEvent[] {
-        return this.events
-            .filter(event => event.userId === userId)
-            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-            .slice(0, limit);
-    }
-
-    public clearEvents(): void {
-        this.events = [];
     }
 }
 

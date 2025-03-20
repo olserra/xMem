@@ -13,12 +13,12 @@ import {
 import { useUser } from '@/app/contexts/UserContext';
 
 export default function ContentAnalysis() {
-    const { memories, projects } = useUser();
+    const { data } = useUser();
 
     // Analyze content types distribution
     const typeDistribution = useMemo(() => {
-        const distribution = memories.reduce((acc, memory) => {
-            acc[memory.type] = (acc[memory.type] || 0) + 1;
+        const distribution = data.reduce((acc, _data) => {
+            acc[_data.type] = (acc[_data.type] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
 
@@ -26,33 +26,15 @@ export default function ContentAnalysis() {
             .map(([type, count]) => ({
                 type,
                 count,
-                percentage: (count / memories.length * 100).toFixed(1)
+                percentage: (count / data.length * 100).toFixed(1)
             }))
             .sort((a, b) => b.count - a.count);
-    }, [memories]);
-
-    // Analyze project activity
-    const projectActivity = useMemo(() => {
-        return projects
-            .map(project => {
-                const projectMemories = memories.filter(m => m.projectId === project.id);
-                const lastActivity = projectMemories.length > 0
-                    ? new Date(Math.max(...projectMemories.map(m => new Date(m.updatedAt).getTime())))
-                    : new Date(project.updatedAt);
-
-                return {
-                    name: project.name,
-                    memoryCount: projectMemories.length,
-                    lastActivity,
-                };
-            })
-            .sort((a, b) => b.memoryCount - a.memoryCount);
-    }, [memories, projects]);
+    }, [data]);
 
     // Analyze content growth over time
     const contentGrowth = useMemo(() => {
-        const timelineData = memories.reduce((acc, memory) => {
-            const date = new Date(memory.createdAt).toLocaleDateString();
+        const timelineData = data.reduce((acc, _data) => {
+            const date = new Date(_data.createdAt).toLocaleDateString();
             acc[date] = (acc[date] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
@@ -63,11 +45,11 @@ export default function ContentAnalysis() {
                 count,
             }))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    }, [memories]);
+    }, [data]);
 
     // Calculate average content length and identify patterns
     const contentMetrics = useMemo(() => {
-        const lengths = memories.map(m => m.content.length);
+        const lengths = data.map(m => m.content.length);
         const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
         const maxLength = Math.max(...lengths);
         const minLength = Math.min(...lengths);
@@ -78,16 +60,16 @@ export default function ContentAnalysis() {
             minLength,
             totalCharacters: lengths.reduce((a, b) => a + b, 0),
         };
-    }, [memories]);
+    }, [data]);
 
     // Handle empty state
-    if (memories.length === 0) {
+    if (data.length === 0) {
         return (
             <div className="space-y-8">
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4">No Content to Analyze</h3>
                     <p className="text-gray-500">
-                        Start adding memories to see insights and patterns in your content.
+                        Start adding data to see insights and patterns in your content.
                     </p>
                 </Card>
             </div>
@@ -96,7 +78,6 @@ export default function ContentAnalysis() {
 
     return (
         <div className="space-y-8">
-
             {/* Content Metrics */}
             <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Content Metrics</h3>
@@ -121,26 +102,6 @@ export default function ContentAnalysis() {
                         <p className="text-2xl font-bold">{contentMetrics.totalCharacters}</p>
                         <p className="text-sm text-gray-500">characters</p>
                     </div>
-                </div>
-            </Card>
-
-            {/* Project Activity */}
-            <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Project Activity</h3>
-                <div className="space-y-4">
-                    {projectActivity.map(project => (
-                        <div key={project.name} className="flex justify-between items-center">
-                            <div>
-                                <h4 className="font-medium">{project.name}</h4>
-                                <p className="text-sm text-gray-500">
-                                    Last activity: {project.lastActivity.toLocaleDateString()}
-                                </p>
-                            </div>
-                            <Badge variant="secondary">
-                                {project.memoryCount} memories
-                            </Badge>
-                        </div>
-                    ))}
                 </div>
             </Card>
 
@@ -182,7 +143,6 @@ export default function ContentAnalysis() {
                     </ResponsiveContainer>
                 </div>
             </Card>
-
         </div>
     );
 } 

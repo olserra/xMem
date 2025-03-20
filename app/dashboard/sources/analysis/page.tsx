@@ -8,7 +8,7 @@ import ContentAnalysis from '@/app/components/ContentAnalysis';
 import { useUser } from '@/app/contexts/UserContext';
 
 export default function AnalysisPage() {
-    const { user, memories, projects, bearerToken } = useUser();
+    const { user, data, bearerToken } = useUser();
     const userId = user?.id;
     const [activeTab, setActiveTab] = useState('organization');
 
@@ -17,14 +17,11 @@ export default function AnalysisPage() {
         console.log('Analysis Page - User ID:', userId);
         console.log('Analysis Page - Bearer Token:', bearerToken);
         console.log('Analysis Page - Active Tab:', activeTab);
-        console.log('Analysis Page - Memories:', memories);
-        console.log('Analysis Page - Projects:', projects);
-    }, [userId, bearerToken, activeTab, memories, projects]);
+        console.log('Analysis Page - Data:', data);
+    }, [userId, bearerToken, activeTab, data]);
 
     // Calculate some basic stats
-    const totalMemories = memories?.length || 0;
-    const unassignedMemories = memories?.filter(m => !m.projectId)?.length || 0;
-    const totalProjects = projects?.length || 0;
+    const totalData = data?.length || 0;
 
     return (
         <MaxWidthWrapper>
@@ -33,16 +30,8 @@ export default function AnalysisPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <Card className="p-4">
-                        <h3 className="font-medium mb-2">Total Memories</h3>
-                        <p className="text-2xl font-bold">{totalMemories}</p>
-                    </Card>
-                    <Card className="p-4">
-                        <h3 className="font-medium mb-2">Unassigned Memories</h3>
-                        <p className="text-2xl font-bold">{unassignedMemories}</p>
-                    </Card>
-                    <Card className="p-4">
-                        <h3 className="font-medium mb-2">Total Projects</h3>
-                        <p className="text-2xl font-bold">{totalProjects}</p>
+                        <h3 className="font-medium mb-2">Total Data</h3>
+                        <p className="text-2xl font-bold">{totalData}</p>
                     </Card>
                 </div>
 

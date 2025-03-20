@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { syncMemoriesFromSource, syncAllEnabledSources } from '@/app/lib/sync/syncMemories';
+import { syncDataFromSource, syncAllEnabledSources } from '@/app/lib/sync/syncData';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/prisma/prisma';
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
                 );
             }
 
-            const result = await syncMemoriesFromSource(config);
+            const result = await syncDataFromSource(config);
             return NextResponse.json(result);
         } else {
             // Sync all enabled sources
@@ -38,9 +38,9 @@ export async function POST(request: Request) {
             return NextResponse.json(results);
         }
     } catch (error) {
-        console.error('Error syncing memories:', error);
+        console.error('Error syncing data:', error);
         return NextResponse.json(
-            { error: 'Failed to sync memories' },
+            { error: 'Failed to sync data' },
             { status: 500 }
         );
     }

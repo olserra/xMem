@@ -67,22 +67,19 @@ const Navbar = () => {
   ], []);
 
   const menuItems = useMemo(() => [
-    { label: 'Projects', href: '/dashboard/projects' },
-    { label: 'Memories', href: '/dashboard/memories' },
+    { label: 'Data', href: '/dashboard/data' },
     { label: 'Sources', href: '/dashboard/sources' },
     { label: 'Analysis', href: '/dashboard/analysis' },
   ], []);
 
   // Memoize isActive function
-  const isActive = useCallback((href: string) => {
-    if (pathname === href) return true;
-    if (href === '/dashboard/projects' && pathname.startsWith('/dashboard/projects/')) return true;
-    if (href === '/dashboard/memories' && pathname.startsWith('/dashboard/memories/') && !pathname.includes('/create')) return true;
-    if (href === '/dashboard/mcp' && pathname.startsWith('/dashboard/mcp/')) return true;
-    if (href === '/dashboard/sources' && pathname.startsWith('/dashboard/sources/')) return true;
-    if (href === '/dashboard/analysis' && pathname.startsWith('/dashboard/analysis/')) return true;
-    return false;
-  }, [pathname]);
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
+
+  const isDashboardActive = () => {
+    return isAuthenticated && pathname === "/dashboard/data";
+  };
 
   // Memoize handlers
   const handleAvatarClick = useCallback(() => {
@@ -133,7 +130,7 @@ const Navbar = () => {
 
   // Memoize filter bar visibility
   const showFilterBar = useMemo(() =>
-    isAuthenticated && (pathname === "/dashboard/projects" || pathname === "/dashboard/memories"),
+    isAuthenticated && pathname === "/dashboard/data",
     [isAuthenticated, pathname]
   );
 
@@ -157,7 +154,7 @@ const Navbar = () => {
                     className="rounded-full object-cover aspect-square"
                   />
                 )}
-                {isAuthenticated && <p className="font-semibold text-sm">{userData?.name} projects</p>}
+                {isAuthenticated && <p className="font-semibold text-sm">{userData?.name}</p>}
               </div>
             </div>
 
@@ -169,7 +166,7 @@ const Navbar = () => {
                     type="text"
                     value={filterLabel}
                     onChange={handleFilterChange}
-                    placeholder={pathname === "/dashboard/projects" ? "Search projects" : "Search memories"}
+                    placeholder="Search by content or tags..."
                     className="p-2 border border-gray-300 rounded-lg md:w-[500px]"
                   />
                 </div>

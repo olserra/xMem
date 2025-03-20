@@ -1,30 +1,24 @@
 import { useEffect, useState, useCallback } from "react";
-import { Project, Memory } from "../types";
+import { Data } from "../types";
 
 const useFetchData = (userId: string | null, bearerToken: string | null) => {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [memories, setMemories] = useState<Memory[]>([]);
+    const [data, setData] = useState<Data[]>([]);
 
     const fetchData = useCallback(async () => {
         if (!userId || !bearerToken) return;
 
         try {
-            const [projectsRes, memoriesRes] = await Promise.all([
-                fetch(`/api/projects?userId=${userId}`, {
-                    headers: { Authorization: `Bearer ${bearerToken}` },
-                }),
-                fetch(`/api/memory?userId=${userId}`, {
+            const [dataRes] = await Promise.all([
+                fetch(`/api/_data?userId=${userId}`, {
                     headers: { Authorization: `Bearer ${bearerToken}` },
                 }),
             ]);
 
-            const projectsData = await projectsRes.json();
-            const memoriesData = await memoriesRes.json();
+            const dataData = await dataRes.json();
 
-            setProjects(projectsData);
-            setMemories(memoriesData.memories || []);
+            setData(dataData.data || []);
         } catch (error) {
-            console.error("Error fetching projects and memories:", error);
+            console.error("Error fetching data:", error);
         }
     }, [userId, bearerToken]);
 
@@ -32,7 +26,7 @@ const useFetchData = (userId: string | null, bearerToken: string | null) => {
         fetchData();
     }, [fetchData]);
 
-    return { projects, memories, setMemories };
+    return { data, setData };
 };
 
 export default useFetchData;

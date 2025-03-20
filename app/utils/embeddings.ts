@@ -1,4 +1,4 @@
-import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, MAX_TOKENS_PER_REQUEST } from '../constants';
+import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, MAX_TOKENS_PER_REQUEST, API_TIMEOUT } from '../constants';
 
 interface EmbeddingResponse {
     data: number[];
@@ -13,6 +13,9 @@ export async function getEmbedding(
     model: string = DEFAULT_EMBEDDING_MODEL
 ): Promise<number[]> {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
         const response = await fetch('https://api.openai.com/v1/embeddings', {
             method: 'POST',
             headers: {
@@ -24,17 +27,27 @@ export async function getEmbedding(
                 model,
                 dimensions: EMBEDDING_DIMENSIONS,
             }),
+            signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-            throw new Error(`Embedding API error: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Embedding API error: ${response.statusText} - ${errorData.error?.message || ''}`);
         }
 
         const result: EmbeddingResponse = await response.json();
         return result.data;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error getting embedding:', error);
-        throw error;
+        if (error.name === 'AbortError') {
+            throw new Error('Embedding request timed out. Please try again.');
+        }
+        if (error.message.includes('401')) {
+            throw new Error('OpenAI API key is invalid or not configured.');
+        }
+        throw new Error('Failed to generate embedding. Please try again later.');
     }
 }
 

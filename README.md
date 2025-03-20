@@ -6,15 +6,13 @@ Welcome to xmem.xyz! This is a simple, open-source tool designed to help you man
 ## How it Works
 
 The core functionality is simple yet powerful:
-- **Create Memory Entries**: Add your thoughts, experiences, or facts to the system. Each entry can be tagged with up to 3 relevant tags (e.g., Technology, Skills, Learning).
+- **Create Data Entries**: Add your thoughts, experiences, or facts to the system. Each entry can be tagged with up to 3 relevant tags (e.g., Technology, Skills, Learning).
 - **Persist the Data**: Each entry is saved so that you can retain context for future interactions.
-- **Copy Your Data**: With one click, you can copy all of your saved data into your clipboard in JSON format. This can then be used as input to any LLM for context.
 
 ## Key Features
 
 - **Add Data**: Enter your thoughts and tag them with categories such as Technology, Learning, or Hobbies.
-- **Memory Persistence**: Store your data across sessions to carry context for ongoing conversations.
-- **Copy All Data**: Copy your entire set of data into a JSON format and use it to inject context into new LLM conversations.
+- **Data Persistence**: Store your data across sessions to carry context for ongoing conversations.
 - **Filter Data**: Filter stored data by text or tags to quickly find the context you need.
 
 ## Use Cases and Practical Examples
@@ -48,8 +46,7 @@ The core functionality is simple yet powerful:
 
 1. **Create New Memory**: Enter your thoughts or notes into the input box and tag them with appropriate labels.
 2. **Save Your Data**: Once you've added your data, they will be automatically saved for future use.
-3. **Copy All Data**: Click the "Copy all user data" button to copy your entire set of data in JSON format.
-4. **Use in LLM Conversations**: Paste the copied JSON data as context in your preferred LLM (e.g., ChatGPT, Gemini, Claude, etc.), allowing the model to use the data to improve the conversation.
+3. **Use in LLM Conversations**: Paste the copied JSON data as context in your preferred LLM (e.g., ChatGPT, Gemini, Claude, etc.), allowing the model to use the data to improve the conversation.
 
 ## Roadmap
 

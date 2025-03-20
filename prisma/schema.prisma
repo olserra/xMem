@@ -32,6 +32,7 @@ model Data {
   metadata      Json?
   version       Int       @default(1)
   isArchived    Boolean   @default(false)
+  tags          String[]  @default([])
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   subjects      Subject[] @relation("DataToSubject")
 

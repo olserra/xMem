@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { FaRegCopy, FaTrash, FaPen } from "react-icons/fa";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Upload, Copy, Trash2 } from "lucide-react";
 import MaxWidthWrapper from "@/app/components/MaxWidthWrapper";
 import { useUser } from "@/app/contexts/UserContext";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import DataCard from '@/app/components/DataCard';
 import { Badge } from '@/app/components/ui/badge';
 import { Input } from '@/app/components/ui/input';
 import DataImportDropzone from '@/app/components/DataImportDropzone';
+import { Button } from '@/app/components/ui/button';
 
 const Data = () => {
     const {
@@ -248,36 +249,36 @@ const Data = () => {
         <MaxWidthWrapper>
             <div className="py-6">
                 <div className="mb-6 flex justify-between items-center">
-                    <h1 className="text-2xl font-bold">Data</h1>
                     <div className="flex items-center gap-2">
-                        <Link
-                            href="/dashboard/data/create"
-                            className="flex items-center gap-2 px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-gray-800"
-                        >
-                            Create Data
-                        </Link>
-                        <button
+                        <Button asChild>
+                            <Link href="/dashboard/data/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Data
+                            </Link>
+                        </Button>
+                        <Button
+                            variant="outline"
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                         >
+                            <Upload className="mr-2 h-4 w-4" />
                             Import Data
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="outline"
                             onClick={handleCopyToClipboard}
-                            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                             title="Copy all data to clipboard"
                         >
-                            <FaRegCopy />
+                            <Copy className="mr-2 h-4 w-4" />
                             {isCopied ? 'Copied!' : 'Copy'}
-                        </button>
+                        </Button>
                         {selectedData.size > 0 && (
-                            <button
+                            <Button
+                                variant="destructive"
                                 onClick={handleDeleteSelectedData}
-                                className="flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
                             >
-                                <FaTrash />
+                                <Trash2 className="mr-2 h-4 w-4" />
                                 Delete Selected ({selectedData.size})
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>

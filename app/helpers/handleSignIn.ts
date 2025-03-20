@@ -7,7 +7,7 @@ export const handleSignIn = async (e: MouseEvent<HTMLElement>, setLoading?: (loa
 
   try {
     await signIn("google", {
-      callbackUrl: "/dashboard/projects", // Redirect to /dashboard/projects after login
+      callbackUrl: "/dashboard/data",
     });
   } catch (error) {
     console.error("SignIn Error:", error);

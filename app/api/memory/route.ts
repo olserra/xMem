@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/prisma/prisma';
+import crypto from 'crypto';
 
 // Function to validate the API key and extract the userId
 const getUserIdFromToken = async (token: string) => {
@@ -50,7 +51,13 @@ export async function GET(request: Request) {
         const where = {
             userId,
             ...(source && { source }),
-            ...(projectId && { projectId }),
+            ...(projectId && {
+                MemoryProject: {
+                    some: {
+                        projectId: projectId
+                    }
+                }
+            }),
             ...(subject && {
                 subjects: {
                     some: {
@@ -60,12 +67,16 @@ export async function GET(request: Request) {
             }),
         };
 
-        const [memories, total] = await Promise.all([
-            prisma.memory.findMany({
+        const [data, total] = await Promise.all([
+            prisma._data.findMany({
                 where,
                 include: {
                     subjects: true,
-                    project: true,
+                    MemoryProject: {
+                        include: {
+                            Project: true
+                        }
+                    },
                     Memory_B: {
                         select: {
                             id: true,
@@ -78,11 +89,11 @@ export async function GET(request: Request) {
                 skip: (page - 1) * limit,
                 take: limit,
             }),
-            prisma.memory.count({ where }),
+            prisma._data.count({ where }),
         ]);
 
         return NextResponse.json({
-            memories,
+            data,
             pagination: {
                 total,
                 page,
@@ -91,7 +102,7 @@ export async function GET(request: Request) {
             }
         });
     } catch (error) {
-        console.error('Error fetching memories:', error);
+        console.error('Error fetching data:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -119,7 +130,7 @@ export async function POST(request: Request) {
             metadata,
         } = body;
 
-        const memory = await prisma.memory.create({
+        const _data = await prisma._data.create({
             data: {
                 content,
                 type,
@@ -131,18 +142,27 @@ export async function POST(request: Request) {
                 language,
                 tags,
                 metadata,
-                project: projectId ? {
-                    connect: { id: projectId }
+                MemoryProject: projectId ? {
+                    create: {
+                        id: `${crypto.randomUUID()}`,
+                        projectId: projectId,
+                        updatedAt: new Date()
+                    }
                 } : undefined,
-                subjects: {
-                    connect: subjects?.map((id: string) => ({ id })) || [],
-                },
-                Memory_B: {
-                    connect: relatedMemoryIds?.map((id: string) => ({ id })) || [],
-                },
+                subjects: subjects && subjects.length > 0 ? {
+                    connect: subjects.filter(id => id).map(id => ({ id }))
+                } : undefined,
+                Memory_B: relatedMemoryIds && relatedMemoryIds.length > 0 ? {
+                    connect: relatedMemoryIds.filter(id => id).map(id => ({ id }))
+                } : undefined,
             },
             include: {
                 subjects: true,
+                MemoryProject: {
+                    include: {
+                        Project: true
+                    }
+                },
                 Memory_B: {
                     select: {
                         id: true,
@@ -153,9 +173,9 @@ export async function POST(request: Request) {
             },
         });
 
-        return NextResponse.json(memory);
+        return NextResponse.json(_data);
     } catch (error) {
-        console.error('Error creating memory:', error);
+        console.error('Error creating _data:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -182,8 +202,8 @@ export async function PUT(request: Request) {
             metadata,
         } = body;
 
-        // Verify the memory belongs to the user
-        const existingMemory = await prisma.memory.findUnique({
+        // Verify the _data belongs to the user
+        const existingMemory = await prisma._data.findUnique({
             where: { id },
         });
 
@@ -191,7 +211,7 @@ export async function PUT(request: Request) {
             return NextResponse.json({ error: 'Memory not found or unauthorized' }, { status: 404 });
         }
 
-        const memory = await prisma.memory.update({
+        const _data = await prisma._data.update({
             where: { id },
             data: {
                 content,
@@ -201,20 +221,33 @@ export async function PUT(request: Request) {
                 language,
                 tags,
                 metadata,
-                project: projectId ? {
-                    connect: { id: projectId }
-                } : {
-                    disconnect: true
-                },
-                subjects: {
-                    set: subjects?.map((id: string) => ({ id })) || [],
-                },
-                Memory_B: {
-                    set: relatedMemoryIds?.map((id: string) => ({ id })) || [],
-                },
+                MemoryProject: projectId ? {
+                    upsert: {
+                        create: {
+                            id: `${crypto.randomUUID()}`,
+                            projectId: projectId,
+                            updatedAt: new Date()
+                        },
+                        update: {
+                            updatedAt: new Date()
+                        },
+                        where: { _dataId_projectId: { _dataId: id, projectId: projectId } }
+                    }
+                } : undefined,
+                subjects: subjects && subjects.length > 0 ? {
+                    set: subjects.filter(id => id).map(id => ({ id }))
+                } : undefined,
+                Memory_B: relatedMemoryIds && relatedMemoryIds.length > 0 ? {
+                    set: relatedMemoryIds.filter(id => id).map(id => ({ id }))
+                } : undefined,
             },
             include: {
                 subjects: true,
+                MemoryProject: {
+                    include: {
+                        Project: true
+                    }
+                },
                 Memory_B: {
                     select: {
                         id: true,
@@ -225,9 +258,9 @@ export async function PUT(request: Request) {
             },
         });
 
-        return NextResponse.json(memory);
+        return NextResponse.json(_data);
     } catch (error) {
-        console.error('Error updating memory:', error);
+        console.error('Error updating _data:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -246,22 +279,22 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Memory ID is required' }, { status: 400 });
         }
 
-        // Verify the memory belongs to the user
-        const memory = await prisma.memory.findUnique({
+        // Verify the _data belongs to the user
+        const _data = await prisma._data.findUnique({
             where: { id },
         });
 
-        if (!memory || memory.userId !== userId) {
+        if (!_data || _data.userId !== userId) {
             return NextResponse.json({ error: 'Memory not found or unauthorized' }, { status: 404 });
         }
 
-        await prisma.memory.delete({
+        await prisma._data.delete({
             where: { id },
         });
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error deleting memory:', error);
+        console.error('Error deleting _data:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

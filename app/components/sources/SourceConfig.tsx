@@ -139,11 +139,11 @@ export function SourceConfig() {
                     toast.error(result.message);
                 }
             } else {
-                toast.error('Failed to sync memories');
+                toast.error('Failed to sync data');
             }
         } catch (error) {
-            console.error('Error syncing memories:', error);
-            toast.error('Failed to sync memories');
+            console.error('Error syncing data:', error);
+            toast.error('Failed to sync data');
         } finally {
             setSyncing(prev => ({ ...prev, [source]: false }));
         }

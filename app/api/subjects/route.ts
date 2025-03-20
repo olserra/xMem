@@ -13,7 +13,7 @@ export async function GET() {
         const subjects = await prisma.subject.findMany({
             include: {
                 _count: {
-                    select: { memories: true }
+                    select: { data: true }
                 }
             }
         });

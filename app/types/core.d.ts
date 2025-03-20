@@ -1,6 +1,5 @@
-import { Project } from './project';
 import { ApiKey, Role } from './auth';
-import { Memory, MemoryType, MemoryMetadata } from './memory';
+import { Data, DataType, DataMetadata } from './_data';
 
 export interface BaseEntity {
     id: string;
@@ -13,8 +12,7 @@ export interface User extends BaseEntity {
     name: string;
     role: Role;
     apiKeys?: ApiKey[];
-    projects?: Project[];
-    memories?: Memory[];
+    data?: Data[];
 }
 
 export interface ApiKey extends BaseEntity {
@@ -26,9 +24,8 @@ export interface ApiKey extends BaseEntity {
     expiresAt?: string;
 }
 
-export interface MemoryFormData {
+export interface DataFormData {
     content: string;
-    type: MemoryType;
-    projectId?: string;
-    metadata?: MemoryMetadata;
+    type: DataType;
+    metadata?: DataMetadata;
 } 

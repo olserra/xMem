@@ -1,4 +1,4 @@
-import { Memory } from './memory';
+import { Memory } from './_data';
 import { Project } from './project';
 
 export interface User {
@@ -11,7 +11,7 @@ export interface UserContextState {
     user: User | null;
     bearerToken: string | null;
     projects: import('./project').Project[];
-    memories: Memory[];
+    data: Memory[];
     favorites: string[];
     filterLabel: string;
     isLoading: boolean;
@@ -22,9 +22,9 @@ export interface UserContextType extends UserContextState {
     userId: string | null;
     setFilterLabel: (label: string) => void;
     toggleFavorite: (projectId: string) => void;
-    updateMemories: (memories: Memory[]) => void;
+    updateData: (data: Memory[]) => void;
     refreshProjects: () => Promise<void>;
-    refreshMemories: () => Promise<void>;
+    refreshData: () => Promise<void>;
 }
 
 export interface ApiResponse<T> {
@@ -46,6 +46,6 @@ export interface ApiPagination {
 }
 
 export interface ApiPaginatedResponse<T> {
-    memories: T[];
+    data: T[];
     pagination: ApiPagination;
 } 

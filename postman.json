@@ -136,7 +136,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\"content\":\"This is a new memory\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
+                    "raw": "{\"content\":\"This is a new _data\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
                 },
                 "url": {
                     "host": [
@@ -145,14 +145,14 @@
                     "port": "3000",
                     "path": [
                         "api",
-                        "memory"
+                        "_data"
                     ]
                 }
             },
             "response": []
         },
         {
-            "name": "Get Memories (GET)",
+            "name": "Get Data (GET)",
             "request": {
                 "method": "GET",
                 "header": [
@@ -169,7 +169,7 @@
                     "port": "3000",
                     "path": [
                         "api",
-                        "memory"
+                        "_data"
                     ]
                 }
             },
@@ -192,7 +192,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\"content\":\"Updated memory content\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
+                    "raw": "{\"content\":\"Updated _data content\",\"projectId\":\"{{projectId}}\",\"type\":\"note\",\"metadata\":{},\"isArchived\":false}"
                 },
                 "url": {
                     "host": [
@@ -201,8 +201,8 @@
                     "port": "3000",
                     "path": [
                         "api",
-                        "memory",
-                        "{{memoryId}}"
+                        "_data",
+                        "{{_dataId}}"
                     ]
                 }
             },
@@ -226,8 +226,8 @@
                     "port": "3000",
                     "path": [
                         "api",
-                        "memory",
-                        "{{memoryId}}"
+                        "_data",
+                        "{{_dataId}}"
                     ]
                 }
             },

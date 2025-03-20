@@ -85,4 +85,28 @@ export const DEFAULT_SETTINGS: UserSettings = {
         model: DEFAULT_EMBEDDING_MODEL,
         dimensions: EMBEDDING_DIMENSIONS,
     },
-} as const; 
+} as const;
+
+export const MAX_DATA_CONTENT_LENGTH = 1000000; // 1MB in characters
+
+export const SUPPORTED_DATA_TYPES = [
+    'TEXT',
+    'CODE',
+    'DOCUMENT',
+    'IMAGE',
+    'URL',
+    'TASK',
+    'NOTE',
+    'CONTACT',
+    'EVENT',
+    'BOOKMARK',
+    'FILE',
+    'DATABASE',
+    'API',
+    'CONFIG',
+    'LOG',
+    'METRIC',
+    'AUDIT',
+    'BACKUP',
+    'ARCHIVE'
+] as const; 

@@ -144,7 +144,7 @@ export default function Home() {
                 Memory Persistence Examples
               </h2>
               <p className="text-gray-600 mt-4">
-                Here are some examples of what could be remembered in a memory persistence system.
+                Here are some examples of what could be remembered in a _data persistence system.
               </p>
             </div>
 

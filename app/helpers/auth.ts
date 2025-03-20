@@ -17,45 +17,10 @@ export async function getAuthenticatedUser(): Promise<User> {
         name: session.user.name || '',
         role: session.user.role,
         apiKeys: [],
-        projects: [],
-        memories: []
+        data: []
     };
 
     return user;
-}
-
-export function checkProjectAccess(
-    project: Project,
-    user: User,
-    requiredPermission: 'READ' | 'WRITE' | 'ADMIN' = 'READ'
-): boolean {
-    // Owner has all permissions
-    if (project.userId === user.id) {
-        return true;
-    }
-
-    // Public projects can be read by anyone
-    if (project.visibility === 'PUBLIC' && requiredPermission === 'READ') {
-        return true;
-    }
-
-    // Shared projects need to check specific permissions
-    if (project.visibility === 'SHARED') {
-        // TODO: Implement shared project permissions
-        return false;
-    }
-
-    return false;
-}
-
-export function assertProjectAccess(
-    project: Project,
-    user: User,
-    requiredPermission: 'READ' | 'WRITE' | 'ADMIN' = 'READ'
-): void {
-    if (!checkProjectAccess(project, user, requiredPermission)) {
-        throw new AuthorizationError('You do not have permission to access this project');
-    }
 }
 
 export function validateApiKey(apiKey: string): boolean {

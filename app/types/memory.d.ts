@@ -1,7 +1,7 @@
 import { BaseEntity } from './core';
 import { User } from './core';
 
-export type MemoryType = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'FILE';
+export type MemoryType = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'FILE' | 'URL' | 'CODE' | 'NOTE' | 'TASK' | 'EVENT' | 'CONTACT' | 'LOCATION' | 'CUSTOM';
 
 export interface MemoryMetadata {
     source?: string;
@@ -18,8 +18,6 @@ export interface MemoryMetadata {
     embedding_model?: string;
     tokens?: number;
     shared?: string[];
-    projectName?: string;
-    projectType?: string;
     lastAccessed?: string;
     createdAt?: string;
 }
@@ -30,8 +28,6 @@ export interface Memory extends BaseEntity {
     metadata?: MemoryMetadata;
     embedding?: number[];
     userId: string;
-    projectId?: string;
-    project?: import('./project').Project;
     user?: User;
     version: number;
     isArchived: boolean;

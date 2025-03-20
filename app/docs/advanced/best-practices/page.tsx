@@ -13,7 +13,7 @@ export default function BestPracticesPage() {
             <div className="space-y-4">
                 <p className="leading-7">
                     To get the most out of xmem, it’s important to follow best practices for organizing, and managing
-                    your projects and memories. By following these guidelines, you can ensure your knowledge base remains efficient
+                    your data. By following these guidelines, you can ensure your knowledge base remains efficient
                     and scalable.
                 </p>
 
@@ -33,8 +33,8 @@ export default function BestPracticesPage() {
 
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Maintaining Knowledge Quality</h2>
                 <p className="leading-7">
-                    Regularly review your projects and memories to keep the knowledge base up to date. Remove outdated content,
-                    archive completed projects, and make sure that your memories remain relevant as your project evolves.
+                    Regularly review your  data to keep the knowledge base up to date. Remove outdated content,
+                    archive completed data, and make sure that your data remain relevant as your project evolves.
                 </p>
             </div>
         </div>

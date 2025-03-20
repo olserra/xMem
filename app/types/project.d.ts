@@ -1,5 +1,5 @@
 import { BaseEntity } from './core';
-import { Memory } from './memory';
+import { Data } from './_data';
 import { User } from './core';
 
 export type ProjectType = 'PERSONAL' | 'TEAM' | 'ORGANIZATION';
@@ -12,14 +12,14 @@ export interface Project extends BaseEntity {
     visibility: ProjectVisibility;
     userId: string;
     user?: User;
-    memories?: Memory[];
-    _count?: { memories: number };
-    memoryCount?: number;
+    data?: Data[];
+    _count?: { data: number };
+    _dataCount?: number;
     metadata?: Record<string, unknown>;
 }
 
-export interface ProjectWithCount extends Omit<Project, 'memoryCount'> {
-    memoryCount: number;
+export interface ProjectWithCount extends Omit<Project, '_dataCount'> {
+    _dataCount: number;
 }
 
 export interface ProjectFormData {

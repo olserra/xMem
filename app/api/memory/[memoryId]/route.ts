@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma';
+import crypto from 'crypto';
 
 // Function to validate the API key and extract the userId
 const getUserIdFromToken = async (token: string) => {
@@ -10,7 +11,7 @@ const getUserIdFromToken = async (token: string) => {
     return apiKey ? apiKey.userId : null;
 };
 
-export async function GET(req: Request, { params }: { params: { memoryId: string } }) {
+export async function GET(req: Request, { params }: { params: { _dataId: string } }) {
     const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
     if (!token) {
@@ -23,23 +24,23 @@ export async function GET(req: Request, { params }: { params: { memoryId: string
     }
 
     try {
-        const memory = await prisma.memory.findUnique({
-            where: { id: params.memoryId },
+        const _data = await prisma._data.findUnique({
+            where: { id: params._dataId },
         });
-        if (!memory) {
+        if (!_data) {
             return NextResponse.json({ error: 'Memory not found' }, { status: 404 });
         }
-        if (memory.userId !== userId) {
-            return NextResponse.json({ error: 'Not authorized to access this memory' }, { status: 403 });
+        if (_data.userId !== userId) {
+            return NextResponse.json({ error: 'Not authorized to access this _data' }, { status: 403 });
         }
 
-        return NextResponse.json(memory);
+        return NextResponse.json(_data);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch memory' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch _data' }, { status: 500 });
     }
 }
 
-export async function PUT(req: Request, { params }: { params: { memoryId: string } }) {
+export async function PUT(req: Request, { params }: { params: { _dataId: string } }) {
     const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
     if (!token) {
@@ -54,35 +55,51 @@ export async function PUT(req: Request, { params }: { params: { memoryId: string
     const { content, projectId } = await req.json();
 
     try {
-        const memory = await prisma.memory.findUnique({
-            where: { id: params.memoryId },
+        const _data = await prisma._data.findUnique({
+            where: { id: params._dataId },
         });
 
-        if (!memory) {
+        if (!_data) {
             return NextResponse.json({ error: 'Memory not found' }, { status: 404 });
         }
 
-        if (memory.userId !== userId) {
-            return NextResponse.json({ error: 'Not authorized to update this memory' }, { status: 403 });
+        if (_data.userId !== userId) {
+            return NextResponse.json({ error: 'Not authorized to update this _data' }, { status: 403 });
         }
 
-        const updatedMemory = await prisma.memory.update({
-            where: { id: params.memoryId },
+        const updatedMemory = await prisma._data.update({
+            where: { id: params._dataId },
             data: {
                 content,
-                projectId: projectId || null,
                 updatedAt: new Date(),
+                MemoryProject: projectId ? {
+                    deleteMany: {},
+                    create: {
+                        id: `${crypto.randomUUID()}`,
+                        projectId: projectId,
+                        updatedAt: new Date()
+                    }
+                } : {
+                    deleteMany: {}
+                }
             },
+            include: {
+                MemoryProject: {
+                    include: {
+                        Project: true
+                    }
+                }
+            }
         });
 
         return NextResponse.json(updatedMemory, { status: 200 });
     } catch (error) {
-        console.error('Error updating memory:', error);
-        return NextResponse.json({ error: 'Failed to update memory' }, { status: 500 });
+        console.error('Error updating _data:', error);
+        return NextResponse.json({ error: 'Failed to update _data' }, { status: 500 });
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { memoryId: string } }) {
+export async function DELETE(req: Request, { params }: { params: { _dataId: string } }) {
     const token = req.headers.get('Authorization')?.split(' ')[1]; // Extract Bearer token
 
     if (!token) {
@@ -94,24 +111,24 @@ export async function DELETE(req: Request, { params }: { params: { memoryId: str
         return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
     }
 
-    const { memoryId } = params; // Extract memoryId from the route
+    const { _dataId } = params; // Extract _dataId from the route
 
     try {
-        const memory = await prisma.memory.findUnique({
-            where: { id: memoryId },
+        const _data = await prisma._data.findUnique({
+            where: { id: _dataId },
         });
 
-        if (!memory || memory.userId !== userId) {
+        if (!_data || _data.userId !== userId) {
             return NextResponse.json({ error: 'Memory not found or user is not authorized' }, { status: 404 });
         }
 
-        const deletedMemory = await prisma.memory.delete({
-            where: { id: memoryId },
+        const deletedMemory = await prisma._data.delete({
+            where: { id: _dataId },
         });
 
         return NextResponse.json(deletedMemory, { status: 200 });
     } catch (error) {
-        console.error('Error deleting memory:', error);
-        return NextResponse.json({ error: 'Failed to delete memory' }, { status: 500 });
+        console.error('Error deleting _data:', error);
+        return NextResponse.json({ error: 'Failed to delete _data' }, { status: 500 });
     }
 }

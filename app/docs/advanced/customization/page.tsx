@@ -12,7 +12,7 @@ export default function CustomizationPage() {
 
             <div className="space-y-4">
                 <p className="leading-7">
-                    xmem is designed to be flexible and customizable to suit the needs of different teams and projects. Whether
+                    xmem is designed to be flexible and customizable to suit the needs of different teams and data. Whether
                     you need custom workflows, branding, or integrations, xmem can be tailored to match your requirements.
                 </p>
 
@@ -26,7 +26,7 @@ export default function CustomizationPage() {
                 <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Custom Workflows</h2>
                 <p className="leading-7">
                     xmem’s API allows you to create custom workflows to automate tasks or integrate with other tools. You can
-                    use the API to trigger actions based on certain events, such as when a new memory is added or when a project
+                    use the API to trigger actions based on certain events, such as when a new _data is added or when a project
                     is completed.
                 </p>
 

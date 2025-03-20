@@ -1,5 +1,5 @@
 export interface UsageMetrics {
-    totalMemories: number;
+    totalData: number;
     totalProjects: number;
     storageUsed: number;
     apiCalls: number;

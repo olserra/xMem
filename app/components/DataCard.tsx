@@ -1,8 +1,8 @@
 import { FaPen, FaTrash } from 'react-icons/fa';
-import { Data, DataType } from '@/app/types/_data';
+import { Data } from '@/app/types/_data';
 import { cn } from '@/lib/utils';
 import { Badge } from './ui/badge';
-import { Checkbox } from './ui/checkbox';
+import { Checkbox } from '@radix-ui/react-checkbox';
 
 interface DataCardProps {
     _data: Data;

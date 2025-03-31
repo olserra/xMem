@@ -23,7 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "csv-parse": "^5.6.0",
-    "framer-motion": "^11.11.17",
+    "framer-motion": "^12.6.2",
     "geist": "^1.1.0",
     "lru-cache": "^6.0.0",
     "lucide-react": "^0.294.0",

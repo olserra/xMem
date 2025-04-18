@@ -1,11 +1,17 @@
 model-context-protocol
-fastapi>=0.68.0
-uvicorn>=0.15.0
+fastapi==0.109.2
+uvicorn==0.27.1
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 python-multipart>=0.0.5
-chromadb>=0.4.0
-sentence-transformers>=2.2.0
-pydantic>=2.0.0
+chromadb==0.4.22
+sentence-transformers==2.2.2
+pydantic==2.6.1
 asyncpg>=0.27.0  # Para autenticação/usuários
-python-dotenv>=0.19.0 
+python-dotenv==1.0.1
+
+# Testing dependencies
+pytest==8.0.1
+pytest-asyncio==0.23.5
+httpx==0.26.0  # Required for FastAPI TestClient
+pytest-cov==4.1.0  # For coverage reports 

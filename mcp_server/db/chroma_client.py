@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 import json
 from datetime import datetime
 
@@ -12,33 +12,70 @@ class ChromaClient:
             anonymized_telemetry=False
         ))
         
-        # Usando sentence-transformers para embeddings
+        # Using sentence-transformers for embeddings
         self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name="all-MiniLM-L6-v2"
         )
         
-        # Coleção principal para memórias
-        self.memories = self.client.get_or_create_collection(
-            name="memories",
-            embedding_function=self.embedding_function,
-            metadata={"hnsw:space": "cosine"}
-        )
+        # Collections cache
+        self.collections = {}
+        self._current_user_id = None
+    
+    def _get_collection_name(self, user_id: str) -> str:
+        """Generate a consistent collection name for a user"""
+        return f"user_{user_id}_memories"
+    
+    async def initialize_collection(self, user_id: str) -> Dict[str, str]:
+        """Initialize or get a collection for a user"""
+        collection_name = self._get_collection_name(user_id)
+        self._current_user_id = user_id
+        
+        if collection_name not in self.collections:
+            self.collections[collection_name] = self.client.get_or_create_collection(
+                name=collection_name,
+                embedding_function=self.embedding_function,
+                metadata={
+                    "hnsw:space": "cosine",
+                    "user_id": user_id,
+                    "created_at": datetime.utcnow().isoformat()
+                }
+            )
+        
+        return {
+            "collection_name": collection_name,
+            "user_id": user_id
+        }
+    
+    def _get_current_collection(self) -> chromadb.Collection:
+        """Get the current user's collection"""
+        if not self._current_user_id:
+            raise ValueError("No active user collection. Call initialize_collection first.")
+        
+        collection_name = self._get_collection_name(self._current_user_id)
+        if collection_name not in self.collections:
+            raise ValueError("Collection not initialized. Call initialize_collection first.")
+            
+        return self.collections[collection_name]
         
     async def create_memory(
         self,
         content: str,
-        user_id: str,
         metadata: Dict[str, Any] = {},
         tags: List[str] = [],
         project_id: Optional[str] = None,
-        type: str = "memory"
+        type: str = "memory",
+        user_id: Optional[str] = None  # For initial collection setup only
     ) -> str:
-        """Cria uma nova memória com embeddings"""
+        """Create a new memory with embeddings in user's collection"""
+        if user_id:
+            await self.initialize_collection(user_id)
+            
+        collection = self._get_current_collection()
         memory_id = chromadb.utils.generate_uuid()
         
-        # Preparar metadados
+        # Prepare metadata
         full_metadata = {
-            "user_id": user_id,
+            "user_id": self._current_user_id,
             "tags": tags,
             "project_id": project_id,
             "type": type,
@@ -47,8 +84,8 @@ class ChromaClient:
             **metadata
         }
         
-        # Adicionar à coleção
-        self.memories.add(
+        # Add to collection
+        collection.add(
             ids=[memory_id],
             documents=[content],
             metadatas=[full_metadata]
@@ -59,42 +96,42 @@ class ChromaClient:
     async def query_memories(
         self,
         query: str,
-        user_id: str,
         filter_metadata: Optional[Dict[str, Any]] = None,
         n_results: int = 10
     ) -> Dict[str, Any]:
-        """Busca memórias semanticamente similares"""
-        where = {"user_id": user_id}
+        """Search semantically similar memories in user's collection"""
+        collection = self._get_current_collection()
+        where = {}
         if filter_metadata:
             where.update(filter_metadata)
             
-        results = self.memories.query(
+        results = collection.query(
             query_texts=[query],
             n_results=n_results,
             where=where
         )
         
         return {
-            "ids": results["ids"][0],
-            "documents": results["documents"][0],
-            "metadatas": results["metadatas"][0],
-            "distances": results["distances"][0]
+            "ids": results["ids"][0] if results["ids"] else [],
+            "documents": results["documents"][0] if results["documents"] else [],
+            "metadatas": results["metadatas"][0] if results["metadatas"] else [],
+            "distances": results["distances"][0] if results["distances"] else []
         }
     
     async def get_project_memories(
         self,
-        user_id: str,
         project_id: Optional[str] = None,
         tags: Optional[List[str]] = None
     ) -> Dict[str, Any]:
-        """Recupera todas as memórias de um projeto"""
-        where = {"user_id": user_id}
+        """Retrieve all memories from a project in user's collection"""
+        collection = self._get_current_collection()
+        where = {}
         if project_id:
             where["project_id"] = project_id
         if tags:
             where["tags"] = {"$in": tags}
             
-        results = self.memories.get(
+        results = collection.get(
             where=where
         )
         
@@ -107,18 +144,21 @@ class ChromaClient:
     async def update_memory(
         self,
         memory_id: str,
-        user_id: str,
         content: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None
     ):
-        """Atualiza uma memória existente"""
-        current = self.memories.get(
-            ids=[memory_id],
-            where={"user_id": user_id}
+        """Update an existing memory in user's collection"""
+        collection = self._get_current_collection()
+        current = collection.get(
+            ids=[memory_id]
         )
         
         if not current["ids"]:
             raise ValueError(f"Memory {memory_id} not found or access denied")
+            
+        # Verify memory belongs to current user
+        if current["metadatas"][0]["user_id"] != self._current_user_id:
+            raise ValueError("Access denied: Memory belongs to another user")
             
         update_data = {}
         if content:
@@ -133,51 +173,50 @@ class ChromaClient:
             update_data["metadatas"] = [update_metadata]
             
         if update_data:
-            self.memories.update(
+            collection.update(
                 ids=[memory_id],
                 **update_data
             )
     
     async def delete_memory(
         self,
-        memory_id: str,
-        user_id: str
+        memory_id: str
     ):
-        """Remove uma memória"""
-        # Verifica se o usuário tem acesso
-        current = self.memories.get(
-            ids=[memory_id],
-            where={"user_id": user_id}
+        """Remove a memory from user's collection"""
+        collection = self._get_current_collection()
+        current = collection.get(
+            ids=[memory_id]
         )
         
         if not current["ids"]:
             raise ValueError(f"Memory {memory_id} not found or access denied")
             
-        self.memories.delete(ids=[memory_id])
+        # Verify memory belongs to current user
+        if current["metadatas"][0]["user_id"] != self._current_user_id:
+            raise ValueError("Access denied: Memory belongs to another user")
+            
+        collection.delete(ids=[memory_id])
     
     async def assign_to_project(
         self,
         memory_id: str,
-        user_id: str,
         project_id: str
     ):
-        """Associa uma memória a um projeto"""
+        """Associate a memory with a project in user's collection"""
         await self.update_memory(
             memory_id=memory_id,
-            user_id=user_id,
             metadata={"project_id": project_id}
         )
         
     async def semantic_search(
         self,
         query: str,
-        user_id: str,
         project_id: Optional[str] = None,
         tags: Optional[List[str]] = None,
         n_results: int = 10
     ) -> Dict[str, Any]:
-        """Busca semântica em memórias com filtros"""
-        filter_metadata = {"user_id": user_id}
+        """Semantic search in memories with filters in user's collection"""
+        filter_metadata = {}
         if project_id:
             filter_metadata["project_id"] = project_id
         if tags:
@@ -185,7 +224,6 @@ class ChromaClient:
             
         return await self.query_memories(
             query=query,
-            user_id=user_id,
             filter_metadata=filter_metadata,
             n_results=n_results
         ) 

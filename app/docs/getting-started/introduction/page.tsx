@@ -1,43 +1,104 @@
 import { Metadata } from "next";
+import { DocLayout } from '@/app/components/docs/DocLayout';
 
 export const metadata: Metadata = {
     title: "Introduction | xmem Documentation",
-    description: "Getting started with xmem – A powerful API for managing data.",
+    description: "Introduction to xmem and its core concepts",
 };
 
 export default function IntroductionPage() {
     return (
-        <div className="space-y-6">
-            <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Introduction</h1>
+        <DocLayout>
+            <h1>Introduction to xmem</h1>
 
-            <div className="space-y-4">
-                <p className="leading-7">
-                    Welcome to <strong>xmem</strong>! xmem is a powerful API that allows developers to create, read, update, and delete (CRUD) data. This documentation will help you get started with integrating xmem into your applications, enabling you to manage knowledge and data programmatically.
-                </p>
+            <h2>What is xmem?</h2>
+            <p>
+                xmem is your personal memory extension, designed to help you store, organize,
+                and retrieve information using advanced semantic search capabilities. Built with
+                Python and ChromaDB, it provides a powerful yet simple interface for managing
+                your digital memories.
+            </p>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">What is xmem?</h2>
-                <p className="leading-7">
-                    xmem is a modern, API-driven knowledge management system that developers can integrate into their applications. It provides a set of RESTful API endpoints to manage data, allowing you to build custom solutions for organizing and accessing knowledge.
-                </p>
+            <h2>Core Architecture</h2>
+            <p>
+                xmem is built on three main pillars:
+            </p>
+            <ul>
+                <li>
+                    <strong>MCP (Memory Control Protocol)</strong>: A Python-based protocol that
+                    handles all memory operations, user management, and data security.
+                </li>
+                <li>
+                    <strong>ChromaDB Backend</strong>: Powers the semantic search capabilities,
+                    storing and indexing your memories for efficient retrieval.
+                </li>
+                <li>
+                    <strong>User-Specific Collections</strong>: Automatically manages isolated
+                    collections for each user, ensuring data privacy and organization.
+                </li>
+            </ul>
 
-                <p className="leading-7">
-                    With xmem, you can create applications that store and retrieve data in a structured way, enabling efficient knowledge sharing and collaboration across different platforms and services.
-                </p>
+            <h2>Key Concepts</h2>
+            <h3>Memories</h3>
+            <p>
+                In xmem, a memory is any piece of information you want to store and retrieve later.
+                Each memory can have:
+            </p>
+            <ul>
+                <li>Content: The main text or information</li>
+                <li>Tags: Labels for organization</li>
+                <li>Metadata: Additional structured information</li>
+                <li>Project Association: Optional grouping by project</li>
+            </ul>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Key Features</h2>
-                <ul className="list-disc list-inside space-y-2">
-                    <li><strong>API-First Approach:</strong> xmem provides a comprehensive RESTful API for managing data, giving developers full control over their data.</li>
-                    <li><strong>Flexible Data Management:</strong> Create, read, update, and delete data programmatically to suit your application&apos;s needs.</li>
-                    <li><strong>Authentication and Security:</strong> Secure your data with API keys and authentication mechanisms to ensure only authorized access.</li>
-                    <li><strong>Scalability:</strong> xmem is designed to handle growing amounts of data, making it suitable for applications of any size.</li>
-                    <li><strong>Integration-Friendly:</strong> Easily integrate xmem&apos;s API with your existing applications, services, and workflows.</li>
-                </ul>
+            <h3>Semantic Search</h3>
+            <p>
+                Unlike traditional keyword search, xmem uses semantic search to find relevant
+                memories based on meaning rather than exact matches. This means you can find
+                information even if you don't remember the exact words used.
+            </p>
 
-                <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight pt-4">Getting Started</h2>
-                <p className="leading-7">
-                    To start using xmem, you need to obtain an API key and familiarize yourself with the available endpoints. The following sections will guide you through the process of setting up your API key and making your first API calls.
-                </p>
-            </div>
-        </div>
+            <h3>Projects</h3>
+            <p>
+                Projects help you organize related memories together. They're optional but
+                useful for grouping memories by context, such as work projects, research
+                topics, or personal goals.
+            </p>
+
+            <h2>Getting Started</h2>
+            <p>
+                The easiest way to get started with xmem is through the Python MCP client:
+            </p>
+            <pre>
+                {`# Install the client
+pip install mcp-client
+
+# Initialize
+from mcp_client import MCPClient
+client = MCPClient()
+
+# Start creating memories
+memory_id = client.create_memory(
+    content="My first memory",
+    tags=["getting-started"]
+)`}
+            </pre>
+
+            <h2>Next Steps</h2>
+            <ul>
+                <li>
+                    Check out the <a href="/docs/api-reference">API Reference</a> for detailed
+                    documentation on all available operations
+                </li>
+                <li>
+                    Learn about <a href="/docs/core-concepts/memories">Memory Management</a> for
+                    best practices and advanced features
+                </li>
+                <li>
+                    Explore <a href="/docs/advanced/customization">Advanced Usage</a> for
+                    customization options and integration patterns
+                </li>
+            </ul>
+        </DocLayout>
     );
 }

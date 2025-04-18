@@ -3,17 +3,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    // Find the user with olserra@gmail.com
-    const user = await prisma.user.findUnique({
+    // Find or create the user with olserra@gmail.com
+    let user = await prisma.user.findUnique({
         where: { email: "olserra@gmail.com" },
     });
 
     if (!user) {
-        console.error("User not found. Please create the user first via the UI.");
-        process.exit(1);
+        user = await prisma.user.create({
+            data: {
+                email: "olserra@gmail.com",
+                name: "Orlando Serra",
+                image: "https://avatars.githubusercontent.com/u/12345678?v=4",
+                emailVerified: new Date(),
+            }
+        });
+        console.log("Created new user:", user);
+    } else {
+        console.log("Found existing user:", user);
     }
-
-    console.log("Found user:", user);
 
     // Delete existing data for this user
     await prisma.data.deleteMany({

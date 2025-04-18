@@ -27,11 +27,13 @@ export class MCPClient {
     private baseUrl: string;
     private bearerToken: string;
     private userId: string;
+    private collectionName: string;
 
     constructor(baseUrl: string, bearerToken: string, userId: string) {
         this.baseUrl = baseUrl;
         this.bearerToken = bearerToken;
         this.userId = userId;
+        this.collectionName = `user_${userId}_memories`;
     }
 
     private async request<T>(
@@ -45,11 +47,24 @@ export class MCPClient {
                 'Authorization': `Bearer ${this.bearerToken}`,
                 'Content-Type': 'application/json',
             },
-            body: body ? JSON.stringify(body) : undefined,
+            body: body ? JSON.stringify({
+                ...body,
+                collection_name: this.collectionName,
+            }) : undefined,
         });
 
         const data = await response.json();
         return data as MCPResponse<T>;
+    }
+
+    async initializeCollection(): Promise<MCPResponse<{ message: string }>> {
+        return this.request('/initialize_collection', 'POST', {
+            collection_name: this.collectionName,
+            metadata: {
+                user_id: this.userId,
+                created_at: new Date().toISOString(),
+            }
+        });
     }
 
     async createMemory(
@@ -62,7 +77,10 @@ export class MCPClient {
             content,
             tags,
             project_id: projectId,
-            metadata,
+            metadata: {
+                ...metadata,
+                user_id: this.userId,
+            },
         });
     }
 
@@ -76,7 +94,10 @@ export class MCPClient {
             memory_id: memoryId,
             content,
             tags,
-            metadata,
+            metadata: {
+                ...metadata,
+                user_id: this.userId,
+            },
         });
     }
 
@@ -85,6 +106,7 @@ export class MCPClient {
     ): Promise<MCPResponse<{ message: string }>> {
         return this.request('/delete_memory', 'POST', {
             memory_id: memoryId,
+            user_id: this.userId,
         });
     }
 
@@ -95,6 +117,7 @@ export class MCPClient {
         return this.request('/assign_to_project', 'POST', {
             memory_id: memoryId,
             project_id: projectId,
+            user_id: this.userId,
         });
     }
 
@@ -105,6 +128,7 @@ export class MCPClient {
         const params = new URLSearchParams();
         if (projectId) params.append('project_id', projectId);
         if (tags) params.append('tags', JSON.stringify(tags));
+        params.append('user_id', this.userId);
 
         return this.request(`/list_memories?${params.toString()}`);
     }
@@ -120,6 +144,7 @@ export class MCPClient {
             project_id: projectId,
             tags,
             n_results: nResults,
+            user_id: this.userId,
         });
     }
 
@@ -133,7 +158,8 @@ export class MCPClient {
             body: JSON.stringify({
                 ...data,
                 userId: this.userId,
-                type: 'TEXT'
+                type: 'TEXT',
+                collection_name: this.collectionName,
             }),
         });
 
@@ -145,7 +171,7 @@ export class MCPClient {
     }
 }
 
-// Hook para usar o cliente MCP
+// Hook to use the MCP client
 export function useMCPClient() {
     const { bearerToken, userId } = useUser();
     

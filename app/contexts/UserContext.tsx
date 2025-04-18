@@ -35,40 +35,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const [bearerToken, setBearerToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [filterLabel, setFilterLabel] = useState<string>('');
+    const [retryCount, setRetryCount] = useState(0);
 
     const fetchUser = async () => {
-        if (!session?.user?.id) return;
+        if (!session?.user?.id) return null;
 
         try {
             const response = await fetch(`/api/users/${session.user.id}`);
             if (response.ok) {
                 const userData = await response.json();
-                setUser(userData);
+                return userData;
             }
+            return null;
         } catch (error) {
             console.error('Error fetching user:', error);
+            return null;
         }
     };
 
     const fetchBearerToken = async () => {
-        if (!session?.user?.id) return;
+        if (!session?.user?.id) return null;
 
         try {
             const response = await fetch(`/api/bearer-token?userId=${session.user.id}`);
-            if (response.ok) {
-                const data = await response.json();
-                setBearerToken(data.key);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch bearer token: ${response.status}`);
             }
+            const data = await response.json();
+            if (!data.key) {
+                throw new Error('No bearer token received');
+            }
+            return data.key;
         } catch (error) {
             console.error('Error fetching bearer token:', error);
+            return null;
         }
     };
 
     const refreshData = async () => {
-        if (!session?.user?.id) return;
+        if (!session?.user?.id || !bearerToken) return;
 
         try {
-            const response = await fetch('/api/data');
+            const response = await fetch('/api/data', {
+                headers: {
+                    'Authorization': `Bearer ${bearerToken}`
+                }
+            });
             if (response.ok) {
                 const { data: dataData } = await response.json();
                 setData(dataData);
@@ -80,21 +92,39 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         let mounted = true;
+        let retryTimeout: NodeJS.Timeout;
 
         const initializeData = async () => {
             if (status === 'authenticated' && mounted) {
                 try {
-                    await Promise.all([
+                    const [userData, token] = await Promise.all([
                         fetchUser(),
-                        fetchBearerToken(),
-                        refreshData()
+                        fetchBearerToken()
                     ]);
+
+                    if (mounted) {
+                        if (userData) {
+                            setUser(userData);
+                        }
+                        
+                        if (token) {
+                            setBearerToken(token);
+                            setRetryCount(0); // Reset retry count on success
+                        } else if (retryCount < 3) { // Retry up to 3 times
+                            setRetryCount(prev => prev + 1);
+                            retryTimeout = setTimeout(initializeData, 2000); // Retry after 2 seconds
+                            return;
+                        }
+                    }
                 } finally {
                     if (mounted) {
                         setIsLoading(false);
                     }
                 }
             } else if (status === 'unauthenticated' && mounted) {
+                setUser(null);
+                setBearerToken(null);
+                setData([]);
                 setIsLoading(false);
             }
         };
@@ -103,8 +133,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         return () => {
             mounted = false;
+            if (retryTimeout) {
+                clearTimeout(retryTimeout);
+            }
         };
-    }, [status]);
+    }, [status, retryCount]);
+
+    // Refresh data when bearer token becomes available
+    useEffect(() => {
+        if (bearerToken) {
+            refreshData();
+        }
+    }, [bearerToken]);
 
     return (
         <UserContext.Provider

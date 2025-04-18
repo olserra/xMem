@@ -1,191 +1,163 @@
 from fastapi import FastAPI, HTTPException, Depends
-from model_context_protocol import MCPServer, MCPFunction, MCPResponse
-from typing import List, Optional, Dict, Any
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
 from .db.chroma_client import ChromaClient
-from .auth import User, get_user_dependency
-import json
+import os
 
 app = FastAPI()
-mcp_server = MCPServer()
-chroma_client = ChromaClient()
 
-# Funções MCP para Memórias
-@mcp_server.function()
+# CORS middleware configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize ChromaClient
+chroma_client = ChromaClient(
+    persist_directory=os.getenv("CHROMA_DB_PATH", "./chroma_db")
+)
+
+class Memory(BaseModel):
+    content: str
+    metadata: Optional[Dict[str, Any]] = {}
+    tags: Optional[List[str]] = []
+    project_id: Optional[str] = None
+    type: Optional[str] = "memory"
+
+class SearchQuery(BaseModel):
+    query: str
+    project_id: Optional[str] = None
+    tags: Optional[List[str]] = None
+    n_results: Optional[int] = 10
+
+class ProjectAssignment(BaseModel):
+    memory_id: str
+    project_id: str
+
+async def get_user_id(authorization: str = Depends(lambda x: x)) -> str:
+    """Extract user ID from authorization header"""
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header required")
+    return authorization  # In production, validate and extract actual user ID
+
+@app.post("/api/collections/initialize")
+async def initialize_collection(user_id: str = Depends(get_user_id)):
+    """Initialize a collection for a user"""
+    try:
+        result = await chroma_client.initialize_collection(user_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/memories")
 async def create_memory(
-    content: str,
-    tags: List[str] = [],
-    project_id: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    memory: Memory,
+    user_id: str = Depends(get_user_id)
+):
+    """Create a new memory"""
     try:
         memory_id = await chroma_client.create_memory(
-            content=content,
-            user_id=user.id,
-            tags=tags,
-            project_id=project_id,
-            metadata=metadata or {}
+            content=memory.content,
+            metadata=memory.metadata,
+            tags=memory.tags or [],
+            project_id=memory.project_id,
+            type=memory.type,
+            user_id=user_id  # Only needed for initial setup
         )
-        return MCPResponse(
-            status="success",
-            data={"memory_id": memory_id}
-        )
+        return {"memory_id": memory_id}
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@mcp_server.function()
+@app.put("/api/memories/{memory_id}")
 async def update_memory(
     memory_id: str,
-    content: Optional[str] = None,
-    tags: Optional[List[str]] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    memory: Memory,
+    _: str = Depends(get_user_id)  # Ensures user is authenticated
+):
+    """Update an existing memory"""
     try:
-        update_metadata = {}
-        if tags is not None:
-            update_metadata["tags"] = tags
-        if metadata:
-            update_metadata.update(metadata)
-            
         await chroma_client.update_memory(
             memory_id=memory_id,
-            user_id=user.id,
-            content=content,
-            metadata=update_metadata if update_metadata else None
+            content=memory.content,
+            metadata=memory.metadata
         )
-        return MCPResponse(
-            status="success",
-            data={"message": "Memory updated successfully"}
-        )
+        return {"status": "success"}
     except ValueError as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=f"Unexpected error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@mcp_server.function()
+@app.delete("/api/memories/{memory_id}")
 async def delete_memory(
     memory_id: str,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    _: str = Depends(get_user_id)  # Ensures user is authenticated
+):
+    """Delete a memory"""
     try:
-        await chroma_client.delete_memory(memory_id, user.id)
-        return MCPResponse(
-            status="success",
-            data={"message": "Memory deleted successfully"}
-        )
+        await chroma_client.delete_memory(memory_id)
+        return {"status": "success"}
     except ValueError as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=f"Unexpected error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@mcp_server.function()
+@app.post("/api/memories/assign")
 async def assign_to_project(
-    memory_id: str,
-    project_id: str,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    assignment: ProjectAssignment,
+    _: str = Depends(get_user_id)  # Ensures user is authenticated
+):
+    """Assign a memory to a project"""
     try:
         await chroma_client.assign_to_project(
-            memory_id=memory_id,
-            user_id=user.id,
-            project_id=project_id
+            memory_id=assignment.memory_id,
+            project_id=assignment.project_id
         )
-        return MCPResponse(
-            status="success",
-            data={"message": "Memory assigned to project successfully"}
-        )
+        return {"status": "success"}
     except ValueError as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=f"Unexpected error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@mcp_server.function()
+@app.get("/api/memories")
 async def list_memories(
     project_id: Optional[str] = None,
     tags: Optional[List[str]] = None,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    _: str = Depends(get_user_id)  # Ensures user is authenticated
+):
+    """List memories, optionally filtered by project and tags"""
     try:
-        memories = await chroma_client.get_project_memories(
-            user_id=user.id,
+        result = await chroma_client.get_project_memories(
             project_id=project_id,
             tags=tags
         )
-        return MCPResponse(
-            status="success",
-            data={"memories": memories}
-        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@mcp_server.function()
+@app.post("/api/memories/search")
 async def semantic_search(
-    query: str,
-    project_id: Optional[str] = None,
-    tags: Optional[List[str]] = None,
-    n_results: int = 10,
-    user: User = Depends(get_user_dependency())
-) -> MCPResponse:
+    query: SearchQuery,
+    _: str = Depends(get_user_id)  # Ensures user is authenticated
+):
+    """Search memories semantically"""
     try:
-        results = await chroma_client.semantic_search(
-            query=query,
-            user_id=user.id,
-            project_id=project_id,
-            tags=tags,
-            n_results=n_results
+        result = await chroma_client.semantic_search(
+            query=query.query,
+            project_id=query.project_id,
+            tags=query.tags,
+            n_results=query.n_results
         )
-        return MCPResponse(
-            status="success",
-            data={"results": results}
-        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
-
-# Funções MCP para Projetos
-@mcp_server.function()
-async def create_project(name: str, description: Optional[str] = None) -> MCPResponse:
-    try:
-        # Implementar criação de projeto
-        return MCPResponse(
-            status="success",
-            data={"message": "Project created successfully"}
-        )
-    except Exception as e:
-        return MCPResponse(
-            status="error",
-            error=str(e)
-        )
-
-# Integração com FastAPI
-app.include_router(mcp_server.router, prefix="/mcp")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

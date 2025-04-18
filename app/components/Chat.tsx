@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
-import { useMCPClient } from '@/app/services/mcp';
+import { MCPClient } from '@/app/services/mcp';
+import { useSession } from 'next-auth/react';
 
 interface Message {
     id: string;
@@ -13,13 +14,45 @@ interface Message {
 }
 
 export default function Chat() {
-    const { user } = useUser();
-    const mcpClient = useMCPClient();
+    const { data: session, status } = useSession();
+    const { user, bearerToken, userId } = useUser();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
+    useEffect(() => {
+        if (status === 'loading') {
+            return;
+        }
+        
+        if (status === 'unauthenticated') {
+            setMessages([{
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: 'Please sign in to use the chat feature.',
+                timestamp: new Date(),
+            }]);
+            setIsInitializing(false);
+            return;
+        }
+        
+        if (status === 'authenticated' && !bearerToken) {
+            setMessages([{
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: 'Initializing chat... Please wait.',
+                timestamp: new Date(),
+            }]);
+            return;
+        }
+        
+        if (status === 'authenticated' && bearerToken) {
+            setIsInitializing(false);
+        }
+    }, [status, bearerToken]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -30,7 +63,7 @@ export default function Chat() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!input.trim() || isLoading) return;
+        if (!input.trim() || isLoading || !bearerToken || status !== 'authenticated') return;
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -44,23 +77,23 @@ export default function Chat() {
         setIsLoading(true);
 
         try {
-            // We'll implement the actual API call later
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${bearerToken}`,
                 },
                 body: JSON.stringify({
                     message: userMessage.content,
-                    userId: user?.id,
+                    userId: userId,
                 }),
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to get response');
+                throw new Error('Failed to get response');
             }
+
+            const data = await response.json();
 
             const assistantMessage: Message = {
                 id: Date.now().toString(),
@@ -72,16 +105,26 @@ export default function Chat() {
             setMessages(prev => [...prev, assistantMessage]);
 
             // Save important information to memory if flagged by the model
-            if (data.shouldSaveToMemory) {
-                await mcpClient.addMemory({
-                    content: data.memoryContent || assistantMessage.content,
-                    metadata: {
-                        type: 'CHAT',
-                        source: 'agent',
-                        created_at: new Date().toISOString(),
-                        tags: data.tags || ['chat'],
-                    }
-                });
+            if (data.shouldSaveToMemory && bearerToken) {
+                try {
+                    const mcpClient = new MCPClient(
+                        process.env.NEXT_PUBLIC_MCP_URL || 'http://localhost:8000/mcp',
+                        bearerToken,
+                        userId
+                    );
+                    
+                    await mcpClient.addMemory({
+                        content: data.memoryContent || assistantMessage.content,
+                        metadata: {
+                            type: 'CHAT',
+                            source: 'agent',
+                            created_at: new Date().toISOString(),
+                            tags: data.tags || ['chat'],
+                        }
+                    });
+                } catch (memoryError) {
+                    console.error('Failed to save to memory:', memoryError);
+                }
             }
         } catch (error) {
             console.error('Chat error:', error);
@@ -95,6 +138,15 @@ export default function Chat() {
             setIsLoading(false);
         }
     };
+
+    if (isInitializing) {
+        return (
+            <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <p className="mt-2 text-gray-600">Initializing chat...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto">
@@ -127,13 +179,13 @@ export default function Chat() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your message..."
+                        placeholder={status === 'authenticated' ? "Type your message..." : "Please sign in to chat"}
                         className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5"
-                        disabled={isLoading}
+                        disabled={isLoading || status !== 'authenticated' || !bearerToken}
                     />
                     <button
                         type="submit"
-                        disabled={isLoading || !input.trim()}
+                        disabled={isLoading || !input.trim() || status !== 'authenticated' || !bearerToken}
                         className="p-2 bg-black text-white rounded-lg disabled:opacity-50"
                     >
                         {isLoading ? (

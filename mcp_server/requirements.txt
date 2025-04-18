@@ -1,0 +1,11 @@
+model-context-protocol
+fastapi>=0.68.0
+uvicorn>=0.15.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.5
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+pydantic>=2.0.0
+asyncpg>=0.27.0  # Para autenticação/usuários
+python-dotenv>=0.19.0 

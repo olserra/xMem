@@ -7,6 +7,7 @@ const nextConfig = {
                 hostname: "**",
             },
         ],
+        domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
     },
     webpack: (config, { isServer }) => {
         // Add a rule to handle binary files
@@ -42,9 +43,6 @@ const nextConfig = {
             };
         }
         return config;
-    },
-    experimental: {
-        serverActions: true,
     },
 }
 

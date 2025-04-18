@@ -68,7 +68,7 @@ const Navbar = () => {
 
   const menuItems = useMemo(() => [
     { label: 'Data', href: '/dashboard/data' },
-    { label: 'Sources', href: '/dashboard/sources' },
+    { label: 'Chat', href: '/dashboard/chat' },
     { label: 'Analysis', href: '/dashboard/analysis' },
   ], []);
 

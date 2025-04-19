@@ -1,5 +1,18 @@
+# xmem - Memory and Project Management
 
-# xmem.xyz - Memory Management for LLMs
+A comprehensive project management system with multiple services.
+
+## Project Structure
+
+```
+xmem/
+├── app/              # Next.js frontend application
+├── services/         # Backend services
+│   ├── mcp_server/  # Main Control Program server
+│   └── whatsapp_agent/ # WhatsApp integration with knowledge base
+├── lib/             # Shared libraries
+└── public/          # Public assets
+```
 
 Welcome to xmem.xyz! This is a simple, open-source tool designed to help you manage context and _data for large language models (LLMs). It allows you to store and persist multiple _data entries, tagged with relevant labels, which can then be copied and used as context for new conversations. This is perfect for improving LLM interactions by reducing hallucinations and increasing performance.
 
@@ -20,7 +33,7 @@ The core functionality is simple yet powerful:
 ### 1. **Learning Progress Tracker**
    - **Example**: As you study new topics, you can add entries like "I learned Python" or "I am improving my skills in data science".
    - **Tags**: Skills, Technology, Learning
-   - **How It Helps**: When you interact with an LLM, you can provide your learning history, which improves the LLM’s understanding of your knowledge base and enables better, context-aware answers.
+   - **How It Helps**: When you interact with an LLM, you can provide your learning history, which improves the LLM's understanding of your knowledge base and enables better, context-aware answers.
 
 ### 2. **Personal Facts and Preferences**
    - **Example**: Save important personal facts like "I enjoy hiking" or "I prefer early morning meetings".
@@ -75,4 +88,12 @@ For more detailed contributing instructions, check out [CONTRIBUTING.md](./CONTR
 
 ---
 
-Thank you for being part of xmem.xyz. Let’s make LLMs smarter together!
+Thank you for being part of xmem.xyz. Let's make LLMs smarter together!
+
+## Services
+
+### MCP Server
+The main control program server that handles core functionality. See [services/mcp_server/README.md](services/mcp_server/README.md) for details.
+
+### WhatsApp Agent
+A service that provides WhatsApp integration with knowledge base capabilities. See [services/whatsapp_agent/README.md](services/whatsapp_agent/README.md) for details.

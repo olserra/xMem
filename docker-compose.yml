@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      - NODE_ENV=production
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  whatsapp-agent:
+    build:
+      context: ./services/whatsapp_agent
+      dockerfile: Dockerfile
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./services/whatsapp_agent:/app
+    depends_on:
+      - chroma
+
+  chroma:
+    image: chromadb/chroma
+    volumes:
+      - chroma_data:/chroma/data
+    environment:
+      - CHROMA_DB_IMPL=duckdb+parquet
+      - PERSIST_DIRECTORY=/chroma/data
+    ports:
+      - "8000:8000"
+
+volumes:
+  n8n_data:
+  chroma_data: 

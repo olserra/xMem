@@ -1,4 +1,3 @@
-model-context-protocol
 fastapi==0.109.2
 uvicorn==0.27.1
 python-jose[cryptography]>=3.3.0

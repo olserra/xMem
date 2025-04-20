@@ -13,6 +13,14 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+**/venv/
+**/env/
+
 # Build
 .next/
 dist/
@@ -47,4 +55,18 @@ chroma/
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Large binary files
+*.so
+*.dylib
+*.dll
+*.pyd
+
+# Model files and caches
+**/.cache/
+**/torch/
+**/onnxruntime/
+**/transformers/
+**/models/
+**/.pytorch/ 

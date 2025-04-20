@@ -69,4 +69,66 @@ temp/
 **/onnxruntime/
 **/transformers/
 **/models/
-**/.pytorch/ 
+**/.pytorch/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+.env.*
+!.env.*.example
+
+# Large binary files and libraries
+*.dylib
+*.so
+*.dll
+*.pyd
+*.lib
+*.a
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+services/mcp_server/venv/
+**/node_modules/
+**/.next/
+**/dist/
+**/build/ 

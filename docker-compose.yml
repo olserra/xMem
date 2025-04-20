@@ -1,40 +1,165 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app:delegated
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.docker
+    environment:
+      - NODE_ENV=development
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-development-secret}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/xmem}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-your-google-client-id}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+    depends_on:
+      - backend
+    networks:
+      - xmem_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-docker}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app:delegated
+    env_file:
+      - .env.docker
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/xmem}
+      - SECRET_KEY=${SECRET_KEY:-your-development-secret-key}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-your-google-client-id}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-your-openai-api-key}
+      - CHROMA_HOST=${CHROMA_HOST:-chroma}
+      - CHROMA_PORT=${CHROMA_PORT:-8000}
+    depends_on:
+      - postgres
+      - chroma
+    networks:
+      - xmem_network
+
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "${CHROMA_PORT:-8001}:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - CHROMA_DB_IMPL=clickhouse
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=8123
+    depends_on:
+      - clickhouse
+    networks:
+      - xmem_network
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "${CLICKHOUSE_PORT:-8123}:8123"
+      - "${CLICKHOUSE_TCP_PORT:-9000}:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    networks:
+      - xmem_network
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    env_file:
+      - .env.docker
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DATABASE:-xmem}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - xmem_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DATABASE:-xmem}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   n8n:
     image: n8nio/n8n
     ports:
-      - "5678:5678"
+      - "${N8N_PORT:-5678}:5678"
+    env_file:
+      - .env.docker
     environment:
       - N8N_HOST=${N8N_HOST:-localhost}
-      - N8N_PORT=5678
       - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
-      - N8N_USER_MANAGEMENT_DISABLED=true
-      - NODE_ENV=production
+      - N8N_PORT=${N8N_PORT:-5678}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DATABASE:-xmem}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-postgres}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - n8n_data:/home/node/.n8n
-
-  whatsapp-agent:
-    build:
-      context: ./services/whatsapp_agent
-      dockerfile: Dockerfile
-    environment:
-      - PYTHONUNBUFFERED=1
-    volumes:
-      - ./services/whatsapp_agent:/app
     depends_on:
-      - chroma
+      postgres:
+        condition: service_healthy
+    networks:
+      - xmem_network
 
-  chroma:
-    image: chromadb/chroma
-    volumes:
-      - chroma_data:/chroma/data
-    environment:
-      - CHROMA_DB_IMPL=duckdb+parquet
-      - PERSIST_DIRECTORY=/chroma/data
+  prometheus:
+    image: prom/prometheus
     ports:
-      - "8000:8000"
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - xmem_network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    volumes:
+      - ./monitoring/grafana:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - .env.docker
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - xmem_network
+
+networks:
+  xmem_network:
+    driver: bridge
 
 volumes:
+  postgres_data:
   n8n_data:
-  chroma_data: 
+  prometheus_data:
+  grafana_data:
+  chroma_data:
+  clickhouse_data: 

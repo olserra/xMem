@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "xmem-backend"
+version = "0.1.0"
+description = "Backend API for xmem application"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+sqlalchemy = "^2.0.25"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.13.1"
+httpx = "^0.26.0"
+chromadb = "^0.4.22"
+transformers = "^4.38.2"
+torch = "^2.2.1"
+numpy = "1.24.3"
+prometheus-fastapi-instrumentator = "^6.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+pytest-cov = "^4.1.0"
+black = "^23.12.1"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3 

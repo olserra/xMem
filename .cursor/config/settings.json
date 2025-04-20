@@ -1,0 +1,10 @@
+{
+  "terminal.integrated.defaultProfile.osx": "Warp",
+  "terminal.integrated.profiles.osx": {
+    "Warp": {
+      "path": "/Applications/Warp.app/Contents/MacOS/warp",
+      "args": ["--single-instance"]
+    }
+  },
+  "terminal.external.osxExec": "Warp.app"
+} 

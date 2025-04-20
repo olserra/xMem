@@ -1,37 +1,50 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.docker.example
+!.env.production.example
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
 
-# testing
-/coverage
+# Build
+.next/
+dist/
+build/
+*.egg-info/
 
-# next.js
-/.next/
-/out/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
-.env
+# System
+.DS_Store
+Thumbs.db
 
-# vercel
-.vercel
+# Docker
+docker-compose.override.yml
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Database
+*.sqlite
+*.db
+
+# ChromaDB
+chroma/
+
+# Temporary files
+tmp/
+temp/ 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Code, PlusCircle, RefreshCw } from 'lucide-react';
+import { PlusCircle, RefreshCw } from 'lucide-react';
 import ApiEndpointCard from '../components/integration/ApiEndpointCard';
 import CodeSnippet from '../components/integration/CodeSnippet';
 
@@ -93,9 +93,9 @@ const IntegrationHub: React.FC = () => {
                   <h3 className="text-sm font-medium text-slate-500 mb-2">ENDPOINT</h3>
                   <div className="flex items-center gap-2 p-3 bg-slate-100 rounded-md">
                     <span className={`text-xs font-bold px-2 py-1 rounded ${endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800' :
-                        endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
-                          endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
-                            'bg-rose-100 text-rose-800'
+                      endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
+                        endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
+                          'bg-rose-100 text-rose-800'
                       }`}>
                       {endpoint.method}
                     </span>

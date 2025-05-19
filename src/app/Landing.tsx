@@ -1,8 +1,6 @@
 'use client';
 import React from 'react';
-import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Layers, ListChecks, BarChart3, Users, Settings, Cloud, FileText, RefreshCw, Cpu, Clock } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 // import { useAuth } from '../components/auth/AuthContext';
 
@@ -14,7 +12,6 @@ export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
 };
 
 const Landing: React.FC = () => {
-    const router = useRouter();
     // const { user } = useAuth(); // No longer needed in hero
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
@@ -132,7 +129,7 @@ const Landing: React.FC = () => {
             {/* Problem/Solution */}
             <div className="container mx-auto px-6 py-12 text-center">
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">LLMs forget. Your users notice.</h2>
-                <p className="text-lg text-slate-300 mb-6">Stop losing context and knowledge between sessions. MemOrchestra orchestrates both persistent and session memory for every LLM call—so your AI is always relevant, accurate, and up-to-date.</p>
+                <p className="text-lg text-slate-300 mb-6">Stop losing context and knowledge between sessions. MemOrchestra orchestrates both persistent and session memory for every LLM callso your AI is always relevant, accurate, and up-to-date.</p>
             </div>
             {/* How It Works */}
             <div className="container mx-auto px-6 py-12">
@@ -151,7 +148,7 @@ const Landing: React.FC = () => {
                     <div className="bg-slate-800/60 p-6 rounded-xl border border-slate-700 flex flex-col items-center">
                         <Zap size={32} className="text-teal-400 mb-3" />
                         <h3 className="text-lg font-semibold text-white mb-2">RAG Orchestration</h3>
-                        <p className="text-slate-300 text-center">Automatically assemble the best context for every LLM call—no manual tuning needed.</p>
+                        <p className="text-slate-300 text-center">Automatically assemble the best context for every LLM callno manual tuning needed.</p>
                     </div>
                 </div>
             </div>
@@ -159,10 +156,10 @@ const Landing: React.FC = () => {
             <div className="container mx-auto px-6 py-12">
                 <h2 className="text-2xl font-bold text-white text-center mb-8">Why MemOrchestra?</h2>
                 <ul className="max-w-2xl mx-auto text-left text-slate-300 space-y-3 text-lg">
-                    <li><span className="text-teal-400 font-bold">•</span> Never lose user knowledge or context again</li>
-                    <li><span className="text-teal-400 font-bold">•</span> Boost LLM accuracy and relevance</li>
-                    <li><span className="text-teal-400 font-bold">•</span> Works with any open-source LLM (Llama, Mistral, etc.)</li>
-                    <li><span className="text-teal-400 font-bold">•</span> Easy API and dashboard for integration and monitoring</li>
+                    <li><span className="text-teal-400 font-bold"></span> Never lose user knowledge or context again</li>
+                    <li><span className="text-teal-400 font-bold"></span> Boost LLM accuracy and relevance</li>
+                    <li><span className="text-teal-400 font-bold"></span> Works with any open-source LLM (Llama, Mistral, etc.)</li>
+                    <li><span className="text-teal-400 font-bold"></span> Easy API and dashboard for integration and monitoring</li>
                 </ul>
             </div>
 
@@ -186,7 +183,6 @@ const Landing: React.FC = () => {
                         </div>
                         <div className="relative h-64 mb-4">
                             <div className="absolute inset-0 flex items-center justify-center">
-                                {/* Vector Space Visualization */}
                                 <div className="relative w-full h-full">
                                     {Array.from({ length: 24 }).map((_, i) => {
                                         const x = 20 + Math.random() * 60;
@@ -256,7 +252,6 @@ const Landing: React.FC = () => {
                             </div>
                         </div>
                         <div className="relative h-64 mb-4">
-                            {/* Memory Flow Visualization */}
                             <div className="absolute inset-0">
                                 <div className="relative h-full">
                                     {/* Memory Layers */}
@@ -344,7 +339,7 @@ const Landing: React.FC = () => {
                         <div className="text-white"> orchestrator.query({'{'}</div>
                         <div className="pl-4 text-slate-300">
                             input: </div>
-                        <div className="text-amber-300">"Tell me about our previous discussion"</div>
+                        <div className="text-amber-300">&quot;Tell me about our previous discussion&quot;</div>
                         <div className="text-white">{'});'}</div>
                     </div>
                 </div>
@@ -366,7 +361,7 @@ const Landing: React.FC = () => {
                         </div>
                     </div>
                     <div className="mt-8 text-center text-slate-500 text-sm">
-                        © 2025 MemOrchestra. All rights reserved.
+                        2025 MemOrchestra. All rights reserved.
                     </div>
                 </div>
             </footer>

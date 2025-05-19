@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Plus, Search, Filter, RefreshCw, Database, History } from 'lucide-react';
+import { Search, Filter, Database, History } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
 import MemoryItemList from '../components/memory/MemoryItemList';
 

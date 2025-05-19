@@ -1,10 +1,21 @@
 'use client';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const AuthContext = createContext({ user: null, loading: true });
+// Define a User type
+interface User {
+    name: string;
+    // Add more fields as needed
+}
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+interface AuthContextType {
+    user: User | null;
+    loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, ArrowUpRight, Database, Cpu, Clock, Users } from 'lucide-react';
+import { ArrowUpRight, Database, Cpu, Clock, Users } from 'lucide-react';
 import MetricCard from '../components/dashboard/MetricCard';
 import MemoryUsageChart from '../components/dashboard/MemoryUsageChart';
 import ContextRelevanceChart from '../components/dashboard/ContextRelevanceChart';

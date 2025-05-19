@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../../../prisma/prisma";
+import { Session } from "next-auth";
 
 const options = {
   providers: [
@@ -23,14 +24,16 @@ const options = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn({ user, account, profile }: { user: any; account: any; profile: any }) {
+    async signIn({ user, account, profile }: { user: unknown; account: unknown; profile: unknown }) {
       console.log("SignIn Attempt:", { user, account, profile });
       return true;
     },
-    async session({ session, token, user }: { session: any; token: any; user: any }) {
+    async session({ session, token, user }: { session: Session; token: unknown; user: unknown }) {
       console.log("Session Callback:", { session, token, user });
-      session.user.id = user.id as string;
-      return session;
+      if (session.user) {
+        (session.user as { id?: string }).id = (user as { id?: string }).id as string;
+      }
+      return session as Session;
     },
     async redirect() {
       return "/dashboard";

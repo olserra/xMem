@@ -1,0 +1,3 @@
+# Ignore Prisma generated files
+src/generated/prisma/**
+src/generated/prisma/runtime/** 

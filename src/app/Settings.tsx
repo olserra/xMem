@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Save, Trash, RefreshCw, AlertTriangle, Lock, Database, LayoutDashboard, PlusCircle } from 'lucide-react';
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab] = useState('general');
 
   // Example settings
   const memorySettings = {

@@ -209,7 +209,6 @@ const Landing: React.FC = () => {
                                             </div>
                                         );
                                     })}
-                                    {/* Connection Lines */}
                                     <svg className="absolute inset-0 w-full h-full">
                                         <path
                                             d="M 30% 40% L 45% 35% L 60% 45% L 70% 30%"
@@ -254,12 +253,10 @@ const Landing: React.FC = () => {
                         <div className="relative h-64 mb-4">
                             <div className="absolute inset-0">
                                 <div className="relative h-full">
-                                    {/* Memory Layers */}
                                     <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-r from-purple-500/20 via-indigo-500/20 to-teal-500/20 rounded-lg border border-slate-700/50"></div>
                                     <div className="absolute inset-x-0 top-20 h-16 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-indigo-500/20 rounded-lg border border-slate-700/50"></div>
                                     <div className="absolute inset-x-0 top-40 h-16 bg-gradient-to-r from-indigo-500/20 via-teal-500/20 to-purple-500/20 rounded-lg border border-slate-700/50"></div>
 
-                                    {/* Flow Lines */}
                                     {Array.from({ length: 5 }).map((_, i) => (
                                         <div
                                             key={i}
@@ -271,7 +268,6 @@ const Landing: React.FC = () => {
                                         ></div>
                                     ))}
 
-                                    {/* Memory Nodes */}
                                     {Array.from({ length: 6 }).map((_, i) => (
                                         <div
                                             key={i}
@@ -315,7 +311,7 @@ const Landing: React.FC = () => {
                         <span className="text-slate-400 text-sm ml-2">memory-orchestration.ts</span>
                     </div>
                     <div className="p-6 font-mono text-sm">
-                        <div className="text-slate-400">// Initialize memory orchestrator</div>
+                        <div className="text-slate-400">{/* Initialize memory orchestrator */}</div>
                         <div className="text-indigo-300">const</div>
                         <div className="text-white"> orchestrator = </div>
                         <div className="text-teal-300">new</div>
@@ -332,7 +328,7 @@ const Landing: React.FC = () => {
                             llmProvider: </div>
                         <div className="text-purple-300">mistral</div>
                         <div className="text-white">{'});'}</div>
-                        <div className="mt-4 text-slate-400">// Retrieve context-aware response</div>
+                        <div className="mt-4 text-slate-400">{/* Retrieve context-aware response */}</div>
                         <div className="text-indigo-300">const</div>
                         <div className="text-white"> response = </div>
                         <div className="text-teal-300">await</div>

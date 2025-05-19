@@ -22,7 +22,7 @@ const Landing: React.FC = () => {
                     <h1 className="text-4xl md:text-6xl font-bold text-white">Hybrid Memory for LLMs</h1>
                 </div>
                 <p className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8">
-                    Instantly supercharge your LLM apps with MemOrchestra: combine long-term knowledge and real-time context for smarter, more relevant AI.
+                    Instantly supercharge your LLM apps with xmem: combine long-term knowledge and real-time context for smarter, more relevant AI.
                 </p>
                 <button
                     className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6"
@@ -129,7 +129,7 @@ const Landing: React.FC = () => {
             {/* Problem/Solution */}
             <div className="container mx-auto px-6 py-12 text-center">
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">LLMs forget. Your users notice.</h2>
-                <p className="text-lg text-slate-300 mb-6">Stop losing context and knowledge between sessions. MemOrchestra orchestrates both persistent and session memory for every LLM callso your AI is always relevant, accurate, and up-to-date.</p>
+                <p className="text-lg text-slate-300 mb-6">Stop losing context and knowledge between sessions. xmem orchestrates both persistent and session memory for every LLM callso your AI is always relevant, accurate, and up-to-date.</p>
             </div>
             {/* How It Works */}
             <div className="container mx-auto px-6 py-12">
@@ -154,7 +154,7 @@ const Landing: React.FC = () => {
             </div>
             {/* Benefits */}
             <div className="container mx-auto px-6 py-12">
-                <h2 className="text-2xl font-bold text-white text-center mb-8">Why MemOrchestra?</h2>
+                <h2 className="text-2xl font-bold text-white text-center mb-8">Why xmem?</h2>
                 <ul className="max-w-2xl mx-auto text-left text-slate-300 space-y-3 text-lg">
                     <li><span className="text-teal-400 font-bold"></span> Never lose user knowledge or context again</li>
                     <li><span className="text-teal-400 font-bold"></span> Boost LLM accuracy and relevance</li>
@@ -315,7 +315,7 @@ const Landing: React.FC = () => {
                         <div className="text-indigo-300">const</div>
                         <div className="text-white"> orchestrator = </div>
                         <div className="text-teal-300">new</div>
-                        <div className="text-white"> MemOrchestra({'{'}</div>
+                        <div className="text-white"> xmem({'{'}</div>
                         <div className="pl-4 text-slate-300">
                             vectorStore: </div>
                         <div className="text-purple-300">chromadb</div>
@@ -347,7 +347,7 @@ const Landing: React.FC = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <div className="flex items-center gap-2 mb-4 md:mb-0">
                             <Brain size={24} className="text-teal-400" />
-                            <span className="text-white font-bold text-xl">MemOrchestra</span>
+                            <span className="text-white font-bold text-xl">xmem</span>
                         </div>
                         <div className="flex gap-6 text-slate-400">
                             <a href="#" className="hover:text-white transition-colors">About</a>
@@ -357,7 +357,7 @@ const Landing: React.FC = () => {
                         </div>
                     </div>
                     <div className="mt-8 text-center text-slate-500 text-sm">
-                        2025 MemOrchestra. All rights reserved.
+                        2025 xmem. All rights reserved.
                     </div>
                 </div>
             </footer>

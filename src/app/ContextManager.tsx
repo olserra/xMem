@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Sliders, Search, Shuffle, Clock, FileText, ArrowDownWideNarrow } from 'lucide-react';
 import ContextPreview from '../components/context/ContextPreview';
@@ -7,7 +9,7 @@ import ContextSourceList from '../components/context/ContextSourceList';
 const ContextManager: React.FC = () => {
   const [selectedSource, setSelectedSource] = useState('all');
   const [rankingMethod, setRankingMethod] = useState('smart');
-  
+
   // Example context configuration
   const contextConfig = {
     maxSize: 4000,
@@ -19,7 +21,7 @@ const ContextManager: React.FC = () => {
       feedback: 0.1,
     },
   };
-  
+
   // Available ranking methods
   const rankingMethods = [
     { id: 'smart', name: 'Smart Ranking', icon: <Shuffle size={16} /> },
@@ -27,22 +29,15 @@ const ContextManager: React.FC = () => {
     { id: 'recency', name: 'Recency', icon: <Clock size={16} /> },
     { id: 'manual', name: 'Manual Selection', icon: <ArrowDownWideNarrow size={16} /> },
   ];
-  
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Context Manager</h1>
-        <p className="text-slate-500 mt-1">Select, rank, and optimize context for LLM inputs</p>
-      </div>
-      
       {/* Context management interface */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left sidebar with context sources */}
         <div className="lg:w-80 flex-shrink-0 bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="p-4 border-b border-slate-200">
             <h2 className="font-medium text-slate-800">Context Sources</h2>
-            
             <div className="relative mt-3">
               <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
               <input
@@ -52,25 +47,21 @@ const ContextManager: React.FC = () => {
               />
             </div>
           </div>
-          
-          <ContextSourceList 
-            selectedSource={selectedSource} 
-            onSourceSelect={setSelectedSource} 
+          <ContextSourceList
+            selectedSource={selectedSource}
+            onSourceSelect={setSelectedSource}
           />
         </div>
-        
         {/* Main content area with context preview */}
         <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Context preview header */}
           <div className="p-4 flex justify-between items-center border-b border-slate-200">
             <h2 className="font-medium text-slate-800">Context Preview</h2>
-            
             <div className="flex items-center gap-2">
               <button className="flex items-center gap-1 px-3 py-1.5 border border-slate-300 rounded-md text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                 <Sliders size={14} />
                 <span>Settings</span>
               </button>
-              
               <select
                 value={rankingMethod}
                 onChange={(e) => setRankingMethod(e.target.value)}
@@ -84,19 +75,17 @@ const ContextManager: React.FC = () => {
               </select>
             </div>
           </div>
-          
           {/* Context preview and controls */}
           <div className="flex flex-col md:flex-row h-[calc(100%-57px)]">
             <div className="flex-1 border-r border-slate-200 overflow-y-auto">
-              <ContextPreview 
+              <ContextPreview
                 method={rankingMethod}
                 maxSize={contextConfig.maxSize}
                 currentSize={contextConfig.currentSize}
               />
             </div>
-            
             <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 overflow-y-auto">
-              <RankingControls 
+              <RankingControls
                 method={rankingMethod}
                 factors={contextConfig.rankingFactors}
                 onFactorChange={(factor, value) => {

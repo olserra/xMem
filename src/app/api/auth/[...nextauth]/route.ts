@@ -33,7 +33,7 @@ const options = {
       return session;
     },
     async redirect() {
-      return "/dashboard/projects";
+      return "/dashboard";
     },
   },
 

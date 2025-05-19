@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Plus, Search, Filter, RefreshCw, Database, History } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
@@ -5,7 +6,7 @@ import MemoryItemList from '../components/memory/MemoryItemList';
 
 const MemoryManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState('vectorDb');
-  
+
   // Example memory sources
   const memorySources = [
     {
@@ -36,70 +37,46 @@ const MemoryManager: React.FC = () => {
       icon: <Database size={24} className="text-purple-600" />,
     },
   ];
-  
+
   // Filter memory sources based on active tab
-  const filteredSources = activeTab === 'all' 
-    ? memorySources 
+  const filteredSources = activeTab === 'all'
+    ? memorySources
     : memorySources.filter(source => source.type === activeTab);
-  
+
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Memory Manager</h1>
-          <p className="text-slate-500 mt-1">Manage your hybrid memory sources and entries</p>
-        </div>
-        
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-            <Plus size={16} />
-            <span>Add Source</span>
-          </button>
-          
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors">
-            <RefreshCw size={16} />
-            <span>Sync All</span>
-          </button>
-        </div>
-      </div>
-      
       {/* Tabs */}
       <div className="border-b border-slate-200">
         <nav className="flex space-x-8" aria-label="Memory Sources">
           <button
             onClick={() => setActiveTab('all')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'all'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-            }`}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'all'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
           >
             All Sources
           </button>
           <button
             onClick={() => setActiveTab('vectorDb')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'vectorDb'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-            }`}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'vectorDb'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
           >
             Vector DB
           </button>
           <button
             onClick={() => setActiveTab('session')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'session'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-            }`}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'session'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
           >
             Session Memory
           </button>
         </nav>
       </div>
-      
       {/* Search and filters */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
@@ -110,20 +87,17 @@ const MemoryManager: React.FC = () => {
             className="pl-10 pr-4 py-2 w-full border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
-        
         <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors">
           <Filter size={16} />
           <span>Filters</span>
         </button>
       </div>
-      
       {/* Memory sources grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSources.map((source) => (
           <MemorySourceCard key={source.id} source={source} />
         ))}
       </div>
-      
       {/* Memory items */}
       <div className="bg-white rounded-lg shadow-sm mt-8">
         <div className="px-6 py-4 border-b border-slate-200">

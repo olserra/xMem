@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Code, PlusCircle, RefreshCw } from 'lucide-react';
 import ApiEndpointCard from '../components/integration/ApiEndpointCard';
@@ -5,7 +7,7 @@ import CodeSnippet from '../components/integration/CodeSnippet';
 
 const IntegrationHub: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState('query');
-  
+
   // Example API endpoints
   const endpoints = [
     {
@@ -44,10 +46,10 @@ const IntegrationHub: React.FC = () => {
       description: 'Add, update, or delete items in the memory store.',
     },
   ];
-  
+
   // Get the selected endpoint
   const endpoint = endpoints.find((e) => e.id === selectedEndpoint);
-  
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -55,7 +57,7 @@ const IntegrationHub: React.FC = () => {
         <h1 className="text-2xl font-bold text-slate-800">Integration Hub</h1>
         <p className="text-slate-500 mt-1">API endpoints and integration guides for using the Memory Orchestrator</p>
       </div>
-      
+
       {/* API endpoints grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {endpoints.map((ep) => (
@@ -66,14 +68,14 @@ const IntegrationHub: React.FC = () => {
             onSelect={() => setSelectedEndpoint(ep.id)}
           />
         ))}
-        
+
         {/* Add new endpoint card */}
         <div className="rounded-lg border-2 border-dashed border-slate-300 bg-transparent p-6 flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 hover:border-indigo-400 transition-colors cursor-pointer">
           <PlusCircle size={24} className="mb-2" />
           <p className="text-sm font-medium">Add Custom Endpoint</p>
         </div>
       </div>
-      
+
       {/* API documentation */}
       {endpoint && (
         <div className="bg-white rounded-lg shadow-sm mt-6">
@@ -82,7 +84,7 @@ const IntegrationHub: React.FC = () => {
               {endpoint.name} API
             </h2>
           </div>
-          
+
           <div className="p-6">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Left column: API details */}
@@ -90,23 +92,22 @@ const IntegrationHub: React.FC = () => {
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-slate-500 mb-2">ENDPOINT</h3>
                   <div className="flex items-center gap-2 p-3 bg-slate-100 rounded-md">
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                      endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800' :
-                      endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
-                      endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
-                      'bg-rose-100 text-rose-800'
-                    }`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded ${endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800' :
+                        endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
+                          endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
+                            'bg-rose-100 text-rose-800'
+                      }`}>
                       {endpoint.method}
                     </span>
                     <code className="text-sm font-mono text-slate-800">{endpoint.path}</code>
                   </div>
                 </div>
-                
+
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-slate-500 mb-2">DESCRIPTION</h3>
                   <p className="text-slate-700">{endpoint.description}</p>
                 </div>
-                
+
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-slate-500 mb-2">PARAMETERS</h3>
                   <div className="border rounded-md overflow-hidden">
@@ -144,7 +145,7 @@ const IntegrationHub: React.FC = () => {
                             </tr>
                           </>
                         )}
-                        
+
                         {selectedEndpoint === 'session' && (
                           <>
                             <tr>
@@ -159,7 +160,7 @@ const IntegrationHub: React.FC = () => {
                             </tr>
                           </>
                         )}
-                        
+
                         {selectedEndpoint === 'feedback' && (
                           <>
                             <tr>
@@ -184,7 +185,7 @@ const IntegrationHub: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Right column: Code examples */}
               <div className="lg:w-1/2">
                 <div className="mb-4 flex justify-between items-center">
@@ -195,9 +196,9 @@ const IntegrationHub: React.FC = () => {
                     <button className="text-xs text-slate-500 hover:text-slate-700">cURL</button>
                   </div>
                 </div>
-                
+
                 <CodeSnippet endpoint={endpoint} />
-                
+
                 <button className="mt-4 flex items-center gap-2 text-indigo-600 text-sm hover:text-indigo-800">
                   <RefreshCw size={14} />
                   <span>Regenerate Example</span>

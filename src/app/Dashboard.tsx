@@ -5,8 +5,15 @@ import MemoryUsageChart from '../components/dashboard/MemoryUsageChart';
 import ContextRelevanceChart from '../components/dashboard/ContextRelevanceChart';
 import RecentQueriesTable from '../components/dashboard/RecentQueriesTable';
 
-// Import the MetricCardProps type
-import type { MetricCardProps } from '../components/dashboard/MetricCard';
+// Remove the import for MetricCardProps and define the type locally
+// interface MetricCardProps is not exported from MetricCard, so define it here
+interface MetricCardProps {
+  title: string;
+  value: string;
+  change: string;
+  trend: 'up' | 'down' | 'neutral';
+  icon: React.ReactNode;
+}
 
 const Dashboard: React.FC = () => {
   // Example metrics data
@@ -43,19 +50,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page title and description */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">Memory Orchestrator Dashboard</h1>
-        <p className="text-slate-500 mt-1">Monitor your hybrid memory system performance at a glance</p>
-      </div>
-
       {/* Metrics row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((metric, index) => (
           <MetricCard key={index} {...metric} />
         ))}
       </div>
-
       {/* Charts section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -67,7 +67,6 @@ const Dashboard: React.FC = () => {
           </div>
           <MemoryUsageChart />
         </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-slate-800">Context Relevance Scores</h2>
@@ -78,7 +77,6 @@ const Dashboard: React.FC = () => {
           <ContextRelevanceChart />
         </div>
       </div>
-
       {/* Recent queries table */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">

@@ -48,11 +48,6 @@ const ContextRelevanceChart: React.FC = () => {
           );
         })}
       </div>
-
-      {/* Chart overlay message */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <p className="text-slate-400 text-sm italic">Interactive relevance visualization will render here</p>
-      </div>
     </div>
   );
 };

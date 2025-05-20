@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Memory Orchestra',
-    description: 'Your personal memory assistant',
+    title: 'Xmem',
+    description: 'Memory Orchestrator for LLMs',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

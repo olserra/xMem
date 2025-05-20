@@ -1,8 +1,7 @@
 'use client';
 import React from 'react';
 import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
-import { signIn } from 'next-auth/react';
-// import { useAuth } from '../components/auth/AuthContext';
+import { signIn, useSession, SessionProvider } from 'next-auth/react';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -12,24 +11,34 @@ export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
 };
 
 const Landing: React.FC = () => {
-    // const { user } = useAuth(); // No longer needed in hero
+    const { data: session, status } = useSession();
+    const loading = status === 'loading';
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
             {/* Hero Section */}
             <div className="container mx-auto px-6 py-20 flex flex-col items-center text-center">
                 <div className="flex items-center gap-3 mb-6">
                     <Brain size={48} className="text-teal-400" />
-                    <h1 className="text-4xl md:text-6xl font-bold text-white">Hybrid Memory for LLMs</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold text-white">Memory Orchestrator for LLMs</h1>
                 </div>
                 <p className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8">
-                    Instantly supercharge your LLM apps with xmem: combine long-term knowledge and real-time context for smarter, more relevant AI.
+                    Instantly supercharge your LLM apps with xmem: a hybrid memory, that combines long-term knowledge and real-time context for smarter, more relevant AI.
                 </p>
-                <button
-                    className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6 cursor-pointer"
-                    onClick={handleSignIn}
-                >
-                    Get Started Free <ArrowRight size={20} />
-                </button>
+                {!loading && session ? (
+                    <a
+                        href="/dashboard"
+                        className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6 cursor-pointer"
+                    >
+                        Go to dashboard <ArrowRight size={20} />
+                    </a>
+                ) : (
+                    <button
+                        className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6 cursor-pointer"
+                        onClick={handleSignIn}
+                    >
+                        Get Started Free <ArrowRight size={20} />
+                    </button>
+                )}
                 {/* Visual Demo Placeholder */}
                 <div className="w-full max-w-4xl bg-white/10 backdrop-blur-sm rounded-xl border border-slate-700 p-6 mb-12">
                     <div className="flex items-center justify-between mb-4">
@@ -365,4 +374,10 @@ const Landing: React.FC = () => {
     );
 };
 
-export default Landing;
+export default function LandingWithSession() {
+    return (
+        <SessionProvider>
+            <Landing />
+        </SessionProvider>
+    );
+}

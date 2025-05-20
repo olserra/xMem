@@ -39,7 +39,7 @@ const Settings: React.FC = () => {
           {['general', 'memory', 'context', 'api', 'visuals'].map(tab => (
             <button
               key={tab}
-              className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
+              className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors cursor-pointer ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
               onClick={() => setActiveTab(tab as typeof activeTab)}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}

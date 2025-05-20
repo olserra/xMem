@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const isAuthenticated = Boolean(request.cookies.get('auth_token'));
+  // Check for NextAuth session cookies (default and secure)
+  const sessionToken =
+    request.cookies.get('next-auth.session-token') ||
+    request.cookies.get('__Secure-next-auth.session-token');
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard');
 
-  if (isDashboard && !isAuthenticated) {
+  if (isDashboard && !sessionToken) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

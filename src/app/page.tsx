@@ -1,5 +1,5 @@
-import Landing from "./Landing";
+import { default as LandingWithSession } from "./Landing";
 
 export default function Home() {
-  return <Landing />;
+  return <LandingWithSession />;
 }

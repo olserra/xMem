@@ -1,7 +1,8 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
 import { signIn, useSession, SessionProvider } from 'next-auth/react';
+import Header from './Header';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -13,14 +14,43 @@ export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
 const Landing: React.FC = () => {
     const { data: session, status } = useSession();
     const loading = status === 'loading';
+
+    // Fix hydration mismatch: generate random bubble data only on client
+    const [bubbles, setBubbles] = useState<Array<{ size: number; color: string; x: number; y: number }>>([]);
+    useEffect(() => {
+        const colors = [
+            'bg-teal-500/40', 'bg-indigo-500/40', 'bg-purple-500/40', 'bg-amber-500/40'
+        ];
+        setBubbles(
+            Array.from({ length: 12 }).map(() => {
+                const size = 12 + Math.floor(Math.random() * 24);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const x = Math.random() * 10 - 5;
+                const y = Math.random() * 10 - 5;
+                return { size, color, x, y };
+            })
+        );
+    }, []);
+
+    // Fix hydration mismatch: generate random vector data for Vector Database Integration only on client
+    const [vectorBubbles, setVectorBubbles] = useState<Array<{ x: number; y: number; size: number; i: number }>>([]);
+    useEffect(() => {
+        setVectorBubbles(
+            Array.from({ length: 24 }).map((_, i) => {
+                const x = 20 + Math.random() * 60;
+                const y = 20 + Math.random() * 60;
+                const size = 6 + Math.random() * 12;
+                return { x, y, size, i };
+            })
+        );
+    }, []);
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+            <Header />
             {/* Hero Section */}
             <div className="container mx-auto px-6 py-20 flex flex-col items-center text-center">
-                <div className="flex items-center gap-3 mb-6">
-                    <Brain size={48} className="text-teal-400" />
-                    <h1 className="text-4xl md:text-6xl font-bold text-white">Memory Orchestrator for LLMs</h1>
-                </div>
+                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Memory Orchestrator for LLMs</h1>
                 <p className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8">
                     Instantly supercharge your LLM apps with xmem: a hybrid memory, that combines long-term knowledge and real-time context for smarter, more relevant AI.
                 </p>
@@ -78,25 +108,17 @@ const Landing: React.FC = () => {
                             </div>
                             <div className="relative h-32">
                                 <div className="absolute inset-0 flex flex-wrap items-center justify-center gap-2">
-                                    {Array.from({ length: 12 }).map((_, i) => {
-                                        const size = 12 + Math.floor(Math.random() * 24);
-                                        const colors = [
-                                            'bg-teal-500/40', 'bg-indigo-500/40', 'bg-purple-500/40',
-                                            'bg-amber-500/40'
-                                        ];
-                                        const color = colors[Math.floor(Math.random() * colors.length)];
-                                        return (
-                                            <div
-                                                key={i}
-                                                className={`rounded-full ${color} backdrop-blur-sm`}
-                                                style={{
-                                                    width: `${size}px`,
-                                                    height: `${size}px`,
-                                                    transform: `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`,
-                                                }}
-                                            />
-                                        );
-                                    })}
+                                    {bubbles.map((bubble, i) => (
+                                        <div
+                                            key={i}
+                                            className={`rounded-full ${bubble.color} backdrop-blur-sm`}
+                                            style={{
+                                                width: `${bubble.size}px`,
+                                                height: `${bubble.size}px`,
+                                                transform: `translate(${bubble.x}px, ${bubble.y}px)`
+                                            }}
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -193,31 +215,26 @@ const Landing: React.FC = () => {
                         <div className="relative h-64 mb-4">
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="relative w-full h-full">
-                                    {Array.from({ length: 24 }).map((_, i) => {
-                                        const x = 20 + Math.random() * 60;
-                                        const y = 20 + Math.random() * 60;
-                                        const size = 6 + Math.random() * 12;
-                                        return (
-                                            <div
-                                                key={i}
-                                                className="absolute bg-indigo-400/40 rounded-full"
-                                                style={{
-                                                    left: `${x}%`,
-                                                    top: `${y}%`,
-                                                    width: `${size}px`,
-                                                    height: `${size}px`,
-                                                    transform: 'translate(-50%, -50%)',
-                                                }}
-                                            >
-                                                {i % 3 === 0 && (
-                                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1">
-                                                        <div className="h-8 w-px bg-indigo-400/30"></div>
-                                                        <div className="text-indigo-300 text-xs whitespace-nowrap mt-1">Vector {i + 1}</div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                    {vectorBubbles.map(({ x, y, size, i }) => (
+                                        <div
+                                            key={i}
+                                            className="absolute bg-indigo-400/40 rounded-full"
+                                            style={{
+                                                left: `${x}%`,
+                                                top: `${y}%`,
+                                                width: `${size}px`,
+                                                height: `${size}px`,
+                                                transform: 'translate(-50%, -50%)',
+                                            }}
+                                        >
+                                            {i % 3 === 0 && (
+                                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1">
+                                                    <div className="h-8 w-px bg-indigo-400/30"></div>
+                                                    <div className="text-indigo-300 text-xs whitespace-nowrap mt-1">Vector {i + 1}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                     <svg className="absolute inset-0 w-full h-full">
                                         <path
                                             d="M 30% 40% L 45% 35% L 60% 45% L 70% 30%"

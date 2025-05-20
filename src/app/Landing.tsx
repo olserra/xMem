@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
+import { Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
 import { signIn, useSession, SessionProvider } from 'next-auth/react';
 import Header from './Header';
 import Footer from '../components/layout/Footer';

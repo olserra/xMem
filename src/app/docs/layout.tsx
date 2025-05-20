@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Header from '../Header';
 import SessionProviderWrapper from './SessionProviderWrapper';
+import Footer from '../../components/layout/Footer';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -36,6 +37,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                         </div>
                     </main>
                 </div>
+                <Footer />
             </div>
         </SessionProviderWrapper>
     );

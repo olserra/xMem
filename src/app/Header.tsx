@@ -6,12 +6,12 @@ import { Brain } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Avatar from './Avatar';
+import navLinks from '../components/layout/navLinks';
 
-const navLinks = [
-    { href: '/docs', label: 'Documentation' },
-    { href: '/integration', label: 'Integration' },
-    // Add more links as needed
-];
+interface NavLink {
+    href: string;
+    label: string;
+}
 
 const Header: React.FC = () => {
     const { data: session, status } = useSession();
@@ -38,7 +38,7 @@ const Header: React.FC = () => {
                 <span className="font-bold text-xl">xmem</span>
             </div>
             <div className="flex items-center gap-6">
-                {navLinks.map((link) => (
+                {(navLinks as NavLink[]).map((link) => (
                     <Link
                         key={link.href}
                         href={link.href}

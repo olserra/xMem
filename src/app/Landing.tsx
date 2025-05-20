@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Brain, Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
 import { signIn, useSession, SessionProvider } from 'next-auth/react';
 import Header from './Header';
+import Footer from '../components/layout/Footer';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -368,25 +369,7 @@ const Landing: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <footer className="border-t border-slate-700">
-                <div className="container mx-auto px-6 py-12">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <div className="flex items-center gap-2 mb-4 md:mb-0">
-                            <Brain size={24} className="text-teal-400" />
-                            <span className="text-white font-bold text-xl">xmem</span>
-                        </div>
-                        <div className="flex gap-6 text-slate-400">
-                            <a href="#" className="hover:text-white transition-colors">About</a>
-                            <a href="#" className="hover:text-white transition-colors">Documentation</a>
-                            <a href="#" className="hover:text-white transition-colors">GitHub</a>
-                            <a href="#" className="hover:text-white transition-colors">Contact</a>
-                        </div>
-                    </div>
-                    <div className="mt-8 text-center text-slate-500 text-sm">
-                        2025 xmem. All rights reserved.
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

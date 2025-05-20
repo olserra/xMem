@@ -1,7 +1,7 @@
 "use client";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import { Database, Cpu, Clock, Settings } from "lucide-react";
+import { Database, Cpu, Clock, Settings, Sparkles } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
@@ -9,6 +9,7 @@ const navItems = [
     { id: "dashboard", label: "Dashboard", icon: <Database size={20} /> },
     { id: "memory", label: "Memory Manager", icon: <Cpu size={20} /> },
     { id: "context", label: "Context Manager", icon: <Clock size={20} /> },
+    { id: "integrationhub", label: "Integration Hub", icon: <Sparkles size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
 ];
 
@@ -19,6 +20,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     let currentPage = "dashboard";
     if (pathname.startsWith("/dashboard/memory")) currentPage = "memory";
     else if (pathname.startsWith("/dashboard/context")) currentPage = "context";
+    else if (pathname.startsWith("/dashboard/integrationhub")) currentPage = "integrationhub";
     else if (pathname.startsWith("/dashboard/settings")) currentPage = "settings";
     else if (pathname.startsWith("/dashboard")) currentPage = "dashboard";
 

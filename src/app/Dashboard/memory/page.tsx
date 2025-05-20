@@ -1,4 +1,4 @@
-import MemoryManager from '../MemoryManager';
+import MemoryManager from '../../MemoryManager';
 
 export default function MemoryPage() {
     return <MemoryManager />;

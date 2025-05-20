@@ -17,9 +17,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     const router = useRouter();
 
     let currentPage = "dashboard";
-    if (pathname.startsWith("/memory")) currentPage = "memory";
-    else if (pathname.startsWith("/context")) currentPage = "context";
-    else if (pathname.startsWith("/settings")) currentPage = "settings";
+    if (pathname.startsWith("/dashboard/memory")) currentPage = "memory";
+    else if (pathname.startsWith("/dashboard/context")) currentPage = "context";
+    else if (pathname.startsWith("/dashboard/settings")) currentPage = "settings";
     else if (pathname.startsWith("/dashboard")) currentPage = "dashboard";
 
     return (
@@ -31,7 +31,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     currentPage={currentPage}
                     onNavigate={(page) => {
                         if (page === "dashboard") router.push("/dashboard");
-                        else router.push(`/${page}`);
+                        else router.push(`/dashboard/${page}`);
                     }}
                 />
                 <main className="flex-1 bg-slate-50 px-4 md:px-8 pt-6">{children}</main>

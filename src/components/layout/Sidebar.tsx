@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ navItems, currentPage, onNavigate }) 
             <li key={item.id}>
               <button
                 onClick={() => onNavigate(item.id)}
-                className={`flex items-center gap-3 w-full px-6 py-3 text-left transition-colors duration-200 hover:bg-slate-800 ${currentPage === item.id ? 'bg-slate-800 border-l-4 border-teal-400' : ''
+                className={`flex items-center gap-3 w-full px-6 py-3 text-left transition-colors duration-200 hover:bg-slate-800 cursor-pointer ${currentPage === item.id ? 'bg-slate-800 border-l-4 border-teal-400' : ''
                   }`}
               >
                 <span className={currentPage === item.id ? 'text-teal-400' : 'text-slate-400'}>

@@ -25,7 +25,7 @@ const Landing: React.FC = () => {
                     Instantly supercharge your LLM apps with xmem: combine long-term knowledge and real-time context for smarter, more relevant AI.
                 </p>
                 <button
-                    className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6"
+                    className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6 cursor-pointer"
                     onClick={handleSignIn}
                 >
                     Get Started Free <ArrowRight size={20} />

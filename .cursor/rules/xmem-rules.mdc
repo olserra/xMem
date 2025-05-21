@@ -3,7 +3,10 @@ description:
 globs: 
 alwaysApply: false
 ---
+- xmem is a memory orchestrator for LLMs, combining long-term (vector DB) and short-term (context window/session) memory, with smarter RAG (retrieval-augmented generation) logic. This approach will maximize xmem’s value and future-proof it in the LLM ecosystem.
 - Case we are using NextJS, always prefer TS instead of JS. Use JS only if the file requires. Feel free to use CJS or MJS when needed too.
 - Always check for existing interfaces and types and constants, before creating new ones.
 - Always try to decouple functions that might be reusable, constants and interfaces as well, centralizing them.
 - Always use the d.ts format for the interfaces and types.
+- Always try to use utility types.
+- Always use pnpm to install packages.

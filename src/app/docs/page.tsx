@@ -25,6 +25,10 @@ export default function DocsHome() {
                     <h2 className="text-xl font-semibold text-white mb-2">FAQ</h2>
                     <p className="text-slate-300">Frequently asked questions and troubleshooting tips.</p>
                 </Link>
+                <Link href="/docs/llm-adapters" className="block bg-slate-800/60 rounded-xl border border-slate-700 p-6 hover:border-teal-400 transition-colors">
+                    <h2 className="text-xl font-semibold text-white mb-2">LLM Adapters</h2>
+                    <p className="text-slate-300">How to use and register LLM providers in xmem.</p>
+                </Link>
             </div>
         </div>
     );

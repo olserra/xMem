@@ -1,0 +1,39 @@
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "../../../../../prisma/prisma";
+import { Session } from "next-auth";
+
+export const authOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
+  ],
+  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async signIn({ user, account, profile }: { user: unknown; account: unknown; profile: unknown }) {
+      console.log("SignIn Attempt:", { user, account, profile });
+      return true;
+    },
+    async session({ session, token, user }: { session: Session; token: unknown; user: unknown }) {
+      console.log("Session Callback:", { session, token, user });
+      if (session.user) {
+        (session.user as { id?: string }).id = (user as { id?: string }).id as string;
+      }
+      return session as Session;
+    },
+    async redirect() {
+      return "/dashboard";
+    },
+  },
+}; 

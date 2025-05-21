@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../prisma/prisma';
 import { getServerSession } from 'next-auth/next';
 import type { Session } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/auth';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {

@@ -1,8 +1,7 @@
 #!/bin/bash
-
-QDRANT_URL="https://e1d45360-76fe-4a7b-b769-f59ced8c7b0f.eu-west-1-0.aws.cloud.qdrant.io:6333"
-COLLECTION="xmem_collection"
-API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.eyIIvmECLQ7wy6H09Kx4xmWaD-gvr_VwEJr07bkiYw8"
+set -a
+source .env
+set +a
 
 # You can change VECTOR_DIM to match your collection's vector size
 VECTOR_DIM=4
@@ -41,7 +40,7 @@ points+="]"
 
 json="{\"points\":$points}"
 
-curl -X PUT "$QDRANT_URL/collections/$COLLECTION/points?wait=true" \
+curl -X PUT "$NEXT_PUBLIC_QDRANT_URL/collections/$COLLECTION/points?wait=true" \
   -H "Content-Type: application/json" \
-  -H "api-key: $API_KEY" \
+  -H "api-key: $NEXT_PUBLIC_QDRANT_API_KEY" \
   -d "$json"

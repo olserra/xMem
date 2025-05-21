@@ -18,7 +18,7 @@ export class GeminiAdapter implements LLMProvider {
     this.apiUrl = config.apiUrl || 'https://generativelanguage.googleapis.com/v1beta/models';
   }
 
-  async generateResponse(prompt: string, context?: Record<string, unknown>): Promise<string> {
+  async generateResponse(prompt: string): Promise<string> {
     const res = await fetch(
       `${this.apiUrl}/${this.model}:generateContent?key=${this.apiKey}`,
       {
@@ -33,7 +33,7 @@ export class GeminiAdapter implements LLMProvider {
     return json.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
 
-  async embed(text: string): Promise<number[]> {
+  async embed(): Promise<number[]> {
     throw new Error('Embedding not implemented for Gemini');
   }
 } 

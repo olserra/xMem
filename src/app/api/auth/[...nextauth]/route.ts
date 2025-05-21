@@ -42,6 +42,8 @@ const options = {
 
 };
 
+export const authOptions = options;
+
 const handler = NextAuth({
   ...options,
   callbacks: {

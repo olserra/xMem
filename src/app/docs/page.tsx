@@ -36,11 +36,13 @@ function flattenSections(sections: Section[]): { href: string; title: string; de
         }
         if (section.children) {
             for (const child of section.children) {
-                items.push({
-                    href: child.href,
-                    title: child.label,
-                    description: docSummaries[child.href] || '',
-                });
+                if (child.href) {
+                    items.push({
+                        href: child.href,
+                        title: child.label,
+                        description: docSummaries[child.href] || '',
+                    });
+                }
             }
         }
     }

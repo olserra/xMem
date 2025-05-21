@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Save, Trash, RefreshCw, AlertTriangle, Lock, Database, LayoutDashboard, PlusCircle } from 'lucide-react';
+import { Save, Trash, RefreshCw, AlertTriangle, Lock, Database, PlusCircle } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
 import MemoryItemList from '../components/memory/MemoryItemList';
 import ContextSourceList from '../components/context/ContextSourceList';

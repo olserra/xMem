@@ -1,20 +1,11 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { Brain } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Avatar from '@/app/Avatar';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import SearchBar from './SearchBar';
-import { useSearch } from '@/app/docs/SearchContext';
 
-function useSafeSearch() {
-    try {
-        return useSearch();
-    } catch {
-        return null;
-    }
-}
 
 const Header: React.FC = () => {
     const { data: session } = useSession();
@@ -22,9 +13,6 @@ const Header: React.FC = () => {
     const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const pathname = usePathname();
-    const isDocs = pathname.startsWith('/docs');
-    const searchCtx = useSafeSearch();
 
     useEffect(() => {
         if (!dropdownOpen) return;
@@ -55,9 +43,6 @@ const Header: React.FC = () => {
                     >
                         Documentation
                     </Link>
-                    {isDocs && searchCtx && (
-                        <SearchBar value={searchCtx.search} onChange={searchCtx.setSearch} />
-                    )}
                 </div>
                 {/* Placeholder for user/account actions */}
                 {user ? (

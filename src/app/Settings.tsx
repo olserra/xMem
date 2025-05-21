@@ -11,7 +11,7 @@ import ContextRelevanceChart from '../components/dashboard/ContextRelevanceChart
 import RecentQueriesTable from '../components/dashboard/RecentQueriesTable';
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'general' | 'memory' | 'context' | 'api' | 'visuals'>('general');
+  const [activeTab, setActiveTab] = useState<'memory' | 'context' | 'api' | 'visuals'>('memory');
 
   // Example settings
   const memorySettings = {
@@ -36,7 +36,7 @@ const Settings: React.FC = () => {
       <div className="p-6">
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-8 border-b border-slate-200">
-          {['general', 'memory', 'context', 'api', 'visuals'].map(tab => (
+          {['memory', 'context', 'api', 'visuals'].map(tab => (
             <button
               key={tab}
               className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors cursor-pointer ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
@@ -46,64 +46,6 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-
-        {/* General Settings */}
-        {activeTab === 'general' && (
-          <div className="space-y-8">
-            <div className="flex items-start gap-6">
-              <div className="h-10 w-10 rounded-md bg-indigo-100 flex items-center justify-center">
-                <LayoutDashboard size={20} className="text-indigo-600" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-medium text-slate-800 mb-1">General Settings</h2>
-                <p className="text-sm text-slate-500 mb-6">Configure basic application preferences</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="appName">
-                      Application Name
-                    </label>
-                    <input
-                      type="text"
-                      id="appName"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      defaultValue="xmem"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="theme">
-                      Theme
-                    </label>
-                    <select
-                      id="theme"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      defaultValue="system"
-                    >
-                      <option value="system">System Default</option>
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="loggingLevel">
-                    Logging Level
-                  </label>
-                  <select
-                    id="loggingLevel"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    defaultValue="info"
-                  >
-                    <option value="error">Error</option>
-                    <option value="warn">Warning</option>
-                    <option value="info">Info</option>
-                    <option value="debug">Debug</option>
-                    <option value="trace">Trace</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Memory Settings */}
         {activeTab === 'memory' && (

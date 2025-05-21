@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useSearch } from './SearchContext';
 import { sections } from './DocsSidebar';
@@ -18,7 +18,13 @@ const docSummaries: Record<string, string> = {
     '/docs/vector-stores': 'How to use and register vector stores in xmem.',
 };
 
-function flattenSections(sections: any[]): { href: string; title: string; description: string }[] {
+type Section = {
+    href?: string;
+    label: string;
+    children?: Section[];
+};
+
+function flattenSections(sections: Section[]): { href: string; title: string; description: string }[] {
     const items: { href: string; title: string; description: string }[] = [];
     for (const section of sections) {
         if (section.href) {
@@ -61,8 +67,6 @@ function getMatchingSnippets(content: string, search: string, maxLines = 2) {
 
 export default function DocsHome() {
     const { search } = useSearch();
-    const [searching, setSearching] = useState(false);
-    useEffect(() => { setSearching(!!search); }, [search]);
     const filtered = useMemo(() => {
         if (!search) return allDocs;
         const s = normalize(search);
@@ -87,7 +91,7 @@ export default function DocsHome() {
             {search ? (
                 <div className="space-y-4">
                     {filtered.length === 0 ? (
-                        <div className="text-slate-400 text-center py-12">No docs found for "{search}"</div>
+                        <div className="text-slate-400 text-center py-12">No docs found for &quot;{search}&quot;</div>
                     ) : (
                         filtered.map(item => {
                             const content = docContentIndex[item.href] || '';

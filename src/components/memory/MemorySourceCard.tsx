@@ -43,30 +43,28 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         let url = `${baseUrl}/collections`;
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (source.apiKey) headers['api-key'] = source.apiKey;
-        // Always use the collection property if present, fallback to 'xmem_collection'
         const collection = source.collection || 'xmem_collection';
         if (collection) {
           url = `${baseUrl}/collections/${collection}`;
         }
+        console.log('Qdrant fetchCollectionInfo', { url, headers });
         const res = await fetch(url, { headers });
+        const text = await res.text();
+        console.log('Qdrant fetchCollectionInfo response', { status: res.status, text });
         if (!res.ok) throw new Error('Failed to fetch Qdrant collection info');
-        const data = await res.json();
+        const data = JSON.parse(text);
         // If fetching a specific collection
         if (data.result && typeof data.result.vectors_count === 'number') {
           setItemCount(data.result.vectors_count);
-          setLastSync(data.result.status || 'N/A');
         } else if (Array.isArray(data.result)) {
           // If fetching all collections, sum up vectors_count
           const total = data.result.reduce((acc: number, c: { vectors_count?: number }) => acc + (c.vectors_count || 0), 0);
           setItemCount(total);
-          setLastSync('N/A');
         } else {
           setItemCount(null);
-          setLastSync(null);
         }
       } catch {
         setItemCount(null);
-        setLastSync(null);
       }
     } else if (source.type === 'chromadb' || source.name.toLowerCase().includes('chroma')) {
       // ChromaDB: GET /api/v1/collections
@@ -75,27 +73,26 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         const url = `${baseUrl}/api/v1/collections`;
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (source.apiKey) headers['Authorization'] = `Bearer ${source.apiKey}`;
+        console.log('ChromaDB fetchCollectionInfo', { url, headers });
         const res = await fetch(url, { headers });
+        const text = await res.text();
+        console.log('ChromaDB fetchCollectionInfo response', { status: res.status, text });
         if (!res.ok) throw new Error('Failed to fetch ChromaDB collections');
-        const data = await res.json();
+        const data = JSON.parse(text);
         // ChromaDB returns a list of collections
         if (Array.isArray(data) && data.length > 0) {
           // Sum up document counts if available
           const total = data.reduce((acc: number, c: { size?: number }) => acc + (c.size || 0), 0);
           setItemCount(total);
-          setLastSync('N/A');
         } else {
           setItemCount(null);
-          setLastSync(null);
         }
       } catch {
         setItemCount(null);
-        setLastSync(null);
       }
     } else {
       // Other DBs: fallback
       setItemCount(null);
-      setLastSync(null);
     }
   }
 
@@ -137,6 +134,7 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         setSyncError(null);
         if (onStatusChange) onStatusChange(source.id, 'connected');
         setLastSync(new Date().toLocaleString());
+        await fetchCollectionInfo();
       } else {
         setSyncError(data.error || 'Failed to connect to the database.');
         if (onStatusChange) onStatusChange(source.id, 'disconnected');
@@ -207,7 +205,7 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         {/* Items and Last Synced */}
         <div className="flex flex-col gap-1 mt-2">
           <div className="flex justify-between text-xs text-slate-500">
-            <span>Items:</span>
+            <span>Items (count):</span>
             <span className="text-slate-500 font-normal">{itemCount !== null ? itemCount : 'N/A'}</span>
           </div>
           <div className="flex justify-between text-xs text-slate-500">

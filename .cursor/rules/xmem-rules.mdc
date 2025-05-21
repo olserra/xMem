@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- Case we are using NextJS, always prefer TS instead of JS. Use JS only if the file requires. Feel free to use CJS or MJS when needed too.
+- Always check for existing interfaces and types and constants, before creating new ones.
+- Always try to decouple functions that might be reusable, constants and interfaces as well, centralizing them.
+- Always use the d.ts format for the interfaces and types.

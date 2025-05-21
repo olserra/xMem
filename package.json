@@ -17,7 +17,6 @@
     "next": "15.3.2",
     "next-auth": "^4.24.11",
     "prism-react-renderer": "^2.4.1",
-    "prisma": "^6.8.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -31,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8.5.3",
+    "prisma": "^6.8.2",
     "tailwindcss": "^4.1.7",
     "typescript": "^5"
   },

@@ -10,3 +10,4 @@ alwaysApply: false
 - Always use the d.ts format for the interfaces and types.
 - Always try to use utility types.
 - Always use pnpm to install packages.
+- All the buttons and clickable items should have a style cursor-pointer.

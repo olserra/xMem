@@ -36,37 +36,54 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
   // Fetch collection info for different DB types
   async function fetchCollectionInfo() {
     if (!source.vectorDbUrl) return;
-    if (source.type === 'qdrant' || source.name.toLowerCase().includes('qdrant') || (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'))) {
-      // Qdrant: GET /collections or /collections/{collection}
+    if (
+      source.type === 'qdrant' ||
+      source.name.toLowerCase().includes('qdrant') ||
+      (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'))
+    ) {
+      // Qdrant: Try /collections/{collection} first, fallback to /collections
       try {
         const baseUrl = source.vectorDbUrl.replace(/\/$/, '');
-        let url = `${baseUrl}/collections`;
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (source.apiKey) headers['api-key'] = source.apiKey;
         const collection = source.collection || 'xmem_collection';
-        if (collection) {
-          url = `${baseUrl}/collections/${collection}`;
-        }
-        console.log('Qdrant fetchCollectionInfo', { url, headers });
-        const res = await fetch(url, { headers });
-        const text = await res.text();
-        console.log('Qdrant fetchCollectionInfo response', { status: res.status, text });
-        if (!res.ok) throw new Error('Failed to fetch Qdrant collection info');
-        const data = JSON.parse(text);
-        // If fetching a specific collection
-        if (data.result && typeof data.result.vectors_count === 'number') {
-          setItemCount(data.result.vectors_count);
-        } else if (Array.isArray(data.result)) {
-          // If fetching all collections, sum up vectors_count
-          const total = data.result.reduce((acc: number, c: { vectors_count?: number }) => acc + (c.vectors_count || 0), 0);
-          setItemCount(total);
+        let url = `${baseUrl}/collections/${collection}`;
+        let res = await fetch(url, { headers });
+        let text = await res.text();
+        console.log('Qdrant fetchCollectionInfo (collection)', { url, headers, status: res.status, text });
+        if (res.ok) {
+          const data = JSON.parse(text);
+          if (data.result && typeof data.result.vectors_count === 'number') {
+            setItemCount(data.result.vectors_count);
+            return;
+          }
         } else {
-          setItemCount(null);
+          // If not found, fallback to all collections
+          if (res.status === 404) {
+            url = `${baseUrl}/collections`;
+            res = await fetch(url, { headers });
+            text = await res.text();
+            console.log('Qdrant fetchCollectionInfo (all)', { url, headers, status: res.status, text });
+            if (!res.ok) throw new Error('Failed to fetch Qdrant collections');
+            const data = JSON.parse(text);
+            if (Array.isArray(data.result)) {
+              const total = data.result.reduce((acc: number, c: { vectors_count?: number }) => acc + (c.vectors_count || 0), 0);
+              setItemCount(total);
+              return;
+            }
+          } else {
+            throw new Error(`Qdrant error: ${res.status} ${text}`);
+          }
         }
-      } catch {
+        setItemCount(null);
+      } catch (err) {
+        console.error('Qdrant fetchCollectionInfo error', err);
         setItemCount(null);
       }
-    } else if (source.type === 'chromadb' || source.name.toLowerCase().includes('chroma')) {
+    } else if (
+      source.type === 'chromadb' ||
+      source.name.toLowerCase().includes('chroma')
+    ) {
       // ChromaDB: GET /api/v1/collections
       try {
         const baseUrl = source.vectorDbUrl.replace(/\/$/, '');
@@ -147,16 +164,16 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col min-h-[320px]">
       {/* Card header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-md bg-slate-100 flex items-center justify-center">
             {source.icon}
           </div>
-          <div>
-            <h3 className="font-medium text-slate-800">{source.name}</h3>
-            <p className="text-xs text-slate-500 capitalize">{source.type}</p>
+          <div className="min-w-0">
+            <h3 className="font-medium text-slate-800 truncate max-w-[140px]" title={source.name}>{source.name}</h3>
+            <p className="text-xs text-slate-500 capitalize truncate max-w-[140px]" title={source.type}>{source.type}</p>
           </div>
         </div>
         <div className="relative" ref={menuRef}>
@@ -187,36 +204,37 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
       </div>
 
       {/* Card body */}
-      <div className="p-4">
-        <div className="flex justify-between mb-3">
-          <span className="text-sm text-slate-500">Status</span>
-          <span className={`text-sm font-medium inline-flex items-center ${source.status === 'connected' || source.status === 'active'
-            ? 'text-emerald-600'
-            : 'text-amber-600'
-            }`}>
-            <span className={`w-2 h-2 rounded-full mr-1.5 ${source.status === 'connected' || source.status === 'active'
-              ? 'bg-emerald-600'
-              : 'bg-amber-600'
-              }`}></span>
-            {source.status}
-          </span>
-        </div>
-
-        {/* Items and Last Synced */}
-        <div className="flex flex-col gap-1 mt-2">
-          <div className="flex justify-between text-xs text-slate-500">
-            <span>Items (count):</span>
-            <span className="text-slate-500 font-normal">{itemCount !== null ? itemCount : 'N/A'}</span>
+      <div className="flex-1 flex flex-col justify-between p-4">
+        <div>
+          <div className="flex justify-between mb-3 items-center">
+            <span className="text-sm text-slate-500">Status</span>
+            <span className={`text-sm font-medium inline-flex items-center ${source.status === 'connected' || source.status === 'active'
+              ? 'text-emerald-600'
+              : 'text-amber-600'
+              }`} title={source.status}>
+              <span className={`inline-block w-2 h-2 rounded-full mr-1.5 align-middle ${source.status === 'connected' || source.status === 'active'
+                ? 'bg-emerald-600'
+                : 'bg-amber-600'
+                }`}></span>
+              {source.status}
+            </span>
           </div>
-          <div className="flex justify-between text-xs text-slate-500">
-            <span>Last Synced:</span>
-            <span className="text-slate-400 font-normal">{lastSync !== null ? lastSync : 'N/A'}</span>
+          {/* Items and Last Synced */}
+          <div className="flex flex-col gap-1 mt-2">
+            <div className="flex justify-between text-xs text-slate-500 items-center">
+              <span>Items (count):</span>
+              <span className="text-slate-500 font-normal truncate max-w-[80px]">{itemCount !== null ? itemCount : 'N/A'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-slate-500 items-center">
+              <span>Last Synced:</span>
+              <span className="text-slate-400 font-medium text-[13px] max-w-[160px] break-words">{lastSync !== null ? lastSync : 'N/A'}</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Card actions */}
-      <div className="p-4 bg-slate-50 border-t border-slate-100">
+      <div className="p-4 bg-slate-50 border-t border-slate-100 mt-auto">
         <button
           className="w-full text-sm flex items-center justify-center gap-2 py-2 text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
           onClick={handleSync}

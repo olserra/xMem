@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  memorySources MemorySource[]
 }
 
 model Account {
@@ -55,4 +56,24 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model MemorySource {
+  id             String    @id @default(cuid())
+  name           String
+  type           String
+  status         String
+  itemCount      Int? // Optional, can be updated after sync
+  lastSync       DateTime?
+  vectorDbUrl    String
+  apiKey         String
+  embeddingModel String
+  maxCacheSize   Int
+  sessionTtl     Int
+  enableCache    Boolean
+  collection     String?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

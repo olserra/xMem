@@ -1,37 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '../../../../prisma/prisma';
+import { getServerSession } from 'next-auth/next';
+import type { Session } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
-// Define the VectorSource type based on the example and usage
-interface VectorSource {
-  id: string;
-  name: string;
-  type: string;
-  url: string;
-  apiKey: string;
-  collection: string;
-  status: 'connected' | 'disconnected';
-  lastSync: string | null;
+// Helper to extract userId from session
+function getUserId(session: Session | null): string | null {
+  // @ts-expect-error: NextAuth session.user may have id
+  return session?.user && session.user.id ? session.user.id : null;
 }
 
-// In-memory store for demo; replace with DB in production
-let vectorSources: VectorSource[] = [
-  // Example source
-  // {
-  //   id: '1',
-  //   name: 'Qdrant Cloud',
-  //   type: 'qdrant',
-  //   url: 'https://example.qdrant.io:6333',
-  //   apiKey: '***',
-  //   collection: 'xmem_collection',
-  //   status: 'connected',
-  //   lastSync: new Date().toISOString(),
-  // }
-];
-
 export async function GET() {
-  return NextResponse.json(vectorSources);
+  const session = await getServerSession(authOptions);
+  const userId = getUserId(session);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const sources = await prisma.memorySource.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+  return NextResponse.json(sources);
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userId = getUserId(session);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const data = await req.json();
   if (data.checkConnection) {
     try {
@@ -78,23 +75,65 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: 'disconnected', error: (e as Error).message }, { status: 400 });
     }
   }
-  const id = Date.now().toString();
-  vectorSources.push({ ...data, id, status: 'disconnected', lastSync: null });
-  return NextResponse.json({ success: true, id });
+  const source = await prisma.memorySource.create({
+    data: {
+      name: data.name,
+      type: data.type,
+      status: data.status || 'disconnected',
+      itemCount: data.itemCount ?? null,
+      lastSync: data.lastSync ? new Date(data.lastSync) : null,
+      vectorDbUrl: data.vectorDbUrl || data.url,
+      apiKey: data.apiKey,
+      embeddingModel: data.embeddingModel,
+      maxCacheSize: data.maxCacheSize,
+      sessionTtl: data.sessionTtl,
+      enableCache: data.enableCache,
+      collection: data.collection,
+      userId,
+    },
+  });
+  return NextResponse.json({ success: true, id: source.id });
 }
 
 export async function PUT(req: NextRequest) {
-  const data = await req.json();
-  const idx = vectorSources.findIndex(s => s.id === data.id);
-  if (idx !== -1) {
-    vectorSources[idx] = { ...vectorSources[idx], ...data };
-    return NextResponse.json({ success: true });
+  const session = await getServerSession(authOptions);
+  const userId = getUserId(session);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
+  const data = await req.json();
+  const source = await prisma.memorySource.update({
+    where: { id: data.id, userId },
+    data: {
+      name: data.name,
+      type: data.type,
+      status: data.status,
+      itemCount: data.itemCount,
+      lastSync: data.lastSync ? new Date(data.lastSync) : null,
+      vectorDbUrl: data.vectorDbUrl || data.url,
+      apiKey: data.apiKey,
+      embeddingModel: data.embeddingModel,
+      maxCacheSize: data.maxCacheSize,
+      sessionTtl: data.sessionTtl,
+      enableCache: data.enableCache,
+      collection: data.collection,
+    },
+  });
+  return NextResponse.json({ success: true, id: source.id });
 }
 
 export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userId = getUserId(session);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { id } = await req.json();
-  vectorSources = vectorSources.filter(s => s.id !== id);
+  // Check ownership first
+  const source = await prisma.memorySource.findUnique({ where: { id } });
+  if (!source || source.userId !== userId) {
+    return NextResponse.json({ error: 'Not found or unauthorized' }, { status: 404 });
+  }
+  await prisma.memorySource.delete({ where: { id } });
   return NextResponse.json({ success: true });
 } 

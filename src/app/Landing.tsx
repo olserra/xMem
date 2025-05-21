@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Zap, Database, MessageSquare, Sparkles, ArrowRight, Users, Clock, Cpu } from 'lucide-react';
-import { signIn, useSession, SessionProvider } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Header from './Header';
 import Footer from '../components/layout/Footer';
+import SessionProviderWrapper from '../components/SessionProviderWrapper';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -376,8 +377,8 @@ const Landing: React.FC = () => {
 
 export default function LandingWithSession() {
     return (
-        <SessionProvider>
+        <SessionProviderWrapper>
             <Landing />
-        </SessionProvider>
+        </SessionProviderWrapper>
     );
 }

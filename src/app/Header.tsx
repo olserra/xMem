@@ -1,7 +1,7 @@
 'use client';
 //create here the header for the landing page only, not for the dashboard
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Brain } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
@@ -19,6 +19,8 @@ const Header: React.FC = () => {
     const user = session?.user;
     const [scrolled, setScrolled] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -28,6 +30,17 @@ const Header: React.FC = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        if (!dropdownOpen) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [dropdownOpen]);
 
     const headerClass = `w-full h-16 fixed top-0 left-0 z-30 transition-colors duration-300 ${mounted && scrolled ? 'bg-slate-100/50 text-slate-900 shadow-lg backdrop-blur-md' : 'bg-slate-900 text-white shadow-md'} flex items-center justify-between px-8`;
 
@@ -48,20 +61,22 @@ const Header: React.FC = () => {
                     </Link>
                 ))}
                 {!loading && user ? (
-                    <div className="relative group ml-4">
-                        <button className="focus:outline-none">
+                    <div className="relative ml-4" ref={dropdownRef}>
+                        <button className="focus:outline-none cursor-pointer" onClick={() => setDropdownOpen((v) => !v)}>
                             <Avatar imageUrl={user.image ?? undefined} name={user.name || ''} size={40} />
                         </button>
                         {/* Dropdown menu */}
-                        <div className="absolute right-0 mt-2 w-40 bg-white text-slate-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-20 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
-                            <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name}</div>
-                            <button
-                                className="w-full text-left px-4 py-2 hover:bg-slate-100"
-                                onClick={() => signOut({ callbackUrl: '/' })}
-                            >
-                                Sign out
-                            </button>
-                        </div>
+                        {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-40 bg-white text-slate-800 rounded-md shadow-lg z-20">
+                                <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name}</div>
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-slate-100"
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                >
+                                    Sign out
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <button

@@ -1,11 +1,20 @@
 import { LLMProvider } from '../xmem';
-import fetch from 'node-fetch';
 
 type GeminiConfig = {
   apiKey: string;
   model?: string;
   apiUrl?: string;
 };
+
+interface GeminiResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+}
 
 export class GeminiAdapter implements LLMProvider {
   private apiKey: string;
@@ -29,7 +38,7 @@ export class GeminiAdapter implements LLMProvider {
         })
       }
     );
-    const json = await res.json();
+    const json = await res.json() as GeminiResponse;
     return json.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
 

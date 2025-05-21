@@ -1,15 +1,13 @@
 'use client';
 //create here the header for the landing page only, not for the dashboard
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { Brain } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Avatar from './Avatar';
 import navLinks from '../components/layout/navLinks';
-import SearchBar from '../components/layout/SearchBar';
 import { usePathname } from 'next/navigation';
-import { useSearch } from '../app/docs/SearchContext';
 
 interface NavLink {
     href: string;
@@ -25,9 +23,12 @@ const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
-    const searchCtxRaw = useSearch();
     const isDocs = pathname.startsWith('/docs');
-    const searchCtx = isDocs ? searchCtxRaw : null;
+    const [searchCtx, setSearchCtx] = useState<{ search: string; setSearch: (s: string) => void } | null>(null);
+    const SearchBar = React.useMemo(() =>
+        isDocs ? React.lazy(() => import('../components/layout/SearchBar')) : null,
+        [isDocs]
+    );
 
     useEffect(() => {
         setMounted(true);
@@ -49,6 +50,18 @@ const Header: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [dropdownOpen]);
 
+    useEffect(() => {
+        let mounted = true;
+        if (isDocs) {
+            import('../app/docs/SearchContext').then(mod => {
+                if (mounted) setSearchCtx(mod.useSearch());
+            });
+        } else {
+            setSearchCtx(null);
+        }
+        return () => { mounted = false; };
+    }, [isDocs]);
+
     const headerClass = `w-full h-16 fixed top-0 left-0 z-30 transition-colors duration-300 ${mounted && scrolled ? 'bg-slate-100/50 text-slate-900 shadow-lg backdrop-blur-md' : 'bg-slate-900 text-white shadow-md'} flex items-center justify-between px-8`;
 
     return (
@@ -60,7 +73,11 @@ const Header: React.FC = () => {
             {isDocs ? (
                 <div className="flex-1 flex justify-center">
                     <div className="w-full max-w-lg">
-                        <SearchBar value={searchCtx?.search ?? ''} onChange={searchCtx?.setSearch ?? (() => { })} />
+                        {SearchBar && searchCtx && (
+                            <Suspense fallback={null}>
+                                <SearchBar value={searchCtx.search} onChange={searchCtx.setSearch} />
+                            </Suspense>
+                        )}
                     </div>
                 </div>
             ) : (

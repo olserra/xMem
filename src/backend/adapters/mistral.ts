@@ -1,5 +1,4 @@
 import { LLMProvider } from '../xmem';
-import fetch from 'node-fetch';
 
 type MistralConfig = {
   apiUrl: string;

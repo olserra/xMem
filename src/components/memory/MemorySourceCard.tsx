@@ -32,6 +32,12 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
   const [syncError, setSyncError] = useState<string | null>(null);
   const [itemCount, setItemCount] = useState<number | null>(null);
   const [lastSync, setLastSync] = useState<string | null>(null);
+  const [qdrantMetrics, setQdrantMetrics] = useState<{
+    points_count?: number;
+    indexed_vectors_count?: number;
+    segments_count?: number;
+    optimizer_status?: string;
+  } | null>(null);
 
   // Fetch collection info for different DB types
   async function fetchCollectionInfo() {
@@ -53,8 +59,21 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         console.log('Qdrant fetchCollectionInfo (collection)', { url, headers, status: res.status, text });
         if (res.ok) {
           const data = JSON.parse(text);
-          if (data.result && typeof data.result.vectors_count === 'number') {
-            setItemCount(data.result.vectors_count);
+          if (data.result) {
+            // Qdrant metrics
+            setItemCount(
+              typeof data.result.points_count === 'number'
+                ? data.result.points_count
+                : typeof data.result.vectors_count === 'number'
+                  ? data.result.vectors_count
+                  : null
+            );
+            setQdrantMetrics({
+              points_count: data.result.points_count,
+              indexed_vectors_count: data.result.indexed_vectors_count,
+              segments_count: data.result.segments_count,
+              optimizer_status: data.result.optimizer_status,
+            });
             return;
           }
         } else {
@@ -69,6 +88,7 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
             if (Array.isArray(data.result)) {
               const total = data.result.reduce((acc: number, c: { vectors_count?: number }) => acc + (c.vectors_count || 0), 0);
               setItemCount(total);
+              setQdrantMetrics(null);
               return;
             }
           } else {
@@ -76,9 +96,11 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
           }
         }
         setItemCount(null);
+        setQdrantMetrics(null);
       } catch (err) {
         console.error('Qdrant fetchCollectionInfo error', err);
         setItemCount(null);
+        setQdrantMetrics(null);
       }
     } else if (
       source.type === 'chromadb' ||
@@ -225,6 +247,34 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
               <span>Items (count):</span>
               <span className="text-slate-500 font-normal truncate max-w-[80px]">{itemCount !== null ? itemCount : 'N/A'}</span>
             </div>
+            {qdrantMetrics && (
+              <>
+                {typeof qdrantMetrics.points_count === 'number' && (
+                  <div className="flex justify-between text-xs text-slate-500 items-center">
+                    <span>Points Count:</span>
+                    <span className="text-slate-500 font-normal truncate max-w-[80px]">{qdrantMetrics.points_count}</span>
+                  </div>
+                )}
+                {typeof qdrantMetrics.indexed_vectors_count === 'number' && (
+                  <div className="flex justify-between text-xs text-slate-500 items-center">
+                    <span>Indexed Vectors:</span>
+                    <span className="text-slate-500 font-normal truncate max-w-[80px]">{qdrantMetrics.indexed_vectors_count}</span>
+                  </div>
+                )}
+                {typeof qdrantMetrics.segments_count === 'number' && (
+                  <div className="flex justify-between text-xs text-slate-500 items-center">
+                    <span>Segments:</span>
+                    <span className="text-slate-500 font-normal truncate max-w-[80px]">{qdrantMetrics.segments_count}</span>
+                  </div>
+                )}
+                {qdrantMetrics.optimizer_status && (
+                  <div className="flex justify-between text-xs text-slate-500 items-center">
+                    <span>Optimizer:</span>
+                    <span className="text-slate-500 font-normal truncate max-w-[80px]">{qdrantMetrics.optimizer_status}</span>
+                  </div>
+                )}
+              </>
+            )}
             <div className="flex justify-between text-xs text-slate-500 items-center">
               <span>Last Synced:</span>
               <span className="text-slate-400 font-medium text-[13px] max-w-[160px] break-words">{lastSync !== null ? lastSync : 'N/A'}</span>

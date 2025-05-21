@@ -1,10 +1,13 @@
 import { LLMProvider } from '../xmem';
-import fetch from 'node-fetch';
 
 type HuggingFaceConfig = {
   apiUrl: string;
   apiKey: string;
 };
+
+type HuggingFaceResponse = Array<{
+  generated_text?: string;
+}>;
 
 export class HuggingFaceAdapter implements LLMProvider {
   private apiUrl: string;
@@ -24,7 +27,7 @@ export class HuggingFaceAdapter implements LLMProvider {
       },
       body: JSON.stringify({ inputs: prompt, parameters: context })
     });
-    const json = await res.json();
+    const json = await res.json() as HuggingFaceResponse;
     return json[0]?.generated_text || '';
   }
 

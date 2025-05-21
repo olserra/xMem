@@ -1,11 +1,17 @@
 import { VectorStore } from '../xmem';
-import fetch from 'node-fetch';
 
 type ChromaDBConfig = {
   url: string;
   collection: string;
   apiKey?: string;
 };
+
+interface ChromaDBQueryResponse {
+  documents: unknown[];
+  ids: string[];
+  distances: number[];
+  metadatas: Record<string, unknown>[];
+}
 
 export class ChromaDBAdapter implements VectorStore {
   private url: string;
@@ -45,7 +51,7 @@ export class ChromaDBAdapter implements VectorStore {
         n_results: topK
       })
     });
-    const json = await res.json();
+    const json = await res.json() as ChromaDBQueryResponse;
     return json.documents || [];
   }
 

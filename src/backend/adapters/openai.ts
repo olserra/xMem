@@ -1,11 +1,12 @@
 import { LLMProvider } from '../xmem';
-import fetch from 'node-fetch';
 
 type OpenAIConfig = {
   apiKey: string;
   model: string;
   apiUrl?: string;
 };
+
+type OpenAIChatMessage = { role: string; content: string };
 
 export class OpenAIAdapter implements LLMProvider {
   private apiKey: string;
@@ -28,7 +29,7 @@ export class OpenAIAdapter implements LLMProvider {
       body: JSON.stringify({
         model: this.model,
         messages: [
-          ...(context?.messages || []),
+          ...((Array.isArray(context?.messages) ? context.messages : []) as OpenAIChatMessage[]),
           { role: 'user', content: prompt }
         ]
       })

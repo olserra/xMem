@@ -1,5 +1,4 @@
 import { LLMProvider } from '../xmem';
-import fetch from 'node-fetch';
 
 type LlamaCppConfig = {
   apiUrl: string;

@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { ArrowUpRight, Database, Cpu, Clock, Users } from 'lucide-react';
 import MetricCard from '../components/dashboard/MetricCard';
 import MemoryUsageChart from '../components/dashboard/MemoryUsageChart';
@@ -16,34 +17,61 @@ interface MetricCardProps {
 }
 
 const Dashboard: React.FC = () => {
-  // Example metrics data
+  const [vectorDbMetrics, setVectorDbMetrics] = useState<{
+    points_count?: number;
+    indexed_vectors_count?: number;
+    segments_count?: number;
+    optimizer_status?: string;
+  } | null>(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
+
+  useEffect(() => {
+    // Fetch Qdrant metrics from internal API route to avoid CORS
+    const fetchMetrics = async () => {
+      setLoadingMetrics(true);
+      try {
+        const res = await fetch('/api/qdrant-metrics');
+        if (res.ok) {
+          const data = await res.json();
+          setVectorDbMetrics(data);
+        } else {
+          setVectorDbMetrics(null);
+        }
+      } catch {
+        setVectorDbMetrics(null);
+      }
+      setLoadingMetrics(false);
+    };
+    fetchMetrics();
+  }, []);
+
   const metrics: MetricCardProps[] = [
     {
-      title: 'Total Retrievals',
-      value: '14,582',
-      change: '+15%',
-      trend: 'up',
+      title: 'Total Vectors',
+      value: loadingMetrics ? '...' : (vectorDbMetrics?.points_count?.toLocaleString() ?? 'N/A'),
+      change: '',
+      trend: 'neutral',
       icon: <Database size={20} className="text-indigo-600" />
     },
     {
-      title: 'Avg. Context Size',
-      value: '4.2 KB',
-      change: '-8%',
-      trend: 'down',
+      title: 'Indexed Vectors',
+      value: loadingMetrics ? '...' : (vectorDbMetrics?.indexed_vectors_count?.toLocaleString() ?? 'N/A'),
+      change: '',
+      trend: 'neutral',
       icon: <Cpu size={20} className="text-teal-600" />
     },
     {
-      title: 'Retrieval Time',
-      value: '42ms',
-      change: '-12%',
-      trend: 'down',
+      title: 'Segments',
+      value: loadingMetrics ? '...' : (vectorDbMetrics?.segments_count?.toLocaleString() ?? 'N/A'),
+      change: '',
+      trend: 'neutral',
       icon: <Clock size={20} className="text-amber-600" />
     },
     {
-      title: 'Active Sessions',
-      value: '187',
-      change: '+24%',
-      trend: 'up',
+      title: 'Optimizer',
+      value: loadingMetrics ? '...' : (vectorDbMetrics?.optimizer_status ?? 'N/A'),
+      change: '',
+      trend: 'neutral',
       icon: <Users size={20} className="text-purple-600" />
     },
   ];

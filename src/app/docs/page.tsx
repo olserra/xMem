@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearch } from './SearchContext';
 import { sections } from './DocsSidebar';
+import { docContentIndex } from './docContentIndex';
 
 // Build a flat index of all docs from the sidebar structure
 const docSummaries: Record<string, string> = {
@@ -42,17 +43,39 @@ function flattenSections(sections: any[]): { href: string; title: string; descri
 
 const allDocs = flattenSections(sections);
 
+function normalize(str: string) {
+    return str.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function getMatchingSnippets(content: string, search: string, maxLines = 2) {
+    if (!search) return [];
+    const lines = content.split(/\n|(?<=[.!?])\s+/g); // split by line or sentence
+    const s = normalize(search);
+    const matches = lines.filter(line => normalize(line).includes(s));
+    return matches.slice(0, maxLines).map(line => {
+        // Highlight all occurrences of the search term (case-insensitive)
+        const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'ig');
+        return line.replace(regex, '<mark>$1</mark>');
+    });
+}
+
 export default function DocsHome() {
     const { search } = useSearch();
     const [searching, setSearching] = useState(false);
     useEffect(() => { setSearching(!!search); }, [search]);
     const filtered = useMemo(() => {
         if (!search) return allDocs;
-        const s = search.toLowerCase();
-        return allDocs.filter(item =>
-            item.title.toLowerCase().includes(s) ||
-            item.description.toLowerCase().includes(s)
-        );
+        const s = normalize(search);
+        return allDocs.filter(item => {
+            const content = normalize(docContentIndex[item.href] || '');
+            const titleNorm = normalize(item.title);
+            const descNorm = normalize(item.description);
+            return (
+                titleNorm.includes(s) ||
+                descNorm.includes(s) ||
+                content.includes(s)
+            );
+        });
     }, [search]);
 
     return (
@@ -66,12 +89,26 @@ export default function DocsHome() {
                     {filtered.length === 0 ? (
                         <div className="text-slate-400 text-center py-12">No docs found for "{search}"</div>
                     ) : (
-                        filtered.map(item => (
-                            <Link key={item.href} href={item.href} className="block bg-slate-800/60 rounded-xl border border-slate-700 p-6 hover:border-teal-400 transition-colors">
-                                <h2 className="text-xl font-semibold text-white mb-2">{item.title}</h2>
-                                <p className="text-slate-300">{item.description}</p>
-                            </Link>
-                        ))
+                        filtered.map(item => {
+                            const content = docContentIndex[item.href] || '';
+                            const snippets = getMatchingSnippets(content, search, 2);
+                            return (
+                                <Link key={item.href} href={item.href} className="block bg-slate-800/60 rounded-xl border border-slate-700 p-6 hover:border-teal-400 transition-colors">
+                                    <h2 className="text-xl font-semibold text-white mb-2">{item.title}</h2>
+                                    <p className="text-slate-300">{item.description}</p>
+                                    {snippets.length > 0 && (
+                                        <div className="mt-2 text-slate-400 text-sm">
+                                            {snippets.map((snippet, i) => (
+                                                <div key={i} dangerouslySetInnerHTML={{ __html: snippet }} />
+                                            ))}
+                                            {getMatchingSnippets(content, search, 10).length > 2 && (
+                                                <div className="text-slate-500">…</div>
+                                            )}
+                                        </div>
+                                    )}
+                                </Link>
+                            );
+                        })
                     )}
                 </div>
             ) : (

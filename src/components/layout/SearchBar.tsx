@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useSearch } from '@/app/docs/SearchContext';
+// import { useSearch } from '@/app/docs/SearchContext';
 import { sections } from '@/app/docs/DocsSidebar';
 
 interface SearchBarProps {
@@ -22,7 +21,7 @@ const docSummaries: Record<string, string> = {
     '/docs/vector-stores': 'How to use and register vector stores in xmem.',
 };
 
-function flattenSections(sections: any[]): { href: string; title: string; description: string }[] {
+function flattenSections(sections: { href?: string; label: string; children?: { href: string; label: string }[] }[]): { href: string; title: string; description: string }[] {
     const items: { href: string; title: string; description: string }[] = [];
     for (const section of sections) {
         if (section.href) {
@@ -51,7 +50,6 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
     const [placeholder, setPlaceholder] = useState('Search docs…   ⌘K / Ctrl+K');
     const [showModal, setShowModal] = useState(false);
     const [highlighted, setHighlighted] = useState(0);
-    const searchCtx = useSearch();
     const filtered = value
         ? allDocs.filter(item =>
             item.title.toLowerCase().includes(value.toLowerCase()) ||
@@ -81,7 +79,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         }
     }
 
-    function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+    function handleBlur() {
         setTimeout(() => setShowModal(false), 100); // allow click
         if (!value) setPlaceholder('Search docs…   ⌘K / Ctrl+K');
     }

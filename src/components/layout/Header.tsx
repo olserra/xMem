@@ -8,6 +8,14 @@ import Link from 'next/link';
 import SearchBar from './SearchBar';
 import { useSearch } from '@/app/docs/SearchContext';
 
+function useSafeSearch() {
+    try {
+        return useSearch();
+    } catch {
+        return null;
+    }
+}
+
 const Header: React.FC = () => {
     const { data: session } = useSession();
     const user = session?.user;
@@ -16,7 +24,7 @@ const Header: React.FC = () => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const isDocs = pathname.startsWith('/docs');
-    const searchCtx = isDocs ? useSearch() : null;
+    const searchCtx = useSafeSearch();
 
     useEffect(() => {
         if (!dropdownOpen) return;
@@ -40,7 +48,7 @@ const Header: React.FC = () => {
                 <span className="font-bold text-xl">xmem</span>
             </div>
             <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
+                <div className="flex gap-2">
                     <Link
                         href="/docs"
                         className="text-slate-200 hover:text-teal-400 transition-colors font-medium cursor-pointer"

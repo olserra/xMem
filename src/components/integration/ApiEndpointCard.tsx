@@ -33,7 +33,7 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
           <Code size={20} className="text-indigo-600" />
         </div>
 
-        <h3 className="font-medium text-slate-200 mb-1">{endpoint.name}</h3>
+        <h3 className="font-medium text-slate-800 mb-1">{endpoint.name}</h3>
         <p className="text-sm text-slate-400 mb-4 line-clamp-2">{endpoint.description}</p>
 
         <div className="flex items-center gap-2">
@@ -44,7 +44,7 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
             }`}>
             {endpoint.method}
           </span>
-          <code className="text-xs font-mono text-slate-200 truncate">{endpoint.path}</code>
+          <code className="text-xs font-mono text-slate-800 truncate">{endpoint.path}</code>
         </div>
       </div>
 

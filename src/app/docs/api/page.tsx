@@ -66,10 +66,10 @@ export default function ApiDocs() {
             </div>
             {endpoint && (
                 <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-6">
-                    <h2 className="text-xl font-semibold text-slate-100 mb-2">{endpoint.name}</h2>
+                    <h2 className="text-xl font-semibold text-slate-800 mb-2">{endpoint.name}</h2>
                     <div className="mb-4">
                         <span className="inline-block px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800 mr-2">{endpoint.method}</span>
-                        <code className="text-slate-200">{endpoint.path}</code>
+                        <code className="text-slate-800">{endpoint.path}</code>
                     </div>
                     <p className="text-slate-400 mb-4">{endpoint.description}</p>
                     <h3 className="text-slate-400 font-semibold mb-2">Example</h3>

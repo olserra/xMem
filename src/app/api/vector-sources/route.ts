@@ -6,7 +6,6 @@ import { authOptions } from '../auth/[...nextauth]/auth';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {
-  // @ts-expect-error: NextAuth session.user may have id
   return session?.user && session.user.id ? session.user.id : null;
 }
 

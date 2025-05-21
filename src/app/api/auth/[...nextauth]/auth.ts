@@ -1,9 +1,18 @@
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../../../prisma/prisma";
-import { Session } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
+import type { DefaultSession } from "next-auth";
 
-export const authOptions = {
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"]
+  }
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -21,16 +30,15 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn({ user, account, profile }: { user: unknown; account: unknown; profile: unknown }) {
+    async signIn({ user, account, profile }) {
       console.log("SignIn Attempt:", { user, account, profile });
       return true;
     },
-    async session({ session, token, user }: { session: Session; token: unknown; user: unknown }) {
-      console.log("Session Callback:", { session, token, user });
+    async session({ session, user }) {
       if (session.user) {
-        (session.user as { id?: string }).id = (user as { id?: string }).id as string;
+        session.user.id = user.id;
       }
-      return session as Session;
+      return session;
     },
     async redirect() {
       return "/dashboard";

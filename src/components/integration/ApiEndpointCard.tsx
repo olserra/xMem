@@ -23,8 +23,8 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
   return (
     <div
       className={`rounded-lg border transition-all cursor-pointer overflow-hidden ${isSelected
-          ? 'border-indigo-500 ring-2 ring-indigo-100 shadow-sm'
-          : 'border-slate-200 hover:border-indigo-300 hover:shadow-sm'
+        ? 'border-indigo-500 ring-2 ring-indigo-100 shadow-sm'
+        : 'border-slate-200 hover:border-indigo-300 hover:shadow-sm'
         }`}
       onClick={onSelect}
     >
@@ -33,18 +33,18 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
           <Code size={20} className="text-indigo-600" />
         </div>
 
-        <h3 className="font-medium text-slate-200 mb-1">{endpoint.name}</h3>
-        <p className="text-sm text-slate-400 mb-4 line-clamp-2">{endpoint.description}</p>
+        <h3 className="font-medium text-slate-800 mb-1">{endpoint.name}</h3>
+        <p className="text-sm text-slate-500 mb-4 line-clamp-2">{endpoint.description}</p>
 
         <div className="flex items-center gap-2">
           <span className={`text-xs font-bold px-2 py-1 rounded ${endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800' :
-              endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
-                endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
-                  'bg-rose-100 text-rose-800'
+            endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
+              endpoint.method === 'PUT' ? 'bg-amber-100 text-amber-800' :
+                'bg-rose-100 text-rose-800'
             }`}>
             {endpoint.method}
           </span>
-          <code className="text-xs font-mono text-slate-300 truncate">{endpoint.path}</code>
+          <code className="text-xs font-mono text-slate-800 truncate">{endpoint.path}</code>
         </div>
       </div>
 

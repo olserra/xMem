@@ -105,7 +105,7 @@ const IntegrationHub: React.FC = () => {
 
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-slate-500 mb-2">DESCRIPTION</h3>
-                  <p className="text-slate-700">{endpoint.description}</p>
+                  <p className="text-slate-400">{endpoint.description}</p>
                 </div>
 
                 <div className="mb-6">

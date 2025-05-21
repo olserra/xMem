@@ -19,6 +19,7 @@ const sections = [
     { label: 'Contribution', href: '/docs/contribution' },
 ];
 
+export { sections };
 export default function DocsSidebar() {
     const pathname = usePathname();
     return (

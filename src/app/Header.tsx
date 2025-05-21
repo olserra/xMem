@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Avatar from './Avatar';
 import navLinks from '../components/layout/navLinks';
+import SearchBar from '../components/layout/SearchBar';
+import { usePathname } from 'next/navigation';
+import { useSearch } from '../app/docs/SearchContext';
 
 interface NavLink {
     href: string;
@@ -21,6 +24,9 @@ const Header: React.FC = () => {
     const [mounted, setMounted] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+    const isDocs = pathname.startsWith('/docs');
+    const searchCtx = isDocs ? useSearch() : null;
 
     useEffect(() => {
         setMounted(true);
@@ -50,6 +56,15 @@ const Header: React.FC = () => {
                 <Brain size={28} className="text-teal-400" />
                 <span className="font-bold text-xl">xmem</span>
             </div>
+            {isDocs ? (
+                <div className="flex-1 flex justify-center">
+                    <div className="w-full max-w-lg">
+                        <SearchBar value={searchCtx?.search ?? ''} onChange={searchCtx?.setSearch ?? (() => { })} />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex-1" />
+            )}
             <div className="flex items-center gap-6">
                 {(navLinks as NavLink[]).map((link) => (
                     <Link

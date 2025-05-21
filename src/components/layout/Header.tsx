@@ -1,9 +1,12 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { Brain } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Avatar from '@/app/Avatar';
 import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
+import SearchBar from './SearchBar';
+import { useSearch } from '@/app/docs/SearchContext';
 
 const Header: React.FC = () => {
     const { data: session } = useSession();
@@ -11,6 +14,10 @@ const Header: React.FC = () => {
     const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+    const searchCtxRaw = useSearch();
+    const isDocs = pathname.startsWith('/docs');
+    const searchCtx = isDocs ? searchCtxRaw : null;
 
     useEffect(() => {
         if (!dropdownOpen) return;
@@ -34,6 +41,17 @@ const Header: React.FC = () => {
                 <span className="font-bold text-xl">xmem</span>
             </div>
             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/docs"
+                        className="text-slate-200 hover:text-teal-400 transition-colors font-medium cursor-pointer"
+                    >
+                        Documentation
+                    </Link>
+                    {isDocs && searchCtx && (
+                        <SearchBar value={searchCtx.search} onChange={searchCtx.setSearch} />
+                    )}
+                </div>
                 {/* Placeholder for user/account actions */}
                 {user ? (
                     <div className="relative ml-4" ref={dropdownRef}>

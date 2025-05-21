@@ -1,26 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Save, Trash, RefreshCw, AlertTriangle, Lock, Database, PlusCircle } from 'lucide-react';
-import MemorySourceCard from '../components/memory/MemorySourceCard';
-import MemoryItemList from '../components/memory/MemoryItemList';
+import { Save, AlertTriangle, Lock, PlusCircle } from 'lucide-react';
 import ContextSourceList from '../components/context/ContextSourceList';
 import RankingControls from '../components/context/RankingControls';
-import MemoryUsageChart from '../components/dashboard/MemoryUsageChart';
-import ContextRelevanceChart from '../components/dashboard/ContextRelevanceChart';
-import RecentQueriesTable from '../components/dashboard/RecentQueriesTable';
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'memory' | 'context' | 'api' | 'visuals'>('memory');
-
-  // Example settings
-  const memorySettings = {
-    vectorDbUrl: 'https://qdrant.example.com:6333',
-    apiKey: '********-****-****-****-************',
-    maxCacheSize: 500,
-    sessionTtl: 3600,
-    embeddingModel: 'text-embedding-3-small',
-  };
+  const [activeTab, setActiveTab] = useState<'context' | 'api-key'>('api-key');
 
   const ragSettings = {
     defaultMaxTokens: 4000,
@@ -36,7 +22,7 @@ const Settings: React.FC = () => {
       <div className="p-6">
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-8 border-b border-slate-200">
-          {['memory', 'context', 'api', 'visuals'].map(tab => (
+          {['memory', 'context', 'api-key'].map(tab => (
             <button
               key={tab}
               className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors cursor-pointer ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
@@ -46,139 +32,6 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-
-        {/* Memory Settings */}
-        {activeTab === 'memory' && (
-          <div className="space-y-8">
-            <div className="flex items-start gap-6">
-              <div className="h-10 w-10 rounded-md bg-indigo-100 flex items-center justify-center">
-                <Database size={20} className="text-indigo-600" />
-              </div>
-
-              <div className="flex-1">
-                <h2 className="text-lg font-medium text-slate-800 mb-1">Memory Settings</h2>
-                <p className="text-sm text-slate-500 mb-6">Configure vector database and memory sources</p>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="vectorDbUrl">
-                      Vector Database URL
-                    </label>
-                    <input
-                      type="text"
-                      id="vectorDbUrl"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      defaultValue={memorySettings.vectorDbUrl}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="apiKey">
-                        API Key
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="password"
-                          id="apiKey"
-                          className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          defaultValue={memorySettings.apiKey}
-                        />
-                        <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                          <Lock size={16} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="embeddingModel">
-                        Embedding Model
-                      </label>
-                      <select
-                        id="embeddingModel"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        defaultValue={memorySettings.embeddingModel}
-                      >
-                        <option value="text-embedding-3-small">text-embedding-3-small</option>
-                        <option value="text-embedding-3-large">text-embedding-3-large</option>
-                        <option value="text-embedding-ada-002">text-embedding-ada-002 (Legacy)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="maxCacheSize">
-                        Max Cache Size (MB)
-                      </label>
-                      <input
-                        type="number"
-                        id="maxCacheSize"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        defaultValue={memorySettings.maxCacheSize}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="sessionTtl">
-                        Session TTL (seconds)
-                      </label>
-                      <input
-                        type="number"
-                        id="sessionTtl"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        defaultValue={memorySettings.sessionTtl}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center mt-4">
-                    <input
-                      id="enableCache"
-                      type="checkbox"
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
-                      defaultChecked
-                    />
-                    <label htmlFor="enableCache" className="ml-2 block text-sm text-slate-700">
-                      Enable local memory cache
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-md font-semibold text-slate-700 mb-2">Connected Memory Sources</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Example static sources for hydration safety */}
-                <MemorySourceCard source={{ id: 'source-1', name: 'Project Documentation', type: 'vectorDb', status: 'connected', itemCount: 1243, lastSync: '2 hours ago', icon: <Database size={24} className="text-indigo-600" /> }} />
-                <MemorySourceCard source={{ id: 'source-2', name: 'Session Memory', type: 'session', status: 'active', itemCount: 87, lastSync: 'Live', icon: <Database size={24} className="text-teal-600" /> }} />
-              </div>
-              <div className="mt-6">
-                <h4 className="text-sm font-medium text-slate-600 mb-2">Recent Memory Items</h4>
-                <MemoryItemList />
-              </div>
-            </div>
-
-            <div className="border-t border-slate-200 pt-6 flex justify-between">
-              <button className="flex items-center gap-2 px-4 py-2 border border-rose-300 text-rose-700 rounded-md hover:bg-rose-50 transition-colors">
-                <Trash size={16} />
-                <span>Clear All Memory</span>
-              </button>
-
-              <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-indigo-300 text-indigo-700 rounded-md hover:bg-indigo-50 transition-colors">
-                  <RefreshCw size={16} />
-                  <span>Test Connection</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-                  <Save size={16} />
-                  <span>Save Changes</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Context & RAG Settings */}
         {activeTab === 'context' && (
@@ -297,7 +150,7 @@ const Settings: React.FC = () => {
         )}
 
         {/* API Keys Settings */}
-        {activeTab === 'api' && (
+        {activeTab === 'api-key' && (
           <div className="space-y-8">
             <div className="flex items-start gap-6">
               <div className="h-10 w-10 rounded-md bg-indigo-100 flex items-center justify-center">
@@ -370,26 +223,6 @@ const Settings: React.FC = () => {
                   <span>Generate New API Key</span>
                 </button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Visuals Tab */}
-        {activeTab === 'visuals' && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="font-semibold text-slate-800 mb-4">Memory Usage Distribution</h2>
-                <MemoryUsageChart />
-              </div>
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="font-semibold text-slate-800 mb-4">Context Relevance Scores</h2>
-                <ContextRelevanceChart />
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="font-semibold text-slate-800 mb-4">Recent Queries</h2>
-              <RecentQueriesTable />
             </div>
           </div>
         )}

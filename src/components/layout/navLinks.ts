@@ -1,5 +1,5 @@
 const navLinks = [
-  { href: '/docs', label: 'Documentation' },
+  { href: '/dashboard', label: 'Dashboard' },
 ];
 
 export default navLinks; 

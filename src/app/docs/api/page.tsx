@@ -52,8 +52,8 @@ export default function ApiDocs() {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-white mb-4">API Reference</h1>
-            <p className="text-slate-300 mb-6">Explore all available API endpoints for xmem.</p>
+            <h1 className="text-3xl font-bold text-slate-100 mb-4">API Reference</h1>
+            <p className="text-slate-400 mb-6">Explore all available API endpoints for xmem.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {endpoints.map((ep) => (
                     <ApiEndpointCard
@@ -66,12 +66,12 @@ export default function ApiDocs() {
             </div>
             {endpoint && (
                 <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-6">
-                    <h2 className="text-xl font-semibold text-white mb-2">{endpoint.name}</h2>
+                    <h2 className="text-xl font-semibold text-slate-100 mb-2">{endpoint.name}</h2>
                     <div className="mb-4">
                         <span className="inline-block px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800 mr-2">{endpoint.method}</span>
                         <code className="text-slate-200">{endpoint.path}</code>
                     </div>
-                    <p className="text-slate-300 mb-4">{endpoint.description}</p>
+                    <p className="text-slate-400 mb-4">{endpoint.description}</p>
                     <h3 className="text-slate-400 font-semibold mb-2">Example</h3>
                     <CodeSnippet endpoint={endpoint} />
                 </div>

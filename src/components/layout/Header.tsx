@@ -15,9 +15,8 @@ const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
-    const searchCtxRaw = useSearch();
     const isDocs = pathname.startsWith('/docs');
-    const searchCtx = isDocs ? searchCtxRaw : null;
+    const searchCtx = isDocs ? useSearch() : null;
 
     useEffect(() => {
         if (!dropdownOpen) return;

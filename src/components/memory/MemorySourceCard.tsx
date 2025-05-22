@@ -41,97 +41,59 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
 
   // Fetch collection info for different DB types
   async function fetchCollectionInfo() {
-    if (!source.vectorDbUrl) return;
-    if (
-      source.type === 'qdrant' ||
-      source.name.toLowerCase().includes('qdrant') ||
-      (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'))
-    ) {
-      // Qdrant: Try /collections/{collection} first, fallback to /collections
-      try {
-        const baseUrl = source.vectorDbUrl.replace(/\/$/, '');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (source.apiKey) headers['api-key'] = source.apiKey;
-        const collection = source.collection || 'xmem_collection';
-        let url = `${baseUrl}/collections/${collection}`;
-        let res = await fetch(url, { headers });
-        let text = await res.text();
-        console.log('Qdrant fetchCollectionInfo (collection)', { url, headers, status: res.status, text });
-        if (res.ok) {
-          const data = JSON.parse(text);
-          if (data.result) {
-            // Qdrant metrics
-            setItemCount(
-              typeof data.result.points_count === 'number'
-                ? data.result.points_count
-                : typeof data.result.vectors_count === 'number'
-                  ? data.result.vectors_count
-                  : null
-            );
-            setQdrantMetrics({
-              points_count: data.result.points_count,
-              indexed_vectors_count: data.result.indexed_vectors_count,
-              segments_count: data.result.segments_count,
-              optimizer_status: data.result.optimizer_status,
-            });
-            return;
-          }
-        } else {
-          // If not found, fallback to all collections
-          if (res.status === 404) {
-            url = `${baseUrl}/collections`;
-            res = await fetch(url, { headers });
-            text = await res.text();
-            console.log('Qdrant fetchCollectionInfo (all)', { url, headers, status: res.status, text });
-            if (!res.ok) throw new Error('Failed to fetch Qdrant collections');
-            const data = JSON.parse(text);
-            if (Array.isArray(data.result)) {
-              const total = data.result.reduce((acc: number, c: { vectors_count?: number }) => acc + (c.vectors_count || 0), 0);
-              setItemCount(total);
-              setQdrantMetrics(null);
-              return;
-            }
-          } else {
-            throw new Error(`Qdrant error: ${res.status} ${text}`);
-          }
-        }
-        setItemCount(null);
-        setQdrantMetrics(null);
-      } catch (err) {
-        console.error('Qdrant fetchCollectionInfo error', err);
-        setItemCount(null);
-        setQdrantMetrics(null);
-      }
-    } else if (
-      source.type === 'chromadb' ||
-      source.name.toLowerCase().includes('chroma')
-    ) {
-      // ChromaDB: GET /api/v1/collections
-      try {
-        const baseUrl = source.vectorDbUrl.replace(/\/$/, '');
-        const url = `${baseUrl}/api/v1/collections`;
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (source.apiKey) headers['Authorization'] = `Bearer ${source.apiKey}`;
-        console.log('ChromaDB fetchCollectionInfo', { url, headers });
-        const res = await fetch(url, { headers });
-        const text = await res.text();
-        console.log('ChromaDB fetchCollectionInfo response', { status: res.status, text });
-        if (!res.ok) throw new Error('Failed to fetch ChromaDB collections');
-        const data = JSON.parse(text);
-        // ChromaDB returns a list of collections
-        if (Array.isArray(data) && data.length > 0) {
-          // Sum up document counts if available
-          const total = data.reduce((acc: number, c: { size?: number }) => acc + (c.size || 0), 0);
-          setItemCount(total);
-        } else {
-          setItemCount(null);
-        }
-      } catch {
-        setItemCount(null);
-      }
-    } else {
-      // Other DBs: fallback
+    setSyncError(null);
+    if (!source.vectorDbUrl) {
+      setSyncError('No vector DB URL provided.');
       setItemCount(null);
+      setQdrantMetrics(null);
+      return;
+    }
+    try {
+      const res = await fetch('/api/vector-collection-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vectorDbUrl: source.vectorDbUrl,
+          apiKey: source.apiKey,
+          type: source.type,
+          collection: source.collection,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSyncError(data.error || 'Failed to fetch collection info.');
+        setItemCount(null);
+        setQdrantMetrics(null);
+        return;
+      }
+      // Qdrant metrics
+      if (
+        source.type === 'qdrant' ||
+        source.name.toLowerCase().includes('qdrant') ||
+        (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'))
+      ) {
+        setItemCount(
+          typeof data.points_count === 'number'
+            ? data.points_count
+            : null
+        );
+        setQdrantMetrics({
+          points_count: data.points_count,
+          indexed_vectors_count: data.indexed_vectors_count,
+          segments_count: data.segments_count,
+          optimizer_status: data.optimizer_status,
+        });
+      } else {
+        // ChromaDB or other
+        setItemCount(
+          typeof data.points_count === 'number' ? data.points_count : null
+        );
+        setQdrantMetrics(null);
+      }
+    } catch (err: any) {
+      setSyncError(err?.message || 'Failed to fetch collection info.');
+      setItemCount(null);
+      setQdrantMetrics(null);
     }
   }
 
@@ -228,6 +190,9 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
       {/* Card body */}
       <div className="flex-1 flex flex-col justify-between p-4">
         <div>
+          {syncError && (
+            <div className="mb-2 text-xs text-rose-600 animate-pulse">{syncError}</div>
+          )}
           <div className="flex justify-between mb-3 items-center">
             <span className="text-sm text-slate-500">Status</span>
             <span className={`text-sm font-medium inline-flex items-center ${source.status === 'connected' || source.status === 'active'
@@ -293,9 +258,6 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
           <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
           <span>{syncing ? 'Syncing...' : 'Sync Now'}</span>
         </button>
-        {syncError && (
-          <div className="mt-2 text-sm text-rose-600 text-center animate-pulse">{syncError}</div>
-        )}
       </div>
     </div>
   );

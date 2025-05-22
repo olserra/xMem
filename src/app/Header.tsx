@@ -2,12 +2,12 @@
 //create here the header for the landing page only, not for the dashboard
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { MdOutlineMemory } from 'react-icons/md';
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Avatar from './Avatar';
 import navLinks from '../components/layout/navLinks';
 import { usePathname } from 'next/navigation';
+import Logo from '../components/ui/Logo';
 
 interface NavLink {
     href: string;
@@ -67,8 +67,7 @@ const Header: React.FC = () => {
     return (
         <header className={headerClass}>
             <div className="flex items-center gap-3">
-                <MdOutlineMemory size={28} className="text-teal-400" />
-                <span className="text-xl font-light tracking-wide bg-gradient-to-r from-teal-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent select-none">xmem</span>
+                <Logo size={28} />
             </div>
             {isDocs ? (
                 <div className="flex-1 flex justify-center">

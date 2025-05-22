@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Avatar from '@/app/Avatar';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Logo from '../ui/Logo';
 
 
 const Header: React.FC = () => {
@@ -32,8 +33,7 @@ const Header: React.FC = () => {
     return (
         <header className="w-full h-16 bg-slate-900 text-white flex items-center justify-between px-6 shadow-md">
             <div className="flex items-center gap-3 cursor-pointer" onClick={handleClick}>
-                <MdOutlineMemory size={28} className="text-teal-400" />
-                <span className="font-bold text-xl">xmem</span>
+                <Logo size={28} boldText textClassName="text-xl text-white" />
             </div>
             <div className="flex items-center gap-4">
                 <div className="flex gap-2">

@@ -160,9 +160,59 @@ const Landing: React.FC = () => {
                 </div>
             </div>
             {/* Problem/Solution */}
-            <div className="container mx-auto px-6 py-12 text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">LLMs forget. Your users notice.</h2>
-                <p className="text-lg text-slate-300 mb-6">Stop losing context and knowledge between sessions. xmem orchestrates both persistent and session memory for every LLM callso your AI is always relevant, accurate, and up-to-date.</p>
+            <div className="container mx-auto px-6 py-12">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+                    {/* Left: Headline and Pain Points */}
+                    <div className="flex-1 text-center md:text-left">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                            LLMs forget.<br className="hidden md:block" /> Your users notice.
+                        </h2>
+                        <p className="text-lg text-slate-300 mb-6 max-w-lg">
+                            Stop losing context and knowledge between sessions. xmem orchestrates both persistent and session memory for every LLM call—so your AI is always relevant, accurate, and up-to-date.
+                        </p>
+                        <div className="flex flex-col gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <MessageSquare size={22} className="text-amber-400" />
+                                <span className="text-slate-200 font-medium">LLM forgot your last conversation</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Users size={22} className="text-purple-400" />
+                                <span className="text-slate-200 font-medium">Lost project or team context</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Clock size={22} className="text-teal-400" />
+                                <span className="text-slate-200 font-medium">Wasting time repeating yourself</span>
+                            </div>
+                        </div>
+                        <a
+                            href="#why-xmem"
+                            className="inline-block px-7 py-3 bg-gradient-to-r from-teal-500 to-indigo-500 text-white rounded-lg font-semibold shadow-lg hover:scale-105 transition-transform"
+                        >
+                            See how xmem solves this
+                        </a>
+                    </div>
+                    {/* Right: Visual Illustration */}
+                    <div className="flex-1 flex items-center justify-center relative w-full h-72 md:h-80">
+                        {/* Fading chat bubbles (LLM) */}
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 opacity-60">
+                            <div className="bg-slate-700/70 text-slate-300 px-4 py-2 rounded-full shadow mb-1 animate-fadeOut">&quot;Remind me what we discussed?&quot;</div>
+                            <div className="bg-slate-700/50 text-slate-400 px-4 py-2 rounded-full shadow mb-1 animate-fadeOut delay-200">&quot;Who are you again?&quot;</div>
+                            <div className="bg-slate-700/30 text-slate-500 px-4 py-2 rounded-full shadow animate-fadeOut delay-400">&quot;Sorry, I lost that info.&quot;</div>
+                        </div>
+                        {/* Persistent chat bubbles (xmem) */}
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 items-end">
+                            <div className="bg-gradient-to-r from-teal-500 to-indigo-500 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse">&quot;Welcome back, Alex!&quot;</div>
+                            <div className="bg-gradient-to-r from-purple-500 to-teal-400 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-200">&quot;Here&apos;s your project summary.&quot;</div>
+                            <div className="bg-gradient-to-r from-amber-400 to-teal-500 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-400">&quot;Let&apos;s pick up where you left off.&quot;</div>
+                        </div>
+                        {/* Decorative floating memory orbs */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            <div className="absolute left-10 top-8 w-8 h-8 bg-teal-400/30 rounded-full blur-xl animate-float" />
+                            <div className="absolute right-12 bottom-10 w-10 h-10 bg-purple-400/30 rounded-full blur-xl animate-float delay-200" />
+                            <div className="absolute left-1/2 top-1/3 w-6 h-6 bg-amber-400/30 rounded-full blur-xl animate-float delay-400" />
+                        </div>
+                    </div>
+                </div>
             </div>
             {/* How It Works */}
             <div className="container mx-auto px-6 py-12">
@@ -188,12 +238,32 @@ const Landing: React.FC = () => {
             {/* Benefits */}
             <div className="container mx-auto px-6 py-12">
                 <h2 className="text-2xl font-bold text-white text-center mb-8">Why xmem?</h2>
-                <ul className="max-w-2xl mx-auto text-left text-slate-300 space-y-3 text-lg">
-                    <li><span className="text-teal-400 font-bold"></span> Never lose user knowledge or context again</li>
-                    <li><span className="text-teal-400 font-bold"></span> Boost LLM accuracy and relevance</li>
-                    <li><span className="text-teal-400 font-bold"></span> Works with any open-source LLM (Llama, Mistral, etc.)</li>
-                    <li><span className="text-teal-400 font-bold"></span> Easy API and dashboard for integration and monitoring</li>
-                </ul>
+                <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="group bg-gradient-to-br from-teal-500/30 via-slate-800/80 to-indigo-500/20 rounded-2xl p-6 border border-slate-700 shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                        <div className="absolute -top-6 -right-6 opacity-20 blur-xl w-24 h-24 bg-teal-400 rounded-full animate-pulse" />
+                        <Database size={32} className="text-teal-300 mb-3 drop-shadow-lg" />
+                        <h3 className="text-lg font-bold text-white mb-1">Never Lose Knowledge</h3>
+                        <p className="text-slate-300 text-sm">Persistent memory ensures user knowledge and context are always available.</p>
+                    </div>
+                    <div className="group bg-gradient-to-br from-purple-500/30 via-slate-800/80 to-indigo-500/20 rounded-2xl p-6 border border-slate-700 shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                        <div className="absolute -top-6 -right-6 opacity-20 blur-xl w-24 h-24 bg-purple-400 rounded-full animate-pulse" />
+                        <Sparkles size={32} className="text-purple-300 mb-3 drop-shadow-lg" />
+                        <h3 className="text-lg font-bold text-white mb-1">Boost LLM Accuracy</h3>
+                        <p className="text-slate-300 text-sm">Orchestrated context makes every LLM response more relevant and precise.</p>
+                    </div>
+                    <div className="group bg-gradient-to-br from-indigo-500/30 via-slate-800/80 to-teal-500/20 rounded-2xl p-6 border border-slate-700 shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                        <div className="absolute -top-6 -right-6 opacity-20 blur-xl w-24 h-24 bg-indigo-400 rounded-full animate-pulse" />
+                        <Cpu size={32} className="text-indigo-300 mb-3 drop-shadow-lg" />
+                        <h3 className="text-lg font-bold text-white mb-1">Open-Source First</h3>
+                        <p className="text-slate-300 text-sm">Works with any open-source LLM (Llama, Mistral, etc.) and vector DB.</p>
+                    </div>
+                    <div className="group bg-gradient-to-br from-amber-500/30 via-slate-800/80 to-teal-500/20 rounded-2xl p-6 border border-slate-700 shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                        <div className="absolute -top-6 -right-6 opacity-20 blur-xl w-24 h-24 bg-amber-400 rounded-full animate-pulse" />
+                        <MessageSquare size={32} className="text-amber-300 mb-3 drop-shadow-lg" />
+                        <h3 className="text-lg font-bold text-white mb-1">Effortless Integration</h3>
+                        <p className="text-slate-300 text-sm">Easy API and dashboard for seamless integration and monitoring.</p>
+                    </div>
+                </div>
             </div>
 
             {/* Vector DB Integration */}

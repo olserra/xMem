@@ -3,11 +3,12 @@
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import Avatar from './Avatar';
 import navLinks from '../components/layout/navLinks';
 import { usePathname } from 'next/navigation';
 import Logo from '../components/ui/Logo';
+import Image from 'next/image';
 
 interface NavLink {
     href: string;
@@ -123,12 +124,13 @@ const Header: React.FC = () => {
                         className="ml-4"
                         style={{ display: 'flex', alignItems: 'center' }}
                     >
-                        <img
+                        <Image
                             src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
                             alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
-                            style={{ width: 150, height: 32 }}
                             width={150}
                             height={32}
+                            style={{ width: 150, height: 32 }}
+                            priority
                         />
                     </a>
                 )}

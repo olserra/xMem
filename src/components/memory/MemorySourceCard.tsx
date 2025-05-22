@@ -90,8 +90,8 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
         );
         setQdrantMetrics(null);
       }
-    } catch (err: any) {
-      setSyncError(err?.message || 'Failed to fetch collection info.');
+    } catch (err: unknown) {
+      setSyncError(err instanceof Error ? err.message : 'Failed to fetch collection info.');
       setItemCount(null);
       setQdrantMetrics(null);
     }

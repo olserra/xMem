@@ -3,7 +3,18 @@ import { ChevronRight, File, MessageSquare, Clock } from 'lucide-react';
 
 interface MemoryItem {
   id: string;
-  // Add other relevant fields here
+  title?: string;
+  text?: string;
+  content?: string;
+  type?: string;
+  kind?: string;
+  source?: string;
+  sessionId?: string;
+  session_id?: string;
+  createdAt?: string;
+  created_at?: string;
+  timestamp?: string;
+  size?: number | string;
 }
 
 const getIcon = (type: string | undefined) => {

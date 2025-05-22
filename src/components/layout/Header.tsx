@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { Brain } from 'lucide-react';
+import { MdOutlineMemory } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import Avatar from '@/app/Avatar';
 import { useSession, signOut } from 'next-auth/react';
@@ -32,7 +32,7 @@ const Header: React.FC = () => {
     return (
         <header className="w-full h-16 bg-slate-900 text-white flex items-center justify-between px-6 shadow-md">
             <div className="flex items-center gap-3 cursor-pointer" onClick={handleClick}>
-                <Brain size={28} className="text-teal-400" />
+                <MdOutlineMemory size={28} className="text-teal-400" />
                 <span className="font-bold text-xl">xmem</span>
             </div>
             <div className="flex items-center gap-4">

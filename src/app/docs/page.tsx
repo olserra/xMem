@@ -88,7 +88,7 @@ export default function DocsHome() {
         <div className="space-y-10">
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-white mb-4">xmem Documentation</h1>
-                <p className="text-lg text-slate-300 mb-6">Everything you need to integrate, use, and master xmem for LLM memory orchestration.</p>
+                <p className="text-lg text-slate-300 mb-6">Everything you need to integrate, use, and master xmem for LLM memory management.</p>
             </div>
             {search ? (
                 <div className="space-y-4">

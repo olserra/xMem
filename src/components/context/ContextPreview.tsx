@@ -12,7 +12,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
   const contextItems = [
     {
       id: 'ctx-1',
-      content: 'The memory orchestrator component ensures efficient retrieval and ranking of context for LLM inputs based on multiple factors including semantic similarity, recency, and user feedback.',
+      content: 'The xmem component ensures efficient retrieval and ranking of context for LLM inputs based on multiple factors including semantic similarity, recency, and user feedback.',
       source: 'Technical Documentation',
       score: 0.92,
       size: 510,
@@ -67,10 +67,10 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       selected: false,
     },
   ];
-  
+
   // Calculate usage percentage
   const usagePercentage = (currentSize / maxSize) * 100;
-  
+
   return (
     <div className="h-full flex flex-col">
       {/* Context usage meter */}
@@ -79,18 +79,17 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
           <span className="text-sm font-medium text-slate-700">Context Usage</span>
           <span className="text-sm text-slate-500">{currentSize} / {maxSize} tokens</span>
         </div>
-        
+
         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-          <div 
-            className={`h-full rounded-full ${
-              usagePercentage < 70 ? 'bg-emerald-500' : 
-              usagePercentage < 90 ? 'bg-amber-500' : 'bg-rose-500'
-            }`}
+          <div
+            className={`h-full rounded-full ${usagePercentage < 70 ? 'bg-emerald-500' :
+                usagePercentage < 90 ? 'bg-amber-500' : 'bg-rose-500'
+              }`}
             style={{ width: `${usagePercentage}%` }}
           ></div>
         </div>
       </div>
-      
+
       {/* Context items */}
       <div className="flex-1 overflow-y-auto">
         <ul className="divide-y divide-slate-200">
@@ -98,30 +97,28 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
             <li key={item.id} className={`p-4 hover:bg-slate-50 ${!item.selected ? 'opacity-60' : ''}`}>
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center text-sm">
-                  <div className={`h-5 w-5 rounded mr-2 flex items-center justify-center ${
-                    item.selected ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
-                  }`}>
+                  <div className={`h-5 w-5 rounded mr-2 flex items-center justify-center ${item.selected ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
+                    }`}>
                     {item.selected && <Star size={12} />}
                   </div>
                   <span className="font-medium text-slate-700">{item.source}</span>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    item.score > 0.9 ? 'bg-emerald-100 text-emerald-800' :
-                    item.score > 0.8 ? 'bg-blue-100 text-blue-800' :
-                    item.score > 0.7 ? 'bg-amber-100 text-amber-800' :
-                    'bg-slate-100 text-slate-800'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.score > 0.9 ? 'bg-emerald-100 text-emerald-800' :
+                      item.score > 0.8 ? 'bg-blue-100 text-blue-800' :
+                        item.score > 0.7 ? 'bg-amber-100 text-amber-800' :
+                          'bg-slate-100 text-slate-800'
+                    }`}>
                     {item.score.toFixed(2)}
                   </span>
-                  
+
                   <span className="text-xs text-slate-500">{item.size} tokens</span>
                 </div>
               </div>
-              
+
               <p className="text-sm text-slate-700 mb-3">{item.content}</p>
-              
+
               <div className="flex justify-end space-x-2">
                 {method === 'manual' && (
                   <>
@@ -136,7 +133,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
                     </button>
                   </>
                 )}
-                
+
                 <button className="p-1 text-slate-400 hover:text-rose-600" title="Remove from context">
                   <Trash size={14} />
                 </button>

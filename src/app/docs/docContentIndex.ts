@@ -41,7 +41,7 @@ curl -X POST http://localhost:3000/api/sessions -H 'Content-Type: application/js
 
   '/docs/faq': `Frequently Asked Questions
 What is xmem?
-xmem is a memory orchestrator for LLMs, combining long-term and session memory for smarter, more relevant AI responses.
+xmem is a memory management system for LLMs, combining long-term and session memory for smarter, more relevant AI responses.
 Which LLMs are supported?
 xmem works with any open-source LLM, including Llama, Mistral, and more. You can configure your preferred provider in the orchestrator setup.
 How do I store custom data?

@@ -56,7 +56,7 @@ const IntegrationHub: React.FC = () => {
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Integration Hub</h1>
-        <p className="text-slate-500 mt-1">API endpoints and integration guides for using the Memory Orchestrator</p>
+        <p className="text-slate-500 mt-1">API endpoints and integration guides for using xmem</p>
       </div>
 
       {/* API endpoints grid */}

@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Xmem',
-    description: 'Memory Orchestrator for LLMs',
+    title: 'xmem',
+    description: 'Hybrid memory for LLMs: long-term, session, and context management.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

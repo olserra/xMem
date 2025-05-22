@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain } from 'lucide-react';
+import { MdOutlineMemory } from 'react-icons/md';
 import navLinks from './navLinks';
 
 const Footer: React.FC = () => (
@@ -7,7 +7,7 @@ const Footer: React.FC = () => (
         <div className="container mx-auto px-6 py-12">
             <div className="flex flex-col md:flex-row justify-between items-center">
                 <div className="flex items-center gap-2 mb-4 md:mb-0">
-                    <Brain size={24} className="text-teal-400" />
+                    <MdOutlineMemory size={24} className="text-teal-400" />
                     <span className="text-white font-bold text-xl">xmem</span>
                 </div>
                 <div className="flex gap-6 text-slate-400">

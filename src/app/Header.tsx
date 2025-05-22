@@ -84,13 +84,15 @@ const Header: React.FC = () => {
             )}
             <div className="flex items-center gap-6">
                 {(navLinks as NavLink[]).map((link) => (
-                    <Link
-                        key={link.href}
-                        href={link.href}
-                        className="hover:text-teal-400 transition-colors"
-                    >
-                        {link.label}
-                    </Link>
+                    user ? (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className="hover:text-teal-400 transition-colors"
+                        >
+                            {link.label}
+                        </Link>
+                    ) : null
                 ))}
                 {!loading && user ? (
                     <div className="relative ml-4" ref={dropdownRef}>
@@ -103,7 +105,10 @@ const Header: React.FC = () => {
                                 <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name}</div>
                                 <button
                                     className="w-full text-left px-4 py-2 hover:bg-slate-100"
-                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    onClick={async () => {
+                                        await signOut({ callbackUrl: '/', redirect: false });
+                                        window.location.href = '/';
+                                    }}
                                 >
                                     Sign out
                                 </button>
@@ -111,12 +116,21 @@ const Header: React.FC = () => {
                         )}
                     </div>
                 ) : (
-                    <button
-                        className="px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors font-medium ml-4"
-                        onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                    <a
+                        href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-4"
+                        style={{ display: 'flex', alignItems: 'center' }}
                     >
-                        Get Started
-                    </button>
+                        <img
+                            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                            alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                            style={{ width: 150, height: 32 }}
+                            width={150}
+                            height={32}
+                        />
+                    </a>
                 )}
             </div>
         </header>

@@ -55,7 +55,10 @@ const Header: React.FC = () => {
                                 <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name}</div>
                                 <button
                                     className="w-full text-left px-4 py-2 hover:bg-slate-100"
-                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    onClick={async () => {
+                                        await signOut({ callbackUrl: '/', redirect: false });
+                                        window.location.href = '/';
+                                    }}
                                 >
                                     Sign out
                                 </button>

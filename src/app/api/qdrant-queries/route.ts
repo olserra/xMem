@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function GET(req) {
-  const baseUrl = process.env.NEXT_PUBLIC_QDRANT_URL || 'https://e1d45360-76fe-4a7b-b769-f59ced8c7b0f.eu-west-1-0.aws.cloud.qdrant.io:6333';
-  const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.eyIIvmECLQ7wy6H09Kx4xmWaD-gvr_VwEJr07bkiYw8';
+export async function GET(req: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_QDRANT_URL;
+  if (!baseUrl) {
+    return NextResponse.json({ error: 'Qdrant URL is not defined' }, { status: 500 });
+  }
+  const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
   const collection = 'xmem_collection';
   const url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -23,14 +27,16 @@ export async function GET(req) {
     const text = await res.text();
     if (res.ok) {
       const data = JSON.parse(text);
-      const points = data.result?.points || [];
+      const points: Array<{ id: string | number; payload?: Record<string, unknown> }> = data.result?.points || [];
       if (relevanceOnly) {
         // Return just the 'number' field (relevance score) from each payload
-        const scores = points.map((pt) => pt.payload?.number).filter((n) => typeof n === 'number');
+        const scores = points
+          .map((pt: { payload?: Record<string, unknown> }) => pt.payload?.number)
+          .filter((n: unknown): n is number => typeof n === 'number');
         return NextResponse.json({ scores });
       }
       // Map to a frontend-friendly format
-      const queries = points.map((pt) => ({
+      const queries = points.map((pt: { id: string | number; payload?: Record<string, unknown> }) => ({
         id: pt.id,
         ...pt.payload,
       }));

@@ -34,7 +34,7 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
         </div>
 
         <h3 className="font-medium text-slate-800 mb-1">{endpoint.name}</h3>
-        <p className="text-sm text-slate-400 mb-4 line-clamp-2">{endpoint.description}</p>
+        <p className="text-sm text-slate-400">{endpoint.description}</p>
 
         <div className="flex items-center gap-2">
           <span className={`text-xs font-bold px-2 py-1 rounded ${endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800' :
@@ -46,9 +46,8 @@ const ApiEndpointCard: React.FC<ApiEndpointCardProps> = ({
           </span>
           <code className="text-xs font-mono text-slate-800 truncate">{endpoint.path}</code>
         </div>
+        <div className={`h-1 mt-4 ${isSelected ? 'bg-indigo-500' : 'bg-transparent'}`}></div>
       </div>
-
-      <div className={`h-1 ${isSelected ? 'bg-indigo-500' : 'bg-transparent'}`}></div>
     </div>
   );
 };

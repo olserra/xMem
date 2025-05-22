@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Database } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
 import MemoryItemList from '../components/memory/MemoryItemList';
+import SessionMemoryManager from '../components/memory/SessionMemoryManager';
 
 interface MemorySource {
   id: string;
@@ -541,57 +542,63 @@ const MemoryManager: React.FC = () => {
       </div>
 
       {/* Add Source Button */}
-      <div className="flex justify-end mt-4">
-        <button
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
-          onClick={handleAdd}
-        >
-          + Add Source
-        </button>
-      </div>
+      {activeTab !== 'session' && (
+        <div className="flex justify-end mt-4">
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
+            onClick={handleAdd}
+          >
+            + Add Source
+          </button>
+        </div>
+      )}
 
       {/* Memory sources grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Template Card */}
-        {(!isAddMode && !hasTemplate) && (
-          <MemorySourceCard
-            key="template"
-            source={{
-              id: 'template',
-              name: 'New Vector DB Source',
-              type: 'vectorDb',
-              status: 'disconnected',
-              itemCount: 0,
-              lastSync: '',
-              icon: <Database size={24} className="text-indigo-300" />,
-              vectorDbUrl: '',
-              apiKey: '',
-              embeddingModel: 'text-embedding-3-small',
-              maxCacheSize: 128,
-              sessionTtl: 3600,
-              enableCache: true,
-              collection: '',
-            }}
-            onEdit={handleAdd}
-            onDelete={() => { }}
-            onStatusChange={() => { }}
-          />
-        )}
-        {loading ? (
-          <div className="col-span-full text-center text-slate-400">Loading...</div>
-        ) : filteredSources.map((source) => (
-          <MemorySourceCard
-            key={source.id}
-            source={source}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onStatusChange={handleStatusChange}
-          />
-        ))}
-        {(!loading && filteredSources.length === 0 && !hasTemplate) && (
-          <div className="col-span-full text-center text-slate-400">No memory sources found.</div>
-        )}
-      </div>
+      {activeTab === 'session' ? (
+        <SessionMemoryManager />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Template Card */}
+          {(!isAddMode && !hasTemplate) && (
+            <MemorySourceCard
+              key="template"
+              source={{
+                id: 'template',
+                name: 'New Vector DB Source',
+                type: 'vectorDb',
+                status: 'disconnected',
+                itemCount: 0,
+                lastSync: '',
+                icon: <Database size={24} className="text-indigo-300" />,
+                vectorDbUrl: '',
+                apiKey: '',
+                embeddingModel: 'text-embedding-3-small',
+                maxCacheSize: 128,
+                sessionTtl: 3600,
+                enableCache: true,
+                collection: '',
+              }}
+              onEdit={handleAdd}
+              onDelete={() => { }}
+              onStatusChange={() => { }}
+            />
+          )}
+          {loading ? (
+            <div className="col-span-full text-center text-slate-400">Loading...</div>
+          ) : filteredSources.map((source) => (
+            <MemorySourceCard
+              key={source.id}
+              source={source}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onStatusChange={handleStatusChange}
+            />
+          ))}
+          {(!loading && filteredSources.length === 0 && !hasTemplate) && (
+            <div className="col-span-full text-center text-slate-400">No memory sources found.</div>
+          )}
+        </div>
+      )}
       {/* Memory items */}
       <div className="bg-white rounded-lg shadow-sm mt-8">
         <div className="px-6 py-4 border-b border-slate-200">

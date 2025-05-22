@@ -7,6 +7,7 @@ import CodeSnippet from '../components/integration/CodeSnippet';
 
 const IntegrationHub: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState('query');
+  const [selectedLanguage, setSelectedLanguage] = useState<'js' | 'python' | 'curl'>('js');
 
   // Example API endpoints
   const endpoints = [
@@ -191,13 +192,28 @@ const IntegrationHub: React.FC = () => {
                 <div className="mb-4 flex justify-between items-center">
                   <h3 className="text-sm font-medium text-slate-500">CODE EXAMPLE</h3>
                   <div className="flex gap-2">
-                    <button className="text-xs text-indigo-600 hover:text-indigo-800">JavaScript</button>
-                    <button className="text-xs text-slate-500 hover:text-slate-700">Python</button>
-                    <button className="text-xs text-slate-500 hover:text-slate-700">cURL</button>
+                    <button
+                      className={`text-xs px-2 py-1 rounded cursor-pointer transition-colors ${selectedLanguage === 'js' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-slate-700'}`}
+                      onClick={() => setSelectedLanguage('js')}
+                    >
+                      JavaScript
+                    </button>
+                    <button
+                      className={`text-xs px-2 py-1 rounded cursor-pointer transition-colors ${selectedLanguage === 'python' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-slate-700'}`}
+                      onClick={() => setSelectedLanguage('python')}
+                    >
+                      Python
+                    </button>
+                    <button
+                      className={`text-xs px-2 py-1 rounded cursor-pointer transition-colors ${selectedLanguage === 'curl' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-slate-700'}`}
+                      onClick={() => setSelectedLanguage('curl')}
+                    >
+                      cURL
+                    </button>
                   </div>
                 </div>
 
-                <CodeSnippet endpoint={endpoint} />
+                <CodeSnippet endpoint={endpoint} language={selectedLanguage} />
 
                 <button className="mt-4 flex items-center gap-2 text-indigo-600 text-sm hover:text-indigo-800">
                   <RefreshCw size={14} />

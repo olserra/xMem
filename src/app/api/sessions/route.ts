@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing sessionId or memory' }, { status: 400 });
   }
   // Attach userId to memory for scoping if needed
-  await orchestrator.getProvider('session').setSession(data.sessionId, { ...data.memory, userId });
+  const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
+  await sessionProvider.setSession(data.sessionId, { ...data.memory, userId });
   return NextResponse.json({ success: true });
 }
 
@@ -48,6 +49,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
   }
   // Optionally, check if session belongs to user
-  await orchestrator.getProvider('session').deleteSession(sessionId);
+  const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
+  await sessionProvider.deleteSession(sessionId);
   return NextResponse.json({ success: true });
 } 

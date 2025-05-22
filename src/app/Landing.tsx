@@ -184,12 +184,11 @@ const Landing: React.FC = () => {
                                 <span className="text-slate-200 font-medium">Wasting time repeating yourself</span>
                             </div>
                         </div>
-                        <a
-                            href="#why-xmem"
-                            className="inline-block px-7 py-3 bg-gradient-to-r from-teal-500 to-indigo-500 text-white rounded-lg font-semibold shadow-lg hover:scale-105 transition-transform"
+                        <span
+                            className="inline-block px-7 py-3 bg-gradient-to-r from-teal-500 to-indigo-500 text-white rounded-lg font-semibold shadow-lg select-none cursor-default mt-2"
                         >
-                            See how xmem solves this
-                        </a>
+                            Persistent memory for every user
+                        </span>
                     </div>
                     {/* Right: Visual Illustration */}
                     <div className="flex-1 flex items-center justify-center relative w-full h-72 md:h-80">

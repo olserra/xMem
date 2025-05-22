@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdOutlineMemory } from 'react-icons/md';
+// import { MdOutlineMemory } from 'react-icons/md';
 import navLinks from './navLinks';
 import Logo from '../ui/Logo';
 

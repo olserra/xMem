@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, File, MessageSquare, Clock } from 'lucide-react';
 
+interface MemoryItem {
+  id: string;
+  // Add other relevant fields here
+}
+
 const getIcon = (type: string | undefined) => {
   if (!type) return <File size={16} className="text-slate-400" />;
   if (type === 'conversation' || type === 'chat' || type === 'message') return <MessageSquare size={16} className="text-teal-600" />;
@@ -8,7 +13,7 @@ const getIcon = (type: string | undefined) => {
 };
 
 const MemoryItemList: React.FC = () => {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<MemoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +26,8 @@ const MemoryItemList: React.FC = () => {
         if (!res.ok) throw new Error('Failed to fetch memory items');
         const data = await res.json();
         setItems(data.queries || []);
-      } catch (e: any) {
-        setError(e.message || 'Error fetching memory items');
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error fetching items');
       } finally {
         setLoading(false);
       }

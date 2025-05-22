@@ -1,5 +1,5 @@
 import { XmemOrchestrator } from './xmem';
-import { RedisAdapter } from './adapters/redis';
+// import { RedisAdapter } from './adapters/redis';
 
 // Create orchestrator instance
 export const orchestrator = new XmemOrchestrator();

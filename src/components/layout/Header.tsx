@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { MdOutlineMemory } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import Avatar from '@/app/Avatar';
 import { useSession, signOut } from 'next-auth/react';

@@ -23,8 +23,8 @@ const RecentQueriesTable: React.FC = () => {
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setRecentQueries(data.queries || []);
-      } catch (e: any) {
-        setError(e.message || 'Error fetching queries');
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error fetching queries');
       }
       setLoading(false);
     };

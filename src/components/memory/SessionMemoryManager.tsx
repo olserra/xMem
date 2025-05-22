@@ -28,7 +28,7 @@ const SessionMemoryManager: React.FC = () => {
             } else {
                 setError('Failed to load session.');
             }
-        } catch (e) {
+        } catch {
             setError('Error loading session.');
         } finally {
             setLoading(false);
@@ -50,7 +50,7 @@ const SessionMemoryManager: React.FC = () => {
             } else {
                 setError('Failed to save session memory.');
             }
-        } catch (e) {
+        } catch {
             setError('Error saving session memory.');
         } finally {
             setLoading(false);
@@ -76,7 +76,7 @@ const SessionMemoryManager: React.FC = () => {
             } else {
                 setError('Failed to delete session.');
             }
-        } catch (e) {
+        } catch {
             setError('Error deleting session.');
         } finally {
             setLoading(false);

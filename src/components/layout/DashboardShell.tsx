@@ -27,7 +27,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return (
         <>
             <Header />
-            <div className="flex min-h-screen">
+            <div className="flex min-h-screen pt-16">
                 <Sidebar
                     navItems={navItems}
                     currentPage={currentPage}

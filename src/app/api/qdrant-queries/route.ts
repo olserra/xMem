@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req) {
   const baseUrl = process.env.NEXT_PUBLIC_QDRANT_URL || 'https://e1d45360-76fe-4a7b-b769-f59ced8c7b0f.eu-west-1-0.aws.cloud.qdrant.io:6333';
   const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.eyIIvmECLQ7wy6H09Kx4xmWaD-gvr_VwEJr07bkiYw8';
   const collection = 'xmem_collection';
@@ -15,13 +15,22 @@ export async function GET() {
     // Optionally, you could add sorting or filtering here
   });
 
+  const { searchParams } = new URL(req.url);
+  const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
+
   try {
     const res = await fetch(url, { method: 'POST', headers, body });
     const text = await res.text();
     if (res.ok) {
       const data = JSON.parse(text);
+      const points = data.result?.points || [];
+      if (relevanceOnly) {
+        // Return just the 'number' field (relevance score) from each payload
+        const scores = points.map((pt) => pt.payload?.number).filter((n) => typeof n === 'number');
+        return NextResponse.json({ scores });
+      }
       // Map to a frontend-friendly format
-      const queries = (data.result?.points || []).map((pt: any) => ({
+      const queries = points.map((pt) => ({
         id: pt.id,
         ...pt.payload,
       }));

@@ -59,11 +59,11 @@ const Header: React.FC = () => {
                 {user ? (
                     <div className="relative ml-4" ref={dropdownRef}>
                         <button className="focus:outline-none cursor-pointer" onClick={() => setDropdownOpen((v) => !v)}>
-                            <Avatar imageUrl={user.image ?? undefined} name={user.name || ''} size={40} />
+                            <Avatar imageUrl={user.image ?? undefined} name={user.name || user.email || 'User'} size={40} />
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-40 bg-white text-slate-800 rounded-md shadow-lg z-20">
-                                <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name}</div>
+                                <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name || user.email}</div>
                                 <button
                                     className="w-full text-left px-4 py-2 hover:bg-slate-100"
                                     onClick={async () => {

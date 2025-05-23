@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   memorySources MemorySource[]
   APIKey        APIKey[]
+  Project       Project[]
 }
 
 model Account {
@@ -77,6 +78,8 @@ model MemorySource {
   userId         String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  project        Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId      String?
 }
 
 model APIKey {
@@ -88,4 +91,15 @@ model APIKey {
   createdAt DateTime  @default(now())
   lastUsed  DateTime?
   revokedAt DateTime?
+}
+
+model Project {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  memorySources MemorySource[]
 }

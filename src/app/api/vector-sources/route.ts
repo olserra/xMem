@@ -9,14 +9,18 @@ function getUserId(session: Session | null): string | null {
   return session?.user && session.user.id ? session.user.id : null;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = getUserId(session);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const { searchParams } = new URL(req.url);
+  const projectId = searchParams.get('projectId');
+  const where: any = { userId };
+  if (projectId) where.projectId = projectId;
   const sources = await prisma.memorySource.findMany({
-    where: { userId },
+    where,
     orderBy: { createdAt: 'desc' },
   });
   return NextResponse.json(sources);
@@ -89,7 +93,8 @@ export async function POST(req: NextRequest) {
       enableCache: data.enableCache,
       collection: data.collection,
       userId,
-    },
+      projectId: data.projectId ?? undefined,
+    } as any,
   });
   return NextResponse.json({ success: true, id: source.id });
 }

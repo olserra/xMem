@@ -6,7 +6,11 @@ import ContextPreview from '../components/context/ContextPreview';
 import RankingControls from '../components/context/RankingControls';
 import ContextSourceList from '../components/context/ContextSourceList';
 
-const ContextManager: React.FC = () => {
+interface ContextManagerProps {
+  projectId: string;
+}
+
+const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   const [selectedSource, setSelectedSource] = useState('all');
   const [rankingMethod, setRankingMethod] = useState('smart');
 
@@ -50,6 +54,7 @@ const ContextManager: React.FC = () => {
           <ContextSourceList
             selectedSource={selectedSource}
             onSourceSelect={setSelectedSource}
+            projectId={projectId}
           />
         </div>
         {/* Main content area with context preview */}
@@ -82,6 +87,7 @@ const ContextManager: React.FC = () => {
                 method={rankingMethod}
                 maxSize={contextConfig.maxSize}
                 currentSize={contextConfig.currentSize}
+                projectId={projectId}
               />
             </div>
             <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 overflow-y-auto">
@@ -90,8 +96,9 @@ const ContextManager: React.FC = () => {
                 factors={contextConfig.rankingFactors}
                 onFactorChange={(factor, value) => {
                   // In a real app, this would update the ranking factors
-                  console.log(`Changed ${factor} to ${value}`);
+                  console.log(`Changed ${factor} to ${value} for project ${projectId}`);
                 }}
+                projectId={projectId}
               />
             </div>
           </div>

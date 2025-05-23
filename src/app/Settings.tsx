@@ -107,7 +107,7 @@ const Settings: React.FC = () => {
       <div className="p-6">
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-8 border-b border-slate-200">
-          {['context', 'api-key'].map(tab => (
+          {['api-key'].map(tab => (
             <button
               key={tab}
               className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors cursor-pointer ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
@@ -117,122 +117,6 @@ const Settings: React.FC = () => {
             </button>
           ))}
         </div>
-
-        {/* Context & RAG Settings */}
-        {activeTab === 'context' && (
-          <div className="space-y-8">
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-4 flex items-start gap-3">
-              <AlertTriangle size={20} className="text-amber-500 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-amber-800">Advanced Settings</h3>
-                <p className="text-sm text-amber-700 mt-1">
-                  These settings affect how context is selected and ranked. Changing them may impact the quality of responses.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="defaultMaxTokens">
-                  Default Max Tokens
-                </label>
-                <input
-                  type="number"
-                  id="defaultMaxTokens"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  defaultValue={ragSettings.defaultMaxTokens}
-                />
-                <p className="mt-1 text-xs text-slate-500">
-                  Maximum number of tokens to include in context window
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="defaultRankingMethod">
-                  Default Ranking Method
-                </label>
-                <select
-                  id="defaultRankingMethod"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  defaultValue={ragSettings.defaultRankingMethod}
-                >
-                  <option value="smart">Smart (Multi-factor)</option>
-                  <option value="similarity">Similarity</option>
-                  <option value="recency">Recency</option>
-                  <option value="manual">Manual Selection</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="chunkSize">
-                  Chunk Size
-                </label>
-                <input
-                  type="number"
-                  id="chunkSize"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  defaultValue={ragSettings.chunkSize}
-                />
-                <p className="mt-1 text-xs text-slate-500">
-                  Size of text chunks for processing (in tokens)
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="overlapSize">
-                  Overlap Size
-                </label>
-                <input
-                  type="number"
-                  id="overlapSize"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  defaultValue={ragSettings.overlapSize}
-                />
-                <p className="mt-1 text-xs text-slate-500">
-                  Overlap between chunks to maintain context (in tokens)
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="autoSyncInterval">
-                Auto-Sync Interval (minutes)
-              </label>
-              <input
-                type="number"
-                id="autoSyncInterval"
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                defaultValue={ragSettings.autoSyncInterval}
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                How often to automatically sync with the vector database (0 to disable)
-              </p>
-            </div>
-
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-slate-600 mb-2">Available Context Sources</h4>
-                <ContextSourceList selectedSource="all" onSourceSelect={() => { }} />
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-slate-600 mb-2">Ranking Controls</h4>
-                <RankingControls method="smart" factors={{ similarity: 0.7, recency: 0.2, feedback: 0.1 }} onFactorChange={() => { }} />
-              </div>
-            </div>
-
-            <div className="border-t border-slate-200 pt-6 flex justify-end gap-3">
-              <button className="px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors">
-                Reset to Defaults
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-                <Save size={16} />
-                <span>Save Changes</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* API Keys Settings */}
         {activeTab === 'api-key' && (

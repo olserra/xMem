@@ -22,6 +22,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   memorySources MemorySource[]
+  APIKey        APIKey[]
 }
 
 model Account {
@@ -76,4 +77,15 @@ model MemorySource {
   userId         String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+model APIKey {
+  id        String    @id @default(cuid())
+  name      String
+  key       String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime  @default(now())
+  lastUsed  DateTime?
+  revokedAt DateTime?
 }

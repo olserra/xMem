@@ -31,7 +31,8 @@ for i in $(seq 1 50); do
   phrase=$(random_phrase)
   number=$((RANDOM % 100))
   flag=$([ $((RANDOM % 2)) -eq 0 ] && echo "true" || echo "false")
-  points+="{\"id\":$i,\"vector\":$vector,\"payload\":{\"text\":\"$phrase\",\"number\":$number,\"flag\":$flag}}"
+  size=${#phrase}
+  points+="{\"id\":$i,\"vector\":$vector,\"payload\":{\"text\":\"$phrase\",\"source\":\"$phrase\",\"score\":$number,\"size\":$size,\"flag\":$flag}}"
   if [ $i -lt 50 ]; then
     points+=","
   fi

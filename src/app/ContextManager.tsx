@@ -13,11 +13,11 @@ interface ContextManagerProps {
 const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   const [selectedSource, setSelectedSource] = useState('all');
   const [rankingMethod, setRankingMethod] = useState('smart');
+  const [currentSize, setCurrentSize] = useState(0);
 
   // Example context configuration
   const contextConfig = {
     maxSize: 4000,
-    currentSize: 2840,
     chunkStrategy: 'semantic',
     rankingFactors: {
       similarity: 0.7,
@@ -86,8 +86,10 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
               <ContextPreview
                 method={rankingMethod}
                 maxSize={contextConfig.maxSize}
-                currentSize={contextConfig.currentSize}
+                currentSize={currentSize}
                 projectId={projectId}
+                sourceId={selectedSource}
+                onContextItemsLoaded={items => setCurrentSize(items.reduce((sum, item) => sum + (item.size || 0), 0))}
               />
             </div>
             <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 overflow-y-auto">

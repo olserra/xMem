@@ -13,7 +13,7 @@ const Modal: React.FC<{ open: boolean; onClose: () => void; children: React.Reac
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-200/60">
       <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
         <button
-          className="absolute top-2 right-2 text-slate-400 hover:text-slate-700 text-xl"
+          className="absolute top-2 right-2 text-slate-400 hover:text-slate-700 text-xl cursor-pointer"
           onClick={onClose}
           aria-label="Close"
         >
@@ -46,6 +46,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   const [contextConfig, setContextConfig] = useState(defaultContextConfig);
   const [showSettings, setShowSettings] = useState(false);
   const [formConfig, setFormConfig] = useState(contextConfig);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Available ranking methods
   const rankingMethods = [
@@ -79,6 +80,8 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 type="text"
                 placeholder="Search sources..."
                 className="pl-10 pr-4 py-2 w-full border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -86,6 +89,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
             selectedSource={selectedSource}
             onSourceSelect={setSelectedSource}
             projectId={projectId}
+            searchTerm={searchTerm}
           />
         </div>
         {/* Main content area with context preview */}
@@ -95,7 +99,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
             <h2 className="font-medium text-slate-800">Context Preview</h2>
             <div className="flex items-center gap-2">
               <button
-                className="flex items-center gap-1 px-3 py-1.5 border border-slate-300 rounded-md text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                 onClick={handleOpenSettings}
               >
                 <Sliders size={14} />
@@ -104,7 +108,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
               <select
                 value={rankingMethod}
                 onChange={(e) => setRankingMethod(e.target.value)}
-                className="px-3 py-1.5 border border-slate-300 rounded-md text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 {rankingMethods.map((method) => (
                   <option key={method.id} value={method.id}>
@@ -170,7 +174,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
         </div>
         <div className="flex justify-end gap-2 mt-6">
           <button
-            className="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300"
+            className="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 cursor-pointer"
             onClick={() => setShowSettings(false)}
           >
             Cancel

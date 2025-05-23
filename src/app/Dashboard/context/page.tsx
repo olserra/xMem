@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import ContextManager from '../../ContextManager';
 import { PlusCircle, Edit, Trash2, Check, X } from 'lucide-react';
 import { useSession, signIn } from 'next-auth/react';
+import { Project } from './types';
 
 export default function ContextPage() {
-    const { data: session, status } = useSession();
-    const [projects, setProjects] = useState<any[]>([]);
+    const { status } = useSession();
+    const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -16,6 +17,11 @@ export default function ContextPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchProjects();
+        // eslint-disable-next-line
+    }, []);
 
     if (status === 'unauthenticated') {
         return (
@@ -35,7 +41,7 @@ export default function ContextPage() {
                         const err = await res.json();
                         if (res.status === 401) errMsg = 'Please log in to view your projects.';
                         else errMsg = err.error || errMsg;
-                    } catch {}
+                    } catch { }
                     throw new Error(errMsg);
                 }
                 return res.json();
@@ -53,11 +59,6 @@ export default function ContextPage() {
             .finally(() => setLoading(false));
     };
 
-    useEffect(() => {
-        fetchProjects();
-        // eslint-disable-next-line
-    }, []);
-
     const openCreateModal = () => {
         setModalMode('create');
         setModalName('');
@@ -66,7 +67,7 @@ export default function ContextPage() {
         setEditId(null);
         setError(null);
     };
-    const openEditModal = (project: any) => {
+    const openEditModal = (project: Project) => {
         setModalMode('edit');
         setModalName(project.name);
         setModalDesc(project.description || '');
@@ -148,17 +149,20 @@ export default function ContextPage() {
                 <select
                     value={selectedProject || ''}
                     onChange={e => setSelectedProject(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
                 >
-                    {projects.map((p: any) => (
+                    {projects.map((p: Project) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                 </select>
-                <button onClick={openCreateModal} className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded flex items-center gap-1 cursor-pointer text-sm"><PlusCircle size={16} /> New</button>
+                <button onClick={openCreateModal} className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0"><PlusCircle size={16} /> New</button>
                 {selectedProject && (
                     <>
-                        <button onClick={() => openEditModal(projects.find((p: any) => p.id === selectedProject))} className="ml-2 px-2 py-1 bg-slate-200 text-slate-700 rounded flex items-center gap-1 cursor-pointer text-sm"><Edit size={16} /> Rename</button>
-                        <button onClick={() => handleDelete(selectedProject)} className="ml-2 px-2 py-1 bg-rose-100 text-rose-700 rounded flex items-center gap-1 cursor-pointer text-sm" disabled={deleting === selectedProject}><Trash2 size={16} /> {deleting === selectedProject ? 'Deleting...' : 'Delete'}</button>
+                        <button onClick={() => {
+                            const project = projects.find((p: Project) => p.id === selectedProject);
+                            if (project) openEditModal(project);
+                        }} className="ml-2 px-2 py-1 bg-slate-200 text-slate-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0"><Edit size={16} /> Rename</button>
+                        <button onClick={() => handleDelete(selectedProject)} className="ml-2 px-2 py-1 bg-rose-100 text-rose-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0" disabled={deleting === selectedProject}><Trash2 size={16} /> {deleting === selectedProject ? 'Deleting...' : 'Delete'}</button>
                     </>
                 )}
             </div>
@@ -179,7 +183,18 @@ export default function ContextPage() {
     );
 }
 
-function ProjectModal({ mode, name, desc, setName, setDesc, onClose, onSave, error }: any) {
+interface ProjectModalProps {
+    mode: 'create' | 'edit';
+    name: string;
+    desc: string;
+    setName: (name: string) => void;
+    setDesc: (desc: string) => void;
+    onClose: () => void;
+    onSave: () => void;
+    error: string | null;
+}
+
+function ProjectModal({ mode, name, desc, setName, setDesc, onClose, onSave, error }: ProjectModalProps) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">

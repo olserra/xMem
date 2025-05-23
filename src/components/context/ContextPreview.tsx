@@ -93,7 +93,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
                   </>
                 )}
 
-                <button className="p-1 text-slate-400 hover:text-rose-600" title="Remove from context">
+                <button className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer" title="Remove from context">
                   <Trash size={14} />
                 </button>
               </div>

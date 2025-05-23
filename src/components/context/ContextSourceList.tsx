@@ -8,13 +8,19 @@ interface ContextSourceListProps {
   searchTerm?: string;
 }
 
+interface Source {
+  id: string;
+  name: string;
+  itemCount?: number;
+}
+
 const ContextSourceList: React.FC<ContextSourceListProps> = ({
   selectedSource,
   onSourceSelect,
   projectId,
   searchTerm = ''
 }) => {
-  const [sources, setSources] = useState<any[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

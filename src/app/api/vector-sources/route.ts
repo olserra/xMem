@@ -3,6 +3,7 @@ import { prisma } from '../../../../prisma/prisma';
 import { getServerSession } from 'next-auth/next';
 import type { Session } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/auth';
+import type { MemorySource, Prisma } from '@prisma/client';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
   }
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get('projectId');
-  const where: any = { userId };
+  const where: Record<string, unknown> = { userId };
   if (projectId) where.projectId = projectId;
   const sources = await prisma.memorySource.findMany({
     where,
@@ -92,9 +93,9 @@ export async function POST(req: NextRequest) {
       sessionTtl: data.sessionTtl,
       enableCache: data.enableCache,
       collection: data.collection,
-      userId,
-      projectId: data.projectId ?? undefined,
-    } as any,
+      user: { connect: { id: userId } },
+      ...(data.projectId ? { project: { connect: { id: data.projectId } } } : {}),
+    },
   });
   return NextResponse.json({ success: true, id: source.id });
 }

@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Trash, Star, MoveUp, MoveDown, MoveHorizontal } from 'lucide-react';
 
+interface ContextItem {
+  id: string;
+  source?: string;
+  collection?: string;
+  score?: number;
+  size?: number;
+  content?: string;
+  text?: string;
+}
+
 interface ContextPreviewProps {
   method: string;
   maxSize: number;
   currentSize: number;
   projectId: string;
   sourceId: string;
-  onContextItemsLoaded?: (items: any[]) => void;
+  onContextItemsLoaded?: (items: ContextItem[]) => void;
 }
 
 const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceId, onContextItemsLoaded }) => {
-  const [contextItems, setContextItems] = useState<any[]>([]);
+  const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +37,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceId]);
+  }, [projectId, sourceId, onContextItemsLoaded]);
 
   // Calculate usage percentage
   const usagePercentage = (currentSize / maxSize) * 100;

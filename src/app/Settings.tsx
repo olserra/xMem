@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save, AlertTriangle, Lock, PlusCircle, Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
-import ContextSourceList from '../components/context/ContextSourceList';
-import RankingControls from '../components/context/RankingControls';
+import { Lock, PlusCircle, Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
 
 // Define APIKey type
 interface APIKey {
@@ -25,14 +23,6 @@ const Settings: React.FC = () => {
   const [showKeyId, setShowKeyId] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState('');
   const [creating, setCreating] = useState(false);
-
-  const ragSettings = {
-    defaultMaxTokens: 4000,
-    chunkSize: 512,
-    overlapSize: 128,
-    defaultRankingMethod: 'smart',
-    autoSyncInterval: 30,
-  };
 
   // Fetch API keys
   useEffect(() => {

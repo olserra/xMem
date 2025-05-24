@@ -42,7 +42,7 @@ export class GeminiAdapter implements LLMProvider {
     return json.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
 
-  async embed(_text: string, _model?: string): Promise<number[]> {
+  async embed(): Promise<number[]> {
     throw new Error('Embedding not implemented for Gemini');
   }
 } 

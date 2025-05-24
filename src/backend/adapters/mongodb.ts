@@ -49,7 +49,7 @@ export class MongoDBVectorAdapter implements VectorStore {
         },
       ]).toArray();
       return results;
-    } catch (_e) {
+    } catch {
       // Fallback: brute-force cosine similarity
       const all = await collection.find({ $vector: { $exists: true } }).toArray();
       const cosine = (a: number[], b: number[]) => {

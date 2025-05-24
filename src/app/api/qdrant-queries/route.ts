@@ -7,7 +7,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Qdrant URL is not defined' }, { status: 500 });
   }
   const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
-  const collection = 'xmem_collection';
+  const { searchParams } = new URL(req.url);
+  const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
+  const collection = searchParams.get('collection') || 'xmem_collection';
   const url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (apiKey) headers['api-key'] = apiKey;
@@ -18,9 +20,6 @@ export async function GET(req: NextRequest) {
     with_vector: false,
     // Optionally, you could add sorting or filtering here
   });
-
-  const { searchParams } = new URL(req.url);
-  const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
 
   try {
     const res = await fetch(url, { method: 'POST', headers, body });

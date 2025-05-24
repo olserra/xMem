@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sliders, Search, Shuffle, Clock, FileText, ArrowDownWideNarrow } from 'lucide-react';
 import ContextPreview from '../components/context/ContextPreview';
 import RankingControls from '../components/context/RankingControls';
@@ -47,6 +47,33 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [formConfig, setFormConfig] = useState(contextConfig);
   const [searchTerm, setSearchTerm] = useState('');
+  const [collection, setCollection] = useState('xmem_collection');
+  const [collections, setCollections] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Fetch available collections from Qdrant
+    const fetchCollections = async () => {
+      try {
+        const qdrantUrl = process.env.NEXT_PUBLIC_QDRANT_URL;
+        const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
+        if (!qdrantUrl) return;
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (apiKey) headers['api-key'] = apiKey;
+        const res = await fetch(`${qdrantUrl.replace(/\/$/, '')}/collections`, { headers });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.result && Array.isArray(data.result.collections)) {
+          const names = data.result.collections.map((c: { name?: string; collection_name?: string; id?: string }) => c.name || c.collection_name || c.id || '');
+          setCollections(names);
+          if (names.length && !names.includes(collection)) {
+            setCollection(names.includes('xmem_collection') ? 'xmem_collection' : names[0]);
+          }
+        }
+      } catch { }
+    };
+    fetchCollections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Available ranking methods
   const rankingMethods = [
@@ -67,7 +94,21 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full">
+      {/* Collection selector */}
+      <div className="flex items-center gap-4 p-4">
+        <label className="text-sm font-medium text-slate-700">Collection:</label>
+        <select
+          value={collection}
+          onChange={e => setCollection(e.target.value)}
+          className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
+        >
+          {collections.length === 0 && <option value={collection}>{collection}</option>}
+          {collections.map((col) => (
+            <option key={col} value={col}>{col}</option>
+          ))}
+        </select>
+      </div>
       {/* Context management interface */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left sidebar with context sources */}
@@ -127,6 +168,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 currentSize={currentSize}
                 projectId={projectId}
                 sourceId={selectedSource}
+                collection={collection}
                 onContextItemsLoaded={items => setCurrentSize(items.reduce((sum, item) => sum + (item.size || 0), 0))}
               />
             </div>

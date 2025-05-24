@@ -24,6 +24,8 @@ const Dashboard: React.FC = () => {
     optimizer_status?: string;
   } | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [collection, setCollection] = useState('xmem_collection');
+  const [collections, setCollections] = useState<string[]>([]);
 
   useEffect(() => {
     // Fetch Qdrant metrics from internal API route to avoid CORS
@@ -43,6 +45,31 @@ const Dashboard: React.FC = () => {
       setLoadingMetrics(false);
     };
     fetchMetrics();
+  }, []);
+
+  useEffect(() => {
+    // Fetch available collections from Qdrant
+    const fetchCollections = async () => {
+      try {
+        const qdrantUrl = process.env.NEXT_PUBLIC_QDRANT_URL;
+        const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
+        if (!qdrantUrl) return;
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (apiKey) headers['api-key'] = apiKey;
+        const res = await fetch(`${qdrantUrl.replace(/\/$/, '')}/collections`, { headers });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.result && Array.isArray(data.result.collections)) {
+          const names = data.result.collections.map((c: any) => c.name || c.collection_name || c.id || c);
+          setCollections(names);
+          if (names.length && !names.includes(collection)) {
+            setCollection(names.includes('xmem_collection') ? 'xmem_collection' : names[0]);
+          }
+        }
+      } catch { }
+    };
+    fetchCollections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const metrics: MetricCardProps[] = [
@@ -78,6 +105,20 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Collection selector */}
+      <div className="flex items-center gap-4 p-4">
+        <label className="text-sm font-medium text-slate-700">Collection:</label>
+        <select
+          value={collection}
+          onChange={e => setCollection(e.target.value)}
+          className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
+        >
+          {collections.length === 0 && <option value={collection}>{collection}</option>}
+          {collections.map((col) => (
+            <option key={col} value={col}>{col}</option>
+          ))}
+        </select>
+      </div>
       {/* Metrics row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((metric, index) => (
@@ -102,7 +143,7 @@ const Dashboard: React.FC = () => {
               View Details <ArrowUpRight size={14} />
             </button>
           </div>
-          <ContextRelevanceChart />
+          <ContextRelevanceChart collection={collection} />
         </div>
       </div>
       {/* Recent queries table */}
@@ -113,7 +154,7 @@ const Dashboard: React.FC = () => {
             See All <ArrowUpRight size={14} />
           </button>
         </div>
-        <RecentQueriesTable />
+        <RecentQueriesTable collection={collection} />
       </div>
     </div>
   );

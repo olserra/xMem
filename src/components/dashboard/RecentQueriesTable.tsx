@@ -9,7 +9,11 @@ interface Query {
   // Add more fields as needed
 }
 
-const RecentQueriesTable: React.FC = () => {
+interface RecentQueriesTableProps {
+  collection?: string;
+}
+
+const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'xmem_collection' }) => {
   const [recentQueries, setRecentQueries] = useState<Query[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +23,7 @@ const RecentQueriesTable: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('/api/qdrant-queries');
+        const res = await fetch(`/api/qdrant-queries?collection=${encodeURIComponent(collection)}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setRecentQueries(data.queries || []);
@@ -29,7 +33,7 @@ const RecentQueriesTable: React.FC = () => {
       setLoading(false);
     };
     fetchQueries();
-  }, []);
+  }, [collection]);
 
   return (
     <div className="overflow-x-auto">

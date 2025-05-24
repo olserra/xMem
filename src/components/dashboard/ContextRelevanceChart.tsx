@@ -6,7 +6,11 @@ const AXIS_HEIGHT = 32;
 const CHART_HEIGHT = 240;
 const CHART_WIDTH = 520;
 
-const ContextRelevanceChart: React.FC = () => {
+interface ContextRelevanceChartProps {
+  collection?: string;
+}
+
+const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collection = 'xmem_collection' }) => {
   const [scores, setScores] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +18,7 @@ const ContextRelevanceChart: React.FC = () => {
     const fetchScores = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/qdrant-queries?relevanceOnly=true');
+        const res = await fetch(`/api/qdrant-queries?relevanceOnly=true&collection=${encodeURIComponent(collection)}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setScores(data.scores || []);
@@ -24,7 +28,7 @@ const ContextRelevanceChart: React.FC = () => {
       setLoading(false);
     };
     fetchScores();
-  }, []);
+  }, [collection]);
 
   if (loading) {
     return <div className="relative h-60 w-full flex items-center justify-center text-slate-400">Loading...</div>;

@@ -17,10 +17,11 @@ interface ContextPreviewProps {
   currentSize: number;
   projectId: string;
   sourceId: string;
+  collection?: string;
   onContextItemsLoaded?: (items: ContextItem[]) => void;
 }
 
-const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceId, onContextItemsLoaded }) => {
+const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceId, collection = 'xmem_collection', onContextItemsLoaded }) => {
   const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +30,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
     setLoading(true);
     setError(null);
     // TODO: Update API to support filtering by projectId/sourceId if needed
-    fetch(`/api/qdrant-queries`)
+    fetch(`/api/qdrant-queries?collection=${encodeURIComponent(collection)}`)
       .then(res => res.json())
       .then(data => {
         setContextItems(data.queries || []);
@@ -37,7 +38,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceId, onContextItemsLoaded]);
+  }, [projectId, sourceId, collection, onContextItemsLoaded]);
 
   // Calculate usage percentage
   const usagePercentage = (currentSize / maxSize) * 100;

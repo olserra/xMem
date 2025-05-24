@@ -38,7 +38,7 @@ export class OpenAIAdapter implements LLMProvider {
     return json.choices?.[0]?.message?.content || '';
   }
 
-  async embed(text: string): Promise<number[]> {
+  async embed(text: string, model?: string): Promise<number[]> {
     const res = await fetch(`${this.apiUrl}/embeddings`, {
       method: 'POST',
       headers: {
@@ -46,7 +46,7 @@ export class OpenAIAdapter implements LLMProvider {
         'Authorization': `Bearer ${this.apiKey}`
       },
       body: JSON.stringify({
-        model: 'text-embedding-ada-002',
+        model: model || this.model,
         input: text
       })
     });

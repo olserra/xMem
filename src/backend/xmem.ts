@@ -15,7 +15,7 @@ export interface SessionStore {
 
 export interface LLMProvider {
   generateResponse(prompt: string, context?: Record<string, unknown>): Promise<string>;
-  embed(text: string): Promise<number[]>;
+  embed(text: string, model?: string): Promise<number[]>;
 }
 
 // --- Provider Registry Types ---
@@ -59,20 +59,20 @@ export class XmemOrchestrator {
 
   // --- Core Methods (now with provider selection) ---
 
-  async addMemory(memory: { id: string; text: string; metadata?: Record<string, unknown>; sessionId?: string; vectorProvider?: string; sessionProvider?: string; llmProvider?: string }) {
+  async addMemory(memory: { id: string; text: string; metadata?: Record<string, unknown>; sessionId?: string; vectorProvider?: string; sessionProvider?: string; llmProvider?: string; embeddingModel?: string }) {
     const vectorStore = this.getProvider<VectorStore>('vector', memory.vectorProvider);
     const sessionStore = this.getProvider<SessionStore>('session', memory.sessionProvider);
     const llmProvider = this.getProvider<LLMProvider>('llm', memory.llmProvider);
 
-    const embedding = await llmProvider.embed(memory.text);
+    const embedding = await llmProvider.embed(memory.text, memory.embeddingModel);
     await vectorStore.addEmbedding({ id: memory.id, embedding, metadata: memory.metadata });
     if (memory.sessionId) await sessionStore.setSession(memory.sessionId, memory as Record<string, unknown>);
   }
 
-  async getMemoryByEmbedding(queryText: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string }) {
+  async getMemoryByEmbedding(queryText: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string; embeddingModel?: string }) {
     const llmProvider = this.getProvider<LLMProvider>('llm', opts?.llmProvider);
     const vectorStore = this.getProvider<VectorStore>('vector', opts?.vectorProvider);
-    const embedding = await llmProvider.embed(queryText);
+    const embedding = await llmProvider.embed(queryText, opts?.embeddingModel);
     return vectorStore.searchEmbedding(embedding, opts?.topK || 5);
   }
 

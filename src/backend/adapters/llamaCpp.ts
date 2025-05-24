@@ -21,11 +21,13 @@ export class LlamaCppAdapter implements LLMProvider {
     return json.content || json.response || '';
   }
 
-  async embed(text: string): Promise<number[]> {
+  async embed(text: string, model?: string): Promise<number[]> {
+    const body: Record<string, any> = { content: text };
+    if (model) body.model = model;
     const res = await fetch(`${this.apiUrl}/embedding`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: text })
+      body: JSON.stringify(body)
     });
     const json = await res.json();
     return json.embedding || [];

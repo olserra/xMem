@@ -27,14 +27,16 @@ export class MistralAdapter implements LLMProvider {
     return json.response || '';
   }
 
-  async embed(text: string): Promise<number[]> {
+  async embed(text: string, model?: string): Promise<number[]> {
+    const body: Record<string, any> = { text };
+    if (model) body.model = model;
     const res = await fetch(`${this.apiUrl}/embed`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {})
       },
-      body: JSON.stringify({ text })
+      body: JSON.stringify(body)
     });
     const json = await res.json();
     return json.embedding || [];

@@ -8,6 +8,8 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      organizationId?: string;
+      role?: string;
     } & DefaultSession["user"]
   }
 }
@@ -37,8 +39,17 @@ export const authOptions: NextAuthOptions = {
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
+        session.user.organizationId = user.organizationId;
+        session.user.role = user.role;
       }
       return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.organizationId = user.organizationId;
+        token.role = user.role;
+      }
+      return token;
     },
     async redirect() {
       return "/dashboard";

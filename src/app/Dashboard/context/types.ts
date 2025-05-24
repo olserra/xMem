@@ -5,4 +5,9 @@ export interface Project {
   userId: string;
   createdAt: string; // ISO string for Date
   updatedAt: string; // ISO string for Date
+  organizationId?: string;
+  organization?: {
+    id: string;
+    name: string;
+  };
 } 

@@ -13,17 +13,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Organization {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  users       User[]
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 model User {
-  id            String         @id @default(cuid())
-  name          String?
-  email         String?        @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  memorySources MemorySource[]
-  APIKey        APIKey[]
-  Project       Project[]
+  id             String         @id @default(cuid())
+  name           String?
+  email          String?        @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  memorySources  MemorySource[]
+  APIKey         APIKey[]
+  Project        Project[]
+  organizationId String?
+  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  role           Role?          @default(MEMBER)
 }
 
 model Account {
@@ -95,12 +114,14 @@ model APIKey {
 }
 
 model Project {
-  id            String         @id @default(cuid())
-  name          String
-  description   String?
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  memorySources MemorySource[]
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  memorySources  MemorySource[]
+  organizationId String?
+  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 }

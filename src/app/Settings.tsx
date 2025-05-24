@@ -15,8 +15,17 @@ interface APIKey {
 }
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'context' | 'api-key'>('api-key');
+  const [activeTab, setActiveTab] = useState<'context' | 'api-key' | 'organization'>('api-key');
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
+  const [org, setOrg] = useState<any>(null);
+  const [orgsLoading, setOrgsLoading] = useState(false);
+  const [orgError, setOrgError] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('MEMBER');
+  const [inviting, setInviting] = useState(false);
+  const [orgName, setOrgName] = useState('');
+  const [orgDesc, setOrgDesc] = useState('');
+  const [creatingOrg, setCreatingOrg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNewKey, setShowNewKey] = useState<string | null>(null);
@@ -33,6 +42,18 @@ const Settings: React.FC = () => {
         .then(setApiKeys)
         .catch(() => setError('Failed to load API keys'))
         .finally(() => setLoading(false));
+    }
+  }, [activeTab]);
+
+  // Fetch organization
+  useEffect(() => {
+    if (activeTab === 'organization') {
+      setOrgsLoading(true);
+      fetch('/api/organizations')
+        .then(res => res.json())
+        .then(data => setOrg(data[0] || null))
+        .catch(() => setOrgError('Failed to load organization'))
+        .finally(() => setOrgsLoading(false));
     }
   }, [activeTab]);
 
@@ -91,22 +112,140 @@ const Settings: React.FC = () => {
     setShowKeyId(showKeyId === id ? null : id);
   };
 
+  // Create organization
+  const handleCreateOrg = async () => {
+    if (!orgName) return;
+    setCreatingOrg(true);
+    setOrgError(null);
+    try {
+      const res = await fetch('/api/organizations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: orgName, description: orgDesc }),
+      });
+      if (!res.ok) throw new Error('Failed to create organization');
+      setOrg(await res.json());
+      setOrgName('');
+      setOrgDesc('');
+    } catch {
+      setOrgError('Failed to create organization');
+    } finally {
+      setCreatingOrg(false);
+    }
+  };
+
+  // Invite user
+  const handleInvite = async () => {
+    if (!inviteEmail) return;
+    setInviting(true);
+    setOrgError(null);
+    try {
+      const res = await fetch('/api/organizations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole }),
+      });
+      if (!res.ok) throw new Error('Failed to invite user');
+      setInviteEmail('');
+      setInviteRole('MEMBER');
+    } catch {
+      setOrgError('Failed to invite user');
+    } finally {
+      setInviting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Settings interface */}
       <div className="p-6">
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-8 border-b border-slate-200">
-          {['api-key'].map(tab => (
+          {['api-key', 'organization'].map(tab => (
             <button
               key={tab}
               className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors cursor-pointer ${activeTab === tab ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-indigo-600'}`}
               onClick={() => setActiveTab(tab as typeof activeTab)}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'api-key' ? 'API Keys' : 'Organization'}
             </button>
           ))}
         </div>
+
+        {/* Organization Settings */}
+        {activeTab === 'organization' && (
+          <div className="space-y-8">
+            {orgsLoading ? (
+              <div className="text-slate-500">Loading organization...</div>
+            ) : org ? (
+              <div className="border rounded-md p-6 bg-white">
+                <h2 className="text-lg font-medium text-slate-800 mb-1">{org.name}</h2>
+                <p className="text-slate-500 mb-2">{org.description}</p>
+                <div className="mb-4 text-xs text-slate-400">Created: {new Date(org.createdAt).toLocaleDateString()}</div>
+                {/* Invite form (OWNER/ADMIN only) */}
+                {(org.role === 'OWNER' || org.role === 'ADMIN') && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold mb-2">Invite User</h3>
+                    <div className="flex gap-2 mb-2">
+                      <input
+                        type="email"
+                        className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        placeholder="Email address"
+                        value={inviteEmail}
+                        onChange={e => setInviteEmail(e.target.value)}
+                        disabled={inviting}
+                      />
+                      <select
+                        className="px-2 py-2 border border-slate-300 rounded-md text-sm"
+                        value={inviteRole}
+                        onChange={e => setInviteRole(e.target.value)}
+                        disabled={inviting}
+                      >
+                        <option value="MEMBER">Member</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
+                      <button
+                        className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+                        onClick={handleInvite}
+                        disabled={inviting || !inviteEmail}
+                      >
+                        <PlusCircle size={16} /> Invite
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {orgError && <div className="text-red-600 mt-2">{orgError}</div>}
+              </div>
+            ) : (
+              <div className="border rounded-md p-6 bg-white">
+                <h2 className="text-lg font-medium text-slate-800 mb-1">Create Organization</h2>
+                <input
+                  type="text"
+                  className="w-full mb-3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Organization name"
+                  value={orgName}
+                  onChange={e => setOrgName(e.target.value)}
+                  disabled={creatingOrg}
+                />
+                <textarea
+                  className="w-full mb-3 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Description (optional)"
+                  value={orgDesc}
+                  onChange={e => setOrgDesc(e.target.value)}
+                  disabled={creatingOrg}
+                />
+                <button
+                  className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+                  onClick={handleCreateOrg}
+                  disabled={creatingOrg || !orgName}
+                >
+                  <PlusCircle size={16} /> Create Organization
+                </button>
+                {orgError && <div className="text-red-600 mt-2">{orgError}</div>}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* API Keys Settings */}
         {activeTab === 'api-key' && (

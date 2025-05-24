@@ -29,10 +29,36 @@ export async function GET(req: NextRequest) {
       const data = JSON.parse(text);
       const points: Array<{ id: string | number; payload?: Record<string, unknown> }> = data.result?.points || [];
       if (relevanceOnly) {
-        // Return just the 'number' field (relevance score) from each payload
-        const scores = points
-          .map((pt: { payload?: Record<string, unknown> }) => pt.payload?.number)
-          .filter((n: unknown): n is number => typeof n === 'number');
+        // Return just the 'score' field (relevance score) from each payload, parsing as number if needed
+        let scores = points
+          .map((pt: { payload?: Record<string, unknown> }) => {
+            const val = pt.payload?.score;
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
+            return undefined;
+          })
+          .filter((n: unknown): n is number => typeof n === 'number' && !isNaN(n));
+        // If all scores are 0 or in a very small range, try to rescale for better chart granularity
+        if (scores.length > 0) {
+          const min = Math.min(...scores);
+          const max = Math.max(...scores);
+          // Only rescale if all values are 0 or max-min is very small
+          if (max === min) {
+            // All values are the same, set to 50 for visibility
+            scores = scores.map(() => 50);
+          } else if (max <= 1) {
+            // If scores are in [0,1], scale to [0,100]
+            scores = scores.map(s => Math.round(s * 100));
+          } else if (max <= 10) {
+            // If scores are in [0,10], scale to [0,100]
+            scores = scores.map(s => Math.round((s / 10) * 100));
+          } else if (max <= 100 && min >= 0) {
+            // If scores are in [0,100], keep as is
+          } else {
+            // Otherwise, normalize to [0,100]
+            scores = scores.map(s => Math.round(((s - min) / (max - min)) * 100));
+          }
+        }
         return NextResponse.json({ scores });
       }
       // Map to a frontend-friendly format

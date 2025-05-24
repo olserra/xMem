@@ -4,8 +4,8 @@ import { ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
 interface Query {
   id: string | number;
   text: string;
-  number?: number;
-  flag?: boolean;
+  score?: number;
+  size?: number;
   // Add more fields as needed
 }
 
@@ -40,10 +40,10 @@ const RecentQueriesTable: React.FC = () => {
               Query
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-              Number
+              Score
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-              Flag
+              Size
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
               Actions
@@ -70,12 +70,10 @@ const RecentQueriesTable: React.FC = () => {
                   {query.text}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                  {typeof query.number === 'number' ? query.number : '—'}
+                  {typeof query.score === 'number' ? query.score : '—'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {query.flag === true && <ThumbsUp size={16} className="text-emerald-500" />}
-                  {query.flag === false && <ThumbsDown size={16} className="text-rose-500" />}
-                  {typeof query.flag !== 'boolean' && <span className="text-slate-400">—</span>}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                  {typeof query.size === 'number' ? query.size : '—'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                   <button className="text-indigo-600 hover:text-indigo-900">

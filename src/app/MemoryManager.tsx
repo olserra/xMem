@@ -33,6 +33,35 @@ interface MemorySettings {
   collection?: string;
 }
 
+// Add a mapping of provider to supported embedding models
+const PROVIDER_EMBEDDING_MODELS: Record<string, { label: string; value: string }[]> = {
+  openai: [
+    { label: 'text-embedding-3-small', value: 'text-embedding-3-small' },
+    { label: 'text-embedding-3-large', value: 'text-embedding-3-large' },
+    { label: 'text-embedding-ada-002 (Legacy)', value: 'text-embedding-ada-002' },
+  ],
+  ollama: [
+    { label: 'llama2-embed', value: 'llama2-embed' },
+    { label: 'nomic-embed-text', value: 'nomic-embed-text' },
+    { label: 'all-minilm', value: 'all-minilm' },
+  ],
+  llamacpp: [
+    { label: 'llama-embed', value: 'llama-embed' },
+  ],
+  mistral: [
+    { label: 'mistral-embed', value: 'mistral-embed' },
+  ],
+  // Add more providers/models as needed
+};
+
+const PROVIDERS = [
+  { label: 'OpenAI', value: 'openai' },
+  { label: 'Ollama', value: 'ollama' },
+  { label: 'Llama.cpp', value: 'llamacpp' },
+  { label: 'Mistral', value: 'mistral' },
+  // Add more as needed
+];
+
 // Simple modal component
 const Modal: React.FC<{ open: boolean; onClose: () => void; children: React.ReactNode }> = ({ open, onClose, children }) => {
   if (!open) return null;
@@ -65,10 +94,25 @@ const defaultSettings: MemorySettings = {
 const MemorySettingsModal: React.FC<{
   open: boolean;
   onClose: () => void;
-  settings: MemorySettings;
-  onChange: (settings: MemorySettings) => void;
+  settings: MemorySettings & { llmProvider?: string };
+  onChange: (settings: MemorySettings & { llmProvider?: string }) => void;
   onSave: () => void;
 }> = ({ open, onClose, settings, onChange, onSave }) => {
+  const provider = settings.llmProvider || 'openai';
+  const availableModels = PROVIDER_EMBEDDING_MODELS[provider] || [];
+  const modelSupported = availableModels.some(m => m.value === settings.embeddingModel);
+
+  // When provider changes, update embeddingModel to first supported
+  const handleProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newProvider = e.target.value;
+    const newModels = PROVIDER_EMBEDDING_MODELS[newProvider] || [];
+    onChange({
+      ...settings,
+      llmProvider: newProvider,
+      embeddingModel: newModels[0]?.value || '',
+    });
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <div className="flex items-start gap-6 mb-6">
@@ -120,6 +164,23 @@ const MemorySettingsModal: React.FC<{
             />
           </div>
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="llmProvider">
+              LLM Provider
+            </label>
+            <select
+              id="llmProvider"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value={provider}
+              onChange={handleProviderChange}
+            >
+              {PROVIDERS.map(p => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="embeddingModel">
               Embedding Model
             </label>
@@ -129,13 +190,14 @@ const MemorySettingsModal: React.FC<{
               value={settings.embeddingModel}
               onChange={e => onChange({ ...settings, embeddingModel: e.target.value })}
             >
-              <option value="text-embedding-3-small">text-embedding-3-small</option>
-              <option value="text-embedding-3-large">text-embedding-3-large</option>
-              <option value="text-embedding-ada-002">text-embedding-ada-002 (Legacy)</option>
+              {availableModels.map(model => (
+                <option key={model.value} value={model.value}>{model.label}</option>
+              ))}
             </select>
+            {!modelSupported && (
+              <div className="text-xs text-rose-600 mt-1">Warning: This model is not supported by the selected provider.</div>
+            )}
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="maxCacheSize">
               Max Cache Size (MB)
@@ -148,6 +210,8 @@ const MemorySettingsModal: React.FC<{
               onChange={e => onChange({ ...settings, maxCacheSize: Number(e.target.value) })}
             />
           </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="sessionTtl">
               Session TTL (seconds)

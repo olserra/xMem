@@ -11,17 +11,19 @@ interface RankingControlsProps {
   method: string;
   factors: RankingFactors;
   onFactorChange: (factor: keyof RankingFactors, value: number) => void;
+  onApply?: () => void;
 }
 
-const RankingControls: React.FC<RankingControlsProps> = ({ 
-  method, 
+const RankingControls: React.FC<RankingControlsProps> = ({
+  method,
   factors,
-  onFactorChange 
+  onFactorChange,
+  onApply
 }) => {
   return (
     <div className="p-4">
       <h3 className="font-medium text-slate-800 mb-4">Ranking Configuration</h3>
-      
+
       {/* Method description */}
       <div className="mb-6 p-3 bg-white rounded-md border border-slate-200">
         {method === 'smart' && (
@@ -35,7 +37,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
             </div>
           </div>
         )}
-        
+
         {method === 'similarity' && (
           <div className="flex items-start gap-3">
             <FileText size={20} className="text-indigo-600 mt-0.5" />
@@ -47,7 +49,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
             </div>
           </div>
         )}
-        
+
         {method === 'recency' && (
           <div className="flex items-start gap-3">
             <Clock size={20} className="text-indigo-600 mt-0.5" />
@@ -59,7 +61,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
             </div>
           </div>
         )}
-        
+
         {method === 'manual' && (
           <div className="flex items-start gap-3">
             <RefreshCw size={20} className="text-indigo-600 mt-0.5" />
@@ -72,12 +74,12 @@ const RankingControls: React.FC<RankingControlsProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* Ranking factors sliders (only shown for smart ranking) */}
       {method === 'smart' && (
         <div className="space-y-6">
           <h4 className="font-medium text-sm text-slate-700 mb-3">Ranking Factors</h4>
-          
+
           {/* Similarity factor */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -89,7 +91,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
                 {Math.round(factors.similarity * 100)}%
               </span>
             </div>
-            
+
             <input
               type="range"
               min="0"
@@ -99,12 +101,12 @@ const RankingControls: React.FC<RankingControlsProps> = ({
               onChange={(e) => onFactorChange('similarity', parseFloat(e.target.value))}
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
             />
-            
+
             <p className="text-xs text-slate-500 mt-1">
               Weight given to semantic similarity between context and query
             </p>
           </div>
-          
+
           {/* Recency factor */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -116,7 +118,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
                 {Math.round(factors.recency * 100)}%
               </span>
             </div>
-            
+
             <input
               type="range"
               min="0"
@@ -126,12 +128,12 @@ const RankingControls: React.FC<RankingControlsProps> = ({
               onChange={(e) => onFactorChange('recency', parseFloat(e.target.value))}
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
             />
-            
+
             <p className="text-xs text-slate-500 mt-1">
               Importance of how recently the context was added or referenced
             </p>
           </div>
-          
+
           {/* Feedback factor */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -143,7 +145,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
                 {Math.round(factors.feedback * 100)}%
               </span>
             </div>
-            
+
             <input
               type="range"
               min="0"
@@ -153,14 +155,14 @@ const RankingControls: React.FC<RankingControlsProps> = ({
               onChange={(e) => onFactorChange('feedback', parseFloat(e.target.value))}
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
             />
-            
+
             <p className="text-xs text-slate-500 mt-1">
               Impact of previous user feedback on context relevance
             </p>
           </div>
         </div>
       )}
-      
+
       {/* Additional controls based on method */}
       {method === 'similarity' && (
         <div className="space-y-4 mt-6">
@@ -181,7 +183,7 @@ const RankingControls: React.FC<RankingControlsProps> = ({
           </div>
         </div>
       )}
-      
+
       {method === 'recency' && (
         <div className="space-y-4 mt-6">
           <div className="space-y-2">
@@ -196,10 +198,13 @@ const RankingControls: React.FC<RankingControlsProps> = ({
           </div>
         </div>
       )}
-      
+
       {/* Apply button */}
       <div className="mt-8">
-        <button className="w-full py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+        <button
+          className="w-full py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
+          onClick={onApply}
+        >
           Apply Rankings
         </button>
       </div>

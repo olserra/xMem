@@ -16,7 +16,7 @@ export async function GET() {
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const keys = await prisma.APIKey.findMany({
+  const keys = await prisma.aPIKey.findMany({
     where: { userId, revokedAt: null },
     orderBy: { createdAt: 'desc' },
   });
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   }
   const { name } = await req.json();
   const key = randomBytes(32).toString('hex');
-  const apiKey = await prisma.APIKey.create({
+  const apiKey = await prisma.aPIKey.create({
     data: { name, key, userId },
   });
   return NextResponse.json({ ...apiKey, key });
@@ -44,7 +44,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const { id } = await req.json();
-  await prisma.APIKey.updateMany({
+  await prisma.aPIKey.updateMany({
     where: { id, userId, revokedAt: null },
     data: { revokedAt: new Date() },
   });
@@ -58,7 +58,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const { id } = await req.json();
-  await prisma.APIKey.updateMany({
+  await prisma.aPIKey.updateMany({
     where: { id, userId, revokedAt: null },
     data: { lastUsed: new Date() },
   });

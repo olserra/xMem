@@ -140,6 +140,9 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                     rankingFactors: { ...cfg.rankingFactors, [factor]: value },
                   }));
                 }}
+                onApply={() => {
+                  console.log('Apply Rankings clicked', contextConfig);
+                }}
               />
             </div>
           </div>

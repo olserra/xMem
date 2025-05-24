@@ -60,7 +60,8 @@ const Dashboard: React.FC = () => {
         if (!res.ok) return;
         const data = await res.json();
         if (data.result && Array.isArray(data.result.collections)) {
-          const names = data.result.collections.map((c: any) => c.name || c.collection_name || c.id || c);
+          type Collection = { name?: string; collection_name?: string; id?: string };
+          const names = data.result.collections.map((c: Collection) => c.name || c.collection_name || c.id || c);
           setCollections(names);
           if (names.length && !names.includes(collection)) {
             setCollection(names.includes('xmem_collection') ? 'xmem_collection' : names[0]);

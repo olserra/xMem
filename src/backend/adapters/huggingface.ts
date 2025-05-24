@@ -31,7 +31,7 @@ export class HuggingFaceAdapter implements LLMProvider {
     return json[0]?.generated_text || '';
   }
 
-  async embed(text: string, model?: string): Promise<number[]> {
+  async embed(_text: string, _model?: string): Promise<number[]> {
     throw new Error('Embedding not implemented for HuggingFace');
   }
 } 

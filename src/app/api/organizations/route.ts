@@ -4,6 +4,15 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/auth';
 import type { Session } from 'next-auth';
 
+interface Organization {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  role?: string;
+}
+
 function getUserId(session: Session | null): string | null {
   return session?.user && session.user.id ? session.user.id : null;
 }
@@ -13,7 +22,7 @@ export async function GET() {
   const userId = getUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // List organizations the user belongs to
-  const orgs = await prisma.organization.findMany({
+  const orgs: Organization[] = await prisma.organization.findMany({
     where: { users: { some: { id: userId } } },
     orderBy: { createdAt: 'desc' },
   });

@@ -13,13 +13,23 @@ async function getUserOrgId(userId: string) {
   return user?.organizationId;
 }
 
+interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  organizationId?: string;
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   const userId = getUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const organizationId = await getUserOrgId(userId);
   if (!organizationId) return NextResponse.json({ error: 'No organization found' }, { status: 403 });
-  const projects = await prisma.project.findMany({ where: { organizationId }, orderBy: { createdAt: 'desc' } });
+  const projects: Project[] = await prisma.project.findMany({ where: { organizationId }, orderBy: { createdAt: 'desc' } });
   return NextResponse.json(projects);
 }
 

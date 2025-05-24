@@ -62,7 +62,7 @@ export class PineconeAdapter implements VectorStore {
     }
     const json = await res.json();
     // Return the metadata of the top results
-    return (json.matches || []).map((item: any) => item.metadata || {});
+    return (json.matches || []).map((item: Record<string, unknown>) => item.metadata || {});
   }
 
   async deleteEmbedding(id: string): Promise<void> {

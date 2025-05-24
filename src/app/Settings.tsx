@@ -14,10 +14,19 @@ interface APIKey {
   revokedAt?: string | null;
 }
 
+interface Organization {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  role?: string;
+}
+
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'context' | 'api-key' | 'organization'>('api-key');
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
-  const [org, setOrg] = useState<any>(null);
+  const [org, setOrg] = useState<Organization | null>(null);
   const [orgsLoading, setOrgsLoading] = useState(false);
   const [orgError, setOrgError] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');

@@ -1,5 +1,5 @@
 import { VectorStore } from '../xmem';
-import { MongoClient, Document } from 'mongodb';
+import { MongoClient } from 'mongodb';
 
 export type MongoDBVectorConfig = {
   uri: string;
@@ -49,7 +49,7 @@ export class MongoDBVectorAdapter implements VectorStore {
         },
       ]).toArray();
       return results;
-    } catch (e) {
+    } catch (_e) {
       // Fallback: brute-force cosine similarity
       const all = await collection.find({ $vector: { $exists: true } }).toArray();
       const cosine = (a: number[], b: number[]) => {

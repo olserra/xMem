@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
+// import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 interface Query {
   id: string | number;

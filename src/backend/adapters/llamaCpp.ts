@@ -22,7 +22,7 @@ export class LlamaCppAdapter implements LLMProvider {
   }
 
   async embed(text: string, model?: string): Promise<number[]> {
-    const body: Record<string, any> = { content: text };
+    const body: Record<string, unknown> = { content: text };
     if (model) body.model = model;
     const res = await fetch(`${this.apiUrl}/embedding`, {
       method: 'POST',

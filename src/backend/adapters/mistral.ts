@@ -28,7 +28,7 @@ export class MistralAdapter implements LLMProvider {
   }
 
   async embed(text: string, model?: string): Promise<number[]> {
-    const body: Record<string, any> = { text };
+    const body: Record<string, unknown> = { text };
     if (model) body.model = model;
     const res = await fetch(`${this.apiUrl}/embed`, {
       method: 'POST',

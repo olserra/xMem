@@ -54,7 +54,7 @@ export class QdrantAdapter implements VectorStore {
     }
     const json = await res.json();
     // Return the payloads (metadata) of the top results
-    return (json.result || []).map((item: any) => item.payload || {});
+    return (json.result || []).map((item: Record<string, unknown>) => item.payload || {});
   }
 
   async deleteEmbedding(id: string): Promise<void> {

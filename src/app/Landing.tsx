@@ -161,25 +161,25 @@ const Landing: React.FC = () => {
             </div>
             {/* Problem/Solution */}
             <div className="container mx-auto px-6 py-12">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+                <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-10">
                     {/* Left: Headline and Pain Points */}
-                    <div className="flex-1 text-center md:text-left">
+                    <div className="flex-1 text-center md:text-left mt-8 md:mt-0">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
                             LLMs forget.<br className="hidden md:block" /> Your users notice.
                         </h2>
-                        <p className="text-lg text-slate-300 mb-6 max-w-lg">
+                        <p className="text-lg text-slate-300 mb-6 max-w-lg mx-auto md:mx-0">
                             Stop losing context and knowledge between sessions. xmem orchestrates both persistent and session memory for every LLM call—so your AI is always relevant, accurate, and up-to-date.
                         </p>
                         <div className="flex flex-col gap-4 mb-6">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <MessageSquare size={22} className="text-amber-400" />
                                 <span className="text-slate-200 font-medium">LLM forgot your last conversation</span>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <Users size={22} className="text-purple-400" />
                                 <span className="text-slate-200 font-medium">Lost project or team context</span>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <Clock size={22} className="text-teal-400" />
                                 <span className="text-slate-200 font-medium">Wasting time repeating yourself</span>
                             </div>
@@ -191,24 +191,24 @@ const Landing: React.FC = () => {
                         </span>
                     </div>
                     {/* Right: Visual Illustration */}
-                    <div className="flex-1 flex items-center justify-center relative w-full h-72 md:h-80">
+                    <div className="flex-1 flex flex-col md:flex-row items-center justify-center w-full h-auto md:h-80 md:relative md:overflow-hidden">
                         {/* Fading chat bubbles (LLM) */}
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 opacity-60">
-                            <div className="bg-slate-700/70 text-slate-300 px-4 py-2 rounded-full shadow mb-1 animate-fadeOut">&quot;Remind me what we discussed?&quot;</div>
-                            <div className="bg-slate-700/50 text-slate-400 px-4 py-2 rounded-full shadow mb-1 animate-fadeOut delay-200">&quot;Who are you again?&quot;</div>
-                            <div className="bg-slate-700/30 text-slate-500 px-4 py-2 rounded-full shadow animate-fadeOut delay-400">&quot;Sorry, I lost that info.&quot;</div>
+                        <div className="flex flex-col gap-5 opacity-60 w-full max-w-[90vw] md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 md:gap-3 md:max-w-none">
+                            <div className="bg-slate-700/70 text-slate-300 px-3 md:px-4 py-2 rounded-full shadow mb-1 animate-fadeOut text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Remind me what we discussed?&quot;</div>
+                            <div className="bg-slate-700/50 text-slate-400 px-3 md:px-4 py-2 rounded-full shadow mb-1 animate-fadeOut delay-200 text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Who are you again?&quot;</div>
+                            <div className="bg-slate-700/30 text-slate-500 px-3 md:px-4 py-2 rounded-full shadow animate-fadeOut delay-400 text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Sorry, I lost that info.&quot;</div>
                         </div>
                         {/* Persistent chat bubbles (xmem) */}
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 items-end">
-                            <div className="bg-gradient-to-r from-teal-500 to-indigo-500 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse">&quot;Welcome back, Alex!&quot;</div>
-                            <div className="bg-gradient-to-r from-purple-500 to-teal-400 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-200">&quot;Here&apos;s your project summary.&quot;</div>
-                            <div className="bg-gradient-to-r from-amber-400 to-teal-500 text-white px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-400">&quot;Let&apos;s pick up where you left off.&quot;</div>
+                        <div className="flex flex-col gap-5 items-end w-full max-w-[90vw] md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:gap-3 md:max-w-none">
+                            <div className="bg-gradient-to-r from-teal-500 to-indigo-500 text-white px-3 md:px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Welcome back, Alex!&quot;</div>
+                            <div className="bg-gradient-to-r from-purple-500 to-teal-400 text-white px-3 md:px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-200 text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Here&apos;s your project summary.&quot;</div>
+                            <div className="bg-gradient-to-r from-amber-400 to-teal-500 text-white px-3 md:px-4 py-2 rounded-full shadow-lg font-semibold animate-pulse delay-400 text-xs md:text-base whitespace-normal break-words max-w-[90vw] md:max-w-none">&quot;Let&apos;s pick up where you left off.&quot;</div>
                         </div>
                         {/* Decorative floating memory orbs */}
                         <div className="absolute inset-0 pointer-events-none">
-                            <div className="absolute left-10 top-8 w-8 h-8 bg-teal-400/30 rounded-full blur-xl animate-float" />
-                            <div className="absolute right-12 bottom-10 w-10 h-10 bg-purple-400/30 rounded-full blur-xl animate-float delay-200" />
-                            <div className="absolute left-1/2 top-1/3 w-6 h-6 bg-amber-400/30 rounded-full blur-xl animate-float delay-400" />
+                            <div className="absolute left-1/4 top-8 w-6 h-6 md:w-8 md:h-8 bg-teal-400/30 rounded-full blur-xl animate-float" />
+                            <div className="absolute right-1/4 bottom-10 w-8 h-8 md:w-10 md:h-10 bg-purple-400/30 rounded-full blur-xl animate-float delay-200" />
+                            <div className="absolute left-1/2 top-1/3 w-4 h-4 md:w-6 md:h-6 bg-amber-400/30 rounded-full blur-xl animate-float delay-400" />
                         </div>
                     </div>
                 </div>

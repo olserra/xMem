@@ -154,14 +154,14 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Collection selector */}
-      <div className="flex items-center gap-4 p-4">
+      <div className="flex flex-col sm:flex-row items-center gap-4 p-4 w-full max-w-full">
         <label className="text-sm font-medium text-slate-700">Collection:</label>
         <select
           value={collection}
           onChange={e => setCollection(e.target.value)}
-          className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
+          className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9 w-full max-w-xs"
         >
           <option value="__all__">All Collections</option>
           {collections.map((col) => (
@@ -170,14 +170,16 @@ const Dashboard: React.FC = () => {
         </select>
       </div>
       {/* Metrics row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-full">
         {metrics.map((metric, index) => (
-          <MetricCard key={index} {...metric} />
+          <div className="w-full" key={index}>
+            <MetricCard {...metric} />
+          </div>
         ))}
       </div>
       {/* Charts section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-full overflow-x-auto">
+        <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-slate-800">Memory Usage Distribution</h2>
             <button className="text-sm text-indigo-600 flex items-center gap-1">
@@ -186,7 +188,7 @@ const Dashboard: React.FC = () => {
           </div>
           <MemoryUsageChart collection={collection === '__all__' ? undefined : collection} />
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-slate-800">Context Relevance Scores</h2>
             <button className="text-sm text-indigo-600 flex items-center gap-1">
@@ -202,8 +204,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       {/* Recent queries table */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full overflow-x-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
           <h2 className="font-semibold text-slate-800">Recent Queries</h2>
           <button className="text-sm text-indigo-600 flex items-center gap-1">
             See All <ArrowUpRight size={14} />

@@ -8,7 +8,7 @@ import Avatar from './Avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import Logo from '../components/ui/Logo';
 import Image from 'next/image';
-import { Check } from 'lucide-react';
+import { Check, Menu, X } from 'lucide-react';
 
 // Define types for organization and project
 interface Organization {
@@ -43,6 +43,7 @@ const Header: React.FC = () => {
     const [projectsError, setProjectsError] = useState<string | null>(null);
     const [orgsLoading, setOrgsLoading] = useState(false);
     const [projectsLoading, setProjectsLoading] = useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -115,7 +116,8 @@ const Header: React.FC = () => {
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/')}>
                 <Logo size={28} />
             </div>
-            <nav className={`flex-1 flex items-center gap-6 ${isLanding ? 'justify-end' : 'justify-center'}`}>
+            {/* Desktop nav */}
+            <nav className="hidden md:flex flex-1 items-center gap-6 justify-end">
                 {staticNavLinks.map(link => (
                     <Link
                         key={link.href}
@@ -126,7 +128,12 @@ const Header: React.FC = () => {
                     </Link>
                 ))}
             </nav>
-            <div className="flex items-center gap-6">
+            {/* Burger menu button (mobile only) */}
+            <button className="md:hidden p-2 rounded focus:outline-none text-white" onClick={() => setMobileNavOpen(v => !v)} aria-label="Open menu">
+                {mobileNavOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+            {/* Desktop user/org/project controls */}
+            <div className="hidden md:flex items-center gap-6">
                 {!isLanding && user && (
                     <div className="relative flex-shrink-0" ref={orgDropdownRef}>
                         <span
@@ -223,6 +230,80 @@ const Header: React.FC = () => {
                     </a>
                 )}
             </div>
+            {/* Mobile nav drawer */}
+            {mobileNavOpen && (
+                <div className="fixed inset-0 z-40 bg-black/60 flex md:hidden">
+                    <div className="w-64 bg-slate-900 h-full shadow-lg flex flex-col p-6 gap-6 relative">
+                        <button className="absolute top-4 right-4 p-2 text-white" onClick={() => setMobileNavOpen(false)} aria-label="Close menu">
+                            <X size={28} />
+                        </button>
+                        <div className="flex items-center gap-2 mb-6">
+                            <Logo size={28} />
+                        </div>
+                        {/* Only show nav links if NOT on landing */}
+                        {!isLanding && (
+                            <nav className="flex flex-col gap-3">
+                                {staticNavLinks.map(link => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        className={`font-medium px-3 py-2 rounded transition-colors ${pathname.startsWith(link.href) ? 'bg-teal-600 text-white' : 'hover:bg-teal-400/20 text-slate-200'}`}
+                                        onClick={() => setMobileNavOpen(false)}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                        )}
+                        <div className="mt-8 flex flex-col gap-4">
+                            {/* User/org/project controls (mobile) */}
+                            {!isLanding && user && (
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-slate-200 font-medium">{user.name || user.email || 'User'}</span>
+                                    {currentOrg && <span className="text-xs text-slate-300">{currentOrg.name}</span>}
+                                    {currentProject && <span className="text-xs text-slate-400">/ {currentProject.name}</span>}
+                                </div>
+                            )}
+                            {!loading && user && (
+                                <button className="flex items-center gap-2 text-slate-200 hover:text-teal-400" onClick={async () => { await signOut({ callbackUrl: '/', redirect: false }); window.location.href = '/'; }}>
+                                    <Avatar imageUrl={user.image ?? undefined} name={user.name || user.email || 'User'} size={32} />
+                                    <span>Sign out</span>
+                                </button>
+                            )}
+                            {/* On landing, no session: show Get started link above Product Hunt badge */}
+                            {isLanding && !loading && !user && (
+                                <>
+                                    <button
+                                        className="w-full px-4 py-2 mb-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors"
+                                        onClick={() => { setMobileNavOpen(false); router.push('/api/auth/signin'); }}
+                                    >
+                                        Get started
+                                    </button>
+                                </>
+                            )}
+                            {/* Product Hunt badge always shown */}
+                            {!loading && (
+                                <a
+                                    href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center"
+                                >
+                                    <Image
+                                        src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                                        alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                                        width={150}
+                                        height={32}
+                                        style={{ width: 150, height: 32 }}
+                                        priority
+                                    />
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
+                </div>
+            )}
         </header>
     );
 };

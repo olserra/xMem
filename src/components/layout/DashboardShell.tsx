@@ -26,17 +26,19 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
     return (
         <>
-            <Header />
-            <div className="flex min-h-screen pt-16">
-                <Sidebar
-                    navItems={navItems}
-                    currentPage={currentPage}
-                    onNavigate={(page) => {
-                        if (page === "dashboard") router.push("/dashboard");
-                        else router.push(`/dashboard/${page}`);
-                    }}
-                />
-                <main className="flex-1 bg-slate-50 px-4 md:px-8 pt-6">{children}</main>
+            <div className="w-full max-w-full overflow-x-hidden">
+                <Header />
+                <div className="flex min-h-screen pt-16 w-full max-w-full overflow-x-hidden">
+                    <Sidebar
+                        navItems={navItems}
+                        currentPage={currentPage}
+                        onNavigate={(page) => {
+                            if (page === "dashboard") router.push("/dashboard");
+                            else router.push(`/dashboard/${page}`);
+                        }}
+                    />
+                    <main className="flex-1 bg-slate-50 px-2 sm:px-4 md:px-8 pt-6 w-full max-w-full overflow-x-auto">{children}</main>
+                </div>
             </div>
         </>
     );

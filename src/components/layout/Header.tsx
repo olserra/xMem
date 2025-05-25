@@ -6,7 +6,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Logo from '../ui/Logo';
 import { LuMenu } from 'react-icons/lu';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 // Define types for organization and project
 interface Organization {
@@ -34,6 +34,7 @@ const Header: React.FC = () => {
     const [currentProject, setCurrentProject] = useState<Project | null>(null);
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const orgDropdownRef = useRef<HTMLDivElement>(null);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     // Fetch orgs and projects for dropdown
     useEffect(() => {
@@ -73,6 +74,15 @@ const Header: React.FC = () => {
     };
 
     const headerClass = `w-full h-16 fixed top-0 left-0 z-30 transition-colors duration-300 flex items-center justify-between px-4 md:px-6 shadow-md ${scrolled ? 'bg-slate-800/80 text-white backdrop-blur-md' : 'bg-transparent text-slate-900 md:bg-slate-900 md:text-white md:backdrop-blur-none'}`;
+
+    const navItems = [
+        { id: 'dashboard', label: 'Dashboard', href: '/dashboard' },
+        { id: 'memory', label: 'Memory Manager', href: '/dashboard/memory' },
+        { id: 'context', label: 'Context Manager', href: '/dashboard/context' },
+        { id: 'integrationhub', label: 'Integration Hub', href: '/dashboard/integrationhub' },
+        { id: 'settings', label: 'Settings', href: '/dashboard/settings' },
+        { id: 'docs', label: 'Documentation', href: '/docs' },
+    ];
 
     return (
         <header className={headerClass}>
@@ -165,36 +175,51 @@ const Header: React.FC = () => {
             <div className="md:hidden flex items-center relative">
                 <button
                     className="focus:outline-none"
-                    onClick={() => setDropdownOpen((v) => !v)}
+                    onClick={() => setMobileNavOpen((v) => !v)}
                     aria-label="Open menu"
                 >
-                    <LuMenu size={32} />
+                    {mobileNavOpen ? <X size={32} /> : <LuMenu size={32} />}
                 </button>
-                {/* Mobile dropdown menu */}
-                {dropdownOpen && (
-                    <div className="absolute top-16 right-0 w-48 bg-slate-900 text-white rounded-md shadow-lg z-30 animate-fade-in md:hidden">
-                        <Link
-                            href="/docs"
-                            className="block px-4 py-3 hover:bg-slate-800 border-b border-slate-800 font-medium"
-                            onClick={() => setDropdownOpen(false)}
-                        >
-                            Documentation
-                        </Link>
-                        {user && (
-                            <>
-                                <div className="px-4 py-2 border-b border-slate-800 font-semibold">{user.name}</div>
-                                <button
-                                    className="w-full text-left px-4 py-3 hover:bg-slate-800"
-                                    onClick={async () => {
-                                        setDropdownOpen(false);
-                                        await signOut({ callbackUrl: '/', redirect: false });
-                                        window.location.href = '/';
-                                    }}
-                                >
-                                    Sign out
-                                </button>
-                            </>
-                        )}
+                {/* Mobile nav drawer */}
+                {mobileNavOpen && (
+                    <div className="fixed inset-0 z-40 bg-black/60 flex md:hidden">
+                        <div className="w-64 bg-slate-900 h-full shadow-lg flex flex-col p-6 gap-6 relative">
+                            <button className="absolute top-4 right-4 p-2 text-white" onClick={() => setMobileNavOpen(false)} aria-label="Close menu">
+                                <X size={28} />
+                            </button>
+                            <div className="flex items-center gap-2 mb-6">
+                                <Logo size={28} />
+                            </div>
+                            <nav className="flex flex-col gap-3">
+                                {navItems.map(item => (
+                                    <Link
+                                        key={item.id}
+                                        href={item.href}
+                                        className={`font-medium px-3 py-2 rounded transition-colors ${item.href === '/' + location.pathname.split('/')[1] ? 'bg-teal-600 text-white' : 'hover:bg-teal-400/20 text-slate-200'}`}
+                                        onClick={() => setMobileNavOpen(false)}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                            <div className="mt-8 flex flex-col gap-4">
+                                {/* User/org/project controls (mobile) */}
+                                {user && (
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-slate-200 font-medium">{user.name || user.email || 'User'}</span>
+                                        {currentOrg && <span className="text-xs text-slate-300">{currentOrg.name}</span>}
+                                        {currentProject && <span className="text-xs text-slate-400">/ {currentProject.name}</span>}
+                                    </div>
+                                )}
+                                {user && (
+                                    <button className="flex items-center gap-2 text-slate-200 hover:text-teal-400" onClick={async () => { await signOut({ callbackUrl: '/', redirect: false }); window.location.href = '/'; }}>
+                                        <Avatar imageUrl={user.image ?? undefined} name={user.name || user.email || 'User'} size={32} />
+                                        <span>Sign out</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
                     </div>
                 )}
             </div>

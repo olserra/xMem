@@ -214,23 +214,31 @@ const Header: React.FC = () => {
                         )}
                     </div>
                 )}
-                {!loading && !user && (
-                    <a
-                        href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-4"
-                        style={{ display: 'flex', alignItems: 'center' }}
-                    >
-                        <Image
-                            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
-                            alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
-                            width={150}
-                            height={32}
-                            style={{ width: 150, height: 32 }}
-                            priority
-                        />
-                    </a>
+                {!loading && !user && (isLanding || pathname.startsWith('/docs')) && (
+                    <>
+                        <button
+                            className="ml-4 px-4 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors cursor-pointer"
+                            onClick={() => router.push('/api/auth/signin')}
+                        >
+                            Get started
+                        </button>
+                        <a
+                            href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-4"
+                            style={{ display: 'flex', alignItems: 'center' }}
+                        >
+                            <Image
+                                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                                alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                                width={150}
+                                height={32}
+                                style={{ width: 150, height: 32 }}
+                                priority
+                            />
+                        </a>
+                    </>
                 )}
             </div>
             {/* Mobile nav drawer */}
@@ -277,33 +285,30 @@ const Header: React.FC = () => {
                                 </button>
                             )}
                             {/* On landing, no session: show Get started link above Product Hunt badge */}
-                            {isLanding && !loading && !user && (
+                            {((isLanding || pathname.startsWith('/docs')) && !loading && !user) && (
                                 <>
                                     <button
-                                        className="w-full px-4 py-2 mb-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors"
+                                        className="w-full px-4 py-2 mb-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors cursor-pointer"
                                         onClick={() => { setMobileNavOpen(false); router.push('/api/auth/signin'); }}
                                     >
                                         Get started
                                     </button>
+                                    <a
+                                        href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center"
+                                    >
+                                        <Image
+                                            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                                            alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                                            width={150}
+                                            height={32}
+                                            style={{ width: 150, height: 32 }}
+                                            priority
+                                        />
+                                    </a>
                                 </>
-                            )}
-                            {/* Product Hunt badge always shown */}
-                            {!loading && (
-                                <a
-                                    href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center"
-                                >
-                                    <Image
-                                        src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
-                                        alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
-                                        width={150}
-                                        height={32}
-                                        style={{ width: 150, height: 32 }}
-                                        priority
-                                    />
-                                </a>
                             )}
                         </div>
                     </div>

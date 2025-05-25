@@ -12,8 +12,10 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
+      - ML_API_URL=http://ml_service:8000
     depends_on:
       - db
+      - ml_service
 
   db:
     image: postgres:15
@@ -26,6 +28,17 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  ml_service:
+    build:
+      context: ./ml_service
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml_service:/app
+    environment:
+      - PYTHONUNBUFFERED=1
 
 volumes:
   pgdata:

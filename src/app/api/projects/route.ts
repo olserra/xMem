@@ -16,11 +16,11 @@ async function getUserOrgId(userId: string) {
 interface Project {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   userId: string;
-  createdAt: string;
-  updatedAt: string;
-  organizationId?: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  organizationId?: string | null;
 }
 
 export async function GET() {

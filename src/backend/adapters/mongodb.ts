@@ -25,7 +25,8 @@ export class MongoDBVectorAdapter implements VectorStore {
     const db = this.client.db(this.dbName);
     const collection = db.collection(this.collectionName);
     await collection.updateOne(
-      { _id: data.id },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { _id: data.id as any },
       { $set: { _id: data.id, $vector: data.embedding, ...(data.metadata || {}) } },
       { upsert: true }
     );
@@ -69,6 +70,7 @@ export class MongoDBVectorAdapter implements VectorStore {
     await this.client.connect();
     const db = this.client.db(this.dbName);
     const collection = db.collection(this.collectionName);
-    await collection.deleteOne({ _id: id });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await collection.deleteOne({ _id: id as any });
   }
 } 

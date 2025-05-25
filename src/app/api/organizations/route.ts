@@ -4,15 +4,6 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/auth';
 import type { Session } from 'next-auth';
 
-interface Organization {
-  id: string;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  role?: string;
-}
-
 function getUserId(session: Session | null): string | null {
   return session?.user && session.user.id ? session.user.id : null;
 }

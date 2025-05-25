@@ -82,6 +82,21 @@ const METRIC_OPTIONS = [
   { label: 'Dot Product', value: 'dotproduct' },
 ];
 
+const DB_LOGO_MAP: Record<string, string> = {
+  qdrant: '/db-logos/qdrant.png',
+  pinecone: '/db-logos/pinecone.png',
+  mongodb: '/db-logos/mongodb.png',
+  chromadb: '/db-logos/chroma.png',
+};
+
+function getDbIcon(type: string) {
+  const logo = DB_LOGO_MAP[type.toLowerCase()];
+  if (logo) {
+    return <img src={logo} alt={type + ' logo'} className="h-7 w-7 object-contain" />;
+  }
+  return <Database size={24} className="text-indigo-300" />;
+}
+
 // Simple modal component
 const Modal: React.FC<{ open: boolean; onClose: () => void; children: React.ReactNode }> = ({ open, onClose, children }) => {
   if (!open) return null;
@@ -746,7 +761,10 @@ const MemoryManager: React.FC = () => {
           ) : filteredSources.map((source) => (
             <MemorySourceCard
               key={source.id}
-              source={source}
+              source={{
+                ...source,
+                icon: getDbIcon(source.type),
+              }}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onStatusChange={handleStatusChange}

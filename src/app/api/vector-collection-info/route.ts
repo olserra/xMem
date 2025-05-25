@@ -29,9 +29,7 @@ export async function POST(req: NextRequest) {
             };
             return NextResponse.json(metrics);
           }
-        } catch (err) {
-          return NextResponse.json({ error: 'Qdrant returned invalid JSON', raw: text }, { status: 500 });
-        }
+        } catch {}
       }
       // fallback to all collections if not found
       if (res.status === 404) {
@@ -46,9 +44,7 @@ export async function POST(req: NextRequest) {
             metrics = { points_count: total };
             return NextResponse.json(metrics);
           }
-        } catch (err) {
-          return NextResponse.json({ error: 'Qdrant returned invalid JSON', raw: text }, { status: 500 });
-        }
+        } catch {}
       }
       return NextResponse.json({ error: `Qdrant error: ${res.status}`, raw: text }, { status: res.status });
     } else if (type === 'chromadb' || vectorDbUrl.toLowerCase().includes('chroma')) {
@@ -64,9 +60,7 @@ export async function POST(req: NextRequest) {
           metrics = { points_count: total };
           return NextResponse.json(metrics);
         }
-      } catch (err) {
-        return NextResponse.json({ error: 'ChromaDB returned invalid JSON', raw: text }, { status: 500 });
-      }
+      } catch {}
       return NextResponse.json({ error: 'No collections found in ChromaDB', raw: text }, { status: 404 });
     } else if (type === 'pinecone' || vectorDbUrl.toLowerCase().includes('pinecone')) {
       if (!apiKey) return NextResponse.json({ error: 'Missing Pinecone API key' }, { status: 400 });
@@ -79,9 +73,7 @@ export async function POST(req: NextRequest) {
         const data = JSON.parse(text);
         metrics = { points_count: data.totalVectorCount };
         return NextResponse.json(metrics);
-      } catch (err) {
-        return NextResponse.json({ error: 'Pinecone returned invalid JSON', raw: text }, { status: 500 });
-      }
+      } catch {}
     } else if (type === 'mongodb' || vectorDbUrl.toLowerCase().includes('mongodb')) {
       return NextResponse.json({ points_count: 0 }, { status: 200 });
     } else {

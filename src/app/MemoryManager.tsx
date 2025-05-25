@@ -4,6 +4,7 @@ import { Database } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
 import MemoryItemList from '../components/memory/MemoryItemList';
 import SessionMemoryManager from '../components/memory/SessionMemoryManager';
+import Image from 'next/image';
 
 interface MemorySource {
   id: string;
@@ -92,7 +93,16 @@ const DB_LOGO_MAP: Record<string, string> = {
 function getDbIcon(type: string) {
   const logo = DB_LOGO_MAP[type.toLowerCase()];
   if (logo) {
-    return <img src={logo} alt={type + ' logo'} className="h-7 w-7 object-contain" />;
+    return (
+      <Image
+        src={logo}
+        alt={type + ' logo'}
+        width={28}
+        height={28}
+        className="h-7 w-7 object-contain"
+        unoptimized
+      />
+    );
   }
   return <Database size={24} className="text-indigo-300" />;
 }

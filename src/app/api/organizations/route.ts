@@ -13,10 +13,22 @@ export async function GET() {
   const userId = getUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // List organizations the user belongs to
-  const orgs = await prisma.organization.findMany({
+  let orgs = await prisma.organization.findMany({
     where: { users: { some: { id: userId } } },
     orderBy: { createdAt: 'desc' },
   });
+  // If no orgs, create a default Hobby org for the user
+  if (orgs.length === 0) {
+    const hobbyOrg = await prisma.organization.create({
+      data: {
+        name: 'Hobby',
+        description: 'Default free organization',
+        users: { connect: { id: userId } },
+      },
+    });
+    await prisma.user.update({ where: { id: userId }, data: { organizationId: hobbyOrg.id, role: 'OWNER' } });
+    orgs = [hobbyOrg];
+  }
   return NextResponse.json(orgs);
 }
 

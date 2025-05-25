@@ -28,7 +28,7 @@ export async function GET() {
   const userId = getUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const organizationId = await getUserOrgId(userId);
-  if (!organizationId) return NextResponse.json({ error: 'No organization found' }, { status: 403 });
+  if (!organizationId) return NextResponse.json([], { status: 200 });
   const projects: Project[] = await prisma.project.findMany({ where: { organizationId }, orderBy: { createdAt: 'desc' } });
   return NextResponse.json(projects);
 }

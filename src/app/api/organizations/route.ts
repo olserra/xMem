@@ -22,7 +22,7 @@ export async function GET() {
   const userId = getUserId(session);
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // List organizations the user belongs to
-  const orgs: Organization[] = await prisma.organization.findMany({
+  const orgs = await prisma.organization.findMany({
     where: { users: { some: { id: userId } } },
     orderBy: { createdAt: 'desc' },
   });

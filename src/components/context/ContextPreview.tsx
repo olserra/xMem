@@ -38,7 +38,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceId, collection, onContextItemsLoaded]);
+  }, [projectId, sourceId, collection]);
 
   // Calculate usage percentage
   const usagePercentage = (currentSize / maxSize) * 100;

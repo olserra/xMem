@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sliders, Search, Shuffle, Clock, FileText, ArrowDownWideNarrow } from 'lucide-react';
 import ContextPreview from '../components/context/ContextPreview';
 import RankingControls from '../components/context/RankingControls';
@@ -93,6 +93,11 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
     setShowSettings(false);
   };
 
+  const handleContextItemsLoaded = useCallback(
+    (items: Array<{ size?: number }>) => setCurrentSize(items.reduce((sum: number, item: { size?: number }) => sum + (item.size || 0), 0)),
+    []
+  );
+
   return (
     <div className="flex flex-col h-full">
       {/* Collection selector */}
@@ -169,7 +174,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 projectId={projectId}
                 sourceId={selectedSource}
                 collection={collection}
-                onContextItemsLoaded={items => setCurrentSize(items.reduce((sum, item) => sum + (item.size || 0), 0))}
+                onContextItemsLoaded={handleContextItemsLoaded}
               />
             </div>
             <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 overflow-y-auto p-4">
@@ -236,4 +241,4 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   );
 };
 
-export default ContextManager;
+export default React.memo(ContextManager);

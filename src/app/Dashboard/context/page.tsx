@@ -1,5 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import ContextManager from '../../ContextManager';
 import { PlusCircle, Edit, Trash2, Check, X } from 'lucide-react';
 import { useSession, signIn } from 'next-auth/react';
@@ -119,30 +120,8 @@ export default function ContextPage() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading projects...</div>;
-    if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
-    if (!projects.length) return (
-        <div className="p-8 text-center text-slate-500">
-            No projects found.<br />
-            <button onClick={openCreateModal} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md flex items-center gap-2 cursor-pointer">
-                <PlusCircle size={16} /> Create Project
-            </button>
-            {showModal && (
-                <ProjectModal
-                    mode={modalMode}
-                    name={modalName}
-                    desc={modalDesc}
-                    setName={setModalName}
-                    setDesc={setModalDesc}
-                    onClose={() => setShowModal(false)}
-                    onSave={handleModalSave}
-                    error={error}
-                />
-            )}
-        </div>
-    );
-
-    return (
+    // Memoize dashboard content to avoid re-renders from modal state
+    const dashboardContent = useMemo(() => (
         <div className="space-y-6">
             <div className="flex items-center gap-4 p-4">
                 <label className="text-sm font-medium text-slate-700">Project:</label>
@@ -166,7 +145,24 @@ export default function ContextPage() {
                     </>
                 )}
             </div>
-            {showModal && (
+            {selectedProject && !showModal && <ContextManager projectId={selectedProject} />}
+        </div>
+    ), [projects, selectedProject, deleting, showModal]);
+
+    return (
+        <>
+            {loading && <div className="p-8 text-center text-slate-500">Loading projects...</div>}
+            {error && <div className="p-8 text-center text-red-600">{error}</div>}
+            {!loading && !error && !projects.length && (
+                <div className="p-8 text-center text-slate-500">
+                    No projects found.<br />
+                    <button onClick={openCreateModal} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md flex items-center gap-2 cursor-pointer">
+                        <PlusCircle size={16} /> Create Project
+                    </button>
+                </div>
+            )}
+            {!loading && !error && projects.length > 0 && dashboardContent}
+            {showModal && typeof window !== 'undefined' && ReactDOM.createPortal(
                 <ProjectModal
                     mode={modalMode}
                     name={modalName}
@@ -176,10 +172,10 @@ export default function ContextPage() {
                     onClose={() => setShowModal(false)}
                     onSave={handleModalSave}
                     error={error}
-                />
+                />,
+                document.body
             )}
-            {selectedProject && <ContextManager projectId={selectedProject} />}
-        </div>
+        </>
     );
 }
 

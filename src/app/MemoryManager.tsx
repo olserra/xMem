@@ -7,7 +7,6 @@ import SessionMemoryManager from '../components/memory/SessionMemoryManager';
 
 interface MemorySource {
   id: string;
-  name: string;
   type: string;
   status: string;
   itemCount: number;
@@ -19,18 +18,22 @@ interface MemorySource {
   maxCacheSize: number;
   sessionTtl: number;
   enableCache: boolean;
-  collection?: string;
+  collection: string;
+  metric?: string;
+  dimensions?: number;
 }
 
 interface MemorySettings {
-  name: string;
+  type: string;
   vectorDbUrl: string;
   apiKey: string;
   embeddingModel: string;
   maxCacheSize: number;
   sessionTtl: number;
   enableCache: boolean;
-  collection?: string;
+  collection: string;
+  metric?: string;
+  dimensions?: number;
 }
 
 // Add a mapping of provider to supported embedding models
@@ -51,6 +54,9 @@ const PROVIDER_EMBEDDING_MODELS: Record<string, { label: string; value: string }
   mistral: [
     { label: 'mistral-embed', value: 'mistral-embed' },
   ],
+  pinecone: [
+    { label: 'llama-text-embed-v2', value: 'llama-text-embed-v2' },
+  ],
   // Add more providers/models as needed
 };
 
@@ -59,7 +65,21 @@ const PROVIDERS = [
   { label: 'Ollama', value: 'ollama' },
   { label: 'Llama.cpp', value: 'llamacpp' },
   { label: 'Mistral', value: 'mistral' },
+  { label: 'Pinecone', value: 'pinecone' },
   // Add more as needed
+];
+
+const VECTOR_DB_PROVIDERS = [
+  { label: 'Qdrant', value: 'qdrant' },
+  { label: 'MongoDB', value: 'mongodb' },
+  { label: 'Pinecone', value: 'pinecone' },
+  { label: 'ChromaDB', value: 'chromadb' },
+];
+
+const METRIC_OPTIONS = [
+  { label: 'Cosine', value: 'cosine' },
+  { label: 'Euclidean', value: 'euclidean' },
+  { label: 'Dot Product', value: 'dotproduct' },
 ];
 
 // Simple modal component
@@ -82,25 +102,30 @@ const Modal: React.FC<{ open: boolean; onClose: () => void; children: React.Reac
 };
 
 const defaultSettings: MemorySettings = {
-  name: '',
+  type: 'qdrant',
   vectorDbUrl: '',
   apiKey: '',
   embeddingModel: 'text-embedding-3-small',
   maxCacheSize: 128,
   sessionTtl: 3600,
   enableCache: true,
+  collection: '',
+  metric: 'cosine',
+  dimensions: 1024,
 };
 
 const MemorySettingsModal: React.FC<{
   open: boolean;
   onClose: () => void;
-  settings: MemorySettings & { llmProvider?: string };
-  onChange: (settings: MemorySettings & { llmProvider?: string }) => void;
+  settings: MemorySettings & { llmProvider?: string; type?: string };
+  onChange: (settings: MemorySettings & { llmProvider?: string; type?: string }) => void;
   onSave: () => void;
 }> = ({ open, onClose, settings, onChange, onSave }) => {
   const provider = settings.llmProvider || 'openai';
+  const vectorDbProvider = settings.type || 'qdrant';
   const availableModels = PROVIDER_EMBEDDING_MODELS[provider] || [];
   const modelSupported = availableModels.some(m => m.value === settings.embeddingModel);
+  const [error, setError] = useState<string | null>(null);
 
   // When provider changes, update embeddingModel to first supported
   const handleProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -113,6 +138,23 @@ const MemorySettingsModal: React.FC<{
     });
   };
 
+  // When vector DB provider changes
+  const handleVectorDbProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({
+      ...settings,
+      type: e.target.value,
+    });
+  };
+
+  const handleSave = () => {
+    if (!settings.collection || settings.collection.trim() === '') {
+      setError('Collection name is required.');
+      return;
+    }
+    setError(null);
+    onSave();
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <div className="flex items-start gap-6 mb-6">
@@ -121,20 +163,35 @@ const MemorySettingsModal: React.FC<{
         </div>
         <div className="flex-1">
           <h2 className="text-lg font-medium text-slate-800 mb-1">Edit Memory Source</h2>
-          <input
-            type="text"
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2 text-sm text-slate-800 font-medium"
-            value={settings.name}
-            onChange={e => onChange({ ...settings, name: e.target.value })}
-            placeholder="Source Name"
-          />
-          <input
-            type="text"
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2 text-sm text-slate-800 font-medium"
-            value={settings.collection || ''}
-            onChange={e => onChange({ ...settings, collection: e.target.value })}
-            placeholder="Collection Name (for Qdrant, etc)"
-          />
+          <div className="mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="collection">
+              Collection Name
+            </label>
+            <input
+              type="text"
+              id="collection"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2 text-sm text-slate-800 font-medium"
+              value={settings.collection}
+              onChange={e => onChange({ ...settings, collection: e.target.value })}
+              placeholder="Collection Name (e.g. xmem_collection)"
+            />
+            {error && <div className="text-rose-600 text-xs mb-2">{error}</div>}
+          </div>
+          <div className="mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="vectorDbProvider">
+              Vector DB Provider
+            </label>
+            <select
+              id="vectorDbProvider"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value={vectorDbProvider}
+              onChange={handleVectorDbProviderChange}
+            >
+              {VECTOR_DB_PROVIDERS.map(p => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
       <div className="space-y-6">
@@ -237,10 +294,40 @@ const MemorySettingsModal: React.FC<{
             Enable local memory cache
           </label>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="metric">
+              Metric
+            </label>
+            <select
+              id="metric"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value={settings.metric}
+              onChange={e => onChange({ ...settings, metric: e.target.value })}
+            >
+              {METRIC_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="dimensions">
+              Dimensions
+            </label>
+            <input
+              type="number"
+              id="dimensions"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value={settings.dimensions}
+              onChange={e => onChange({ ...settings, dimensions: Number(e.target.value) })}
+              min={1}
+            />
+          </div>
+        </div>
         <div className="flex justify-end gap-3 mt-6">
           <button
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
-            onClick={onSave}
+            onClick={handleSave}
           >
             Save Changes
           </button>
@@ -269,7 +356,7 @@ const MemoryManager: React.FC = () => {
   // Helper: sync a single source by id
   const syncSource = async (source: MemorySource) => {
     try {
-      const isQdrant = source.type === 'qdrant' || source.name.toLowerCase().includes('qdrant') || (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'));
+      const isQdrant = source.type === 'qdrant' || source.collection.toLowerCase().includes('qdrant');
       const payload = {
         checkConnection: true,
         url: source.vectorDbUrl,
@@ -315,7 +402,9 @@ const MemoryManager: React.FC = () => {
   // Filter memory sources based on active tab
   const filteredSources = activeTab === 'all'
     ? memorySources
-    : memorySources.filter(source => source.type === activeTab);
+    : activeTab === 'vectorDb'
+      ? memorySources.filter(source => VECTOR_DB_PROVIDERS.some(p => p.value === source.type))
+      : memorySources.filter(source => source.type === activeTab);
 
   // Helper: check if template card is present
   const hasTemplate = memorySources.some(s => s.id === 'template');
@@ -324,14 +413,16 @@ const MemoryManager: React.FC = () => {
   const handleEdit = (source: MemorySource) => {
     setEditingSource(source);
     setMemorySettings({
-      name: source.name,
+      type: source.type,
       vectorDbUrl: source.vectorDbUrl,
       apiKey: source.apiKey,
       embeddingModel: source.embeddingModel,
       maxCacheSize: source.maxCacheSize,
       sessionTtl: source.sessionTtl,
       enableCache: source.enableCache,
-      collection: source.collection || '',
+      collection: source.collection,
+      metric: source.metric,
+      dimensions: source.dimensions,
     });
     setIsAddMode(false);
     setEditModalOpen(true);
@@ -343,8 +434,7 @@ const MemoryManager: React.FC = () => {
       setMemorySources(sources => [
         {
           id: 'template',
-          name: 'New Vector DB Source',
-          type: 'vectorDb',
+          type: memorySettings.type || defaultSettings.type,
           status: 'disconnected',
           itemCount: 0,
           lastSync: '',
@@ -356,14 +446,15 @@ const MemoryManager: React.FC = () => {
           sessionTtl: 3600,
           enableCache: true,
           collection: '',
+          metric: 'cosine',
+          dimensions: 1024,
         },
         ...sources,
       ]);
     }
     setEditingSource({
       id: 'template',
-      name: 'New Vector DB Source',
-      type: 'vectorDb',
+      type: memorySettings.type || defaultSettings.type,
       status: 'disconnected',
       itemCount: 0,
       lastSync: '',
@@ -375,6 +466,8 @@ const MemoryManager: React.FC = () => {
       sessionTtl: 3600,
       enableCache: true,
       collection: '',
+      metric: 'cosine',
+      dimensions: 1024,
     });
     setMemorySettings(defaultSettings);
     setIsAddMode(true);
@@ -422,6 +515,13 @@ const MemoryManager: React.FC = () => {
     }
   };
 
+  // Handle status change from child
+  const handleStatusChange = (id: string, status: string) => {
+    setMemorySources(sources => sources.map(s =>
+      s.id === id ? { ...s, status } : s
+    ));
+  };
+
   // Handle save (edit or create)
   const handleSave = async () => {
     if (isAddMode && editingSource && editingSource.id === 'template') {
@@ -439,11 +539,12 @@ const MemoryManager: React.FC = () => {
             sessionTtl: memorySettings.sessionTtl,
             enableCache: memorySettings.enableCache,
             collection: memorySettings.collection,
-            name: memorySettings.name,
-            type: 'vectorDb',
+            type: memorySettings.type,
             status: 'disconnected',
             itemCount: 0,
             lastSync: null,
+            metric: memorySettings.metric,
+            dimensions: memorySettings.dimensions,
           }),
         });
         if (res.ok) {
@@ -452,7 +553,7 @@ const MemoryManager: React.FC = () => {
             {
               id,
               ...memorySettings,
-              type: 'vectorDb',
+              type: memorySettings.type,
               status: 'disconnected',
               itemCount: 0,
               lastSync: '',
@@ -485,11 +586,12 @@ const MemoryManager: React.FC = () => {
             sessionTtl: memorySettings.sessionTtl,
             enableCache: memorySettings.enableCache,
             collection: memorySettings.collection,
-            name: memorySettings.name,
-            type: 'vectorDb',
+            type: memorySettings.type,
             status: 'disconnected',
             itemCount: 0,
             lastSync: null,
+            metric: memorySettings.metric,
+            dimensions: memorySettings.dimensions,
           }),
         });
         if (res.ok) {
@@ -499,7 +601,7 @@ const MemoryManager: React.FC = () => {
             {
               id,
               ...memorySettings,
-              type: 'vectorDb',
+              type: memorySettings.type,
               status: 'disconnected',
               itemCount: 0,
               lastSync: '',
@@ -532,17 +634,18 @@ const MemoryManager: React.FC = () => {
             sessionTtl: memorySettings.sessionTtl,
             enableCache: memorySettings.enableCache,
             collection: memorySettings.collection,
-            name: memorySettings.name,
-            type: editingSource.type,
-            status: editingSource.status,
-            itemCount: editingSource.itemCount,
-            lastSync: editingSource.lastSync,
+            type: memorySettings.type,
+            status: memorySettings.status,
+            itemCount: memorySettings.itemCount,
+            lastSync: memorySettings.lastSync,
+            metric: memorySettings.metric,
+            dimensions: memorySettings.dimensions,
           }),
         });
         if (res.ok) {
           setMemorySources(sources => sources.map(s =>
             s.id === editingSource.id
-              ? { ...s, ...memorySettings, name: memorySettings.name, collection: memorySettings.collection }
+              ? { ...s, ...memorySettings, collection: memorySettings.collection }
               : s
           ));
         } else {
@@ -555,13 +658,6 @@ const MemoryManager: React.FC = () => {
     }
     setEditModalOpen(false);
     setIsAddMode(false);
-  };
-
-  // Handle status change from child
-  const handleStatusChange = (id: string, status: string) => {
-    setMemorySources(sources => sources.map(s =>
-      s.id === id ? { ...s, status } : s
-    ));
   };
 
   return (
@@ -628,7 +724,6 @@ const MemoryManager: React.FC = () => {
               key="template"
               source={{
                 id: 'template',
-                name: 'New Vector DB Source',
                 type: 'vectorDb',
                 status: 'disconnected',
                 itemCount: 0,
@@ -641,6 +736,8 @@ const MemoryManager: React.FC = () => {
                 sessionTtl: 3600,
                 enableCache: true,
                 collection: '',
+                metric: 'cosine',
+                dimensions: 1024,
               }}
               onEdit={handleAdd}
               onDelete={() => { }}

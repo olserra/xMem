@@ -3,7 +3,6 @@ import { MoreVertical, RefreshCw } from 'lucide-react';
 
 interface MemorySource {
   id: string;
-  name: string;
   type: string;
   status: string;
   itemCount: number;
@@ -15,7 +14,7 @@ interface MemorySource {
   maxCacheSize: number;
   sessionTtl: number;
   enableCache: boolean;
-  collection?: string;
+  collection: string;
 }
 
 interface MemorySourceCardProps {
@@ -69,7 +68,6 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
       // Qdrant metrics
       if (
         source.type === 'qdrant' ||
-        source.name.toLowerCase().includes('qdrant') ||
         (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'))
       ) {
         setItemCount(
@@ -117,13 +115,13 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
     setSyncing(true);
     setSyncError(null);
     try {
-      const isQdrant = source.type === 'qdrant' || source.name.toLowerCase().includes('qdrant') || (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'));
+      const isQdrant = source.type === 'qdrant' || (source.vectorDbUrl && source.vectorDbUrl.toLowerCase().includes('qdrant'));
       const payload = {
         checkConnection: true,
         url: source.vectorDbUrl,
         apiKey: source.apiKey,
         type: isQdrant ? 'qdrant' : source.type,
-        collection: source.name === 'Project Qdrant Instance' ? 'xmem_collection' : undefined // or use a field if you have it
+        collection: source.collection === 'xmem_collection' ? 'xmem_collection' : undefined
       };
       const res = await fetch('/api/vector-sources', {
         method: 'POST',
@@ -156,7 +154,7 @@ const MemorySourceCard: React.FC<MemorySourceCardProps> = ({ source, onEdit, onD
             {source.icon}
           </div>
           <div className="min-w-0">
-            <h3 className="font-medium text-slate-800 truncate max-w-[140px]" title={source.name}>{source.name}</h3>
+            <h3 className="font-medium text-slate-800 truncate max-w-[140px]" title={source.collection}>{source.collection}</h3>
             <p className="text-xs text-slate-500 capitalize truncate max-w-[140px]" title={source.type}>{source.type}</p>
           </div>
         </div>

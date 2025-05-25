@@ -56,6 +56,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(metrics);
       }
       return NextResponse.json({ error: 'No collections found in ChromaDB' }, { status: 404 });
+    } else if (type === 'pinecone' || vectorDbUrl.toLowerCase().includes('pinecone')) {
+      if (!apiKey) return NextResponse.json({ error: 'Missing Pinecone API key' }, { status: 400 });
+      url = `${baseUrl}/describe_index_stats`;
+      const headersPinecone = { 'Content-Type': 'application/json', 'Api-Key': apiKey };
+      const res = await fetch(url, { method: 'POST', headers: headersPinecone });
+      const text = await res.text();
+      if (!res.ok) return NextResponse.json({ error: 'Failed to fetch Pinecone stats', debug: { url, headers: headersPinecone, status: res.status, body: text } }, { status: res.status });
+      const data = JSON.parse(text);
+      metrics = { points_count: data.totalVectorCount };
+      return NextResponse.json(metrics);
+    } else if (type === 'mongodb' || vectorDbUrl.toLowerCase().includes('mongodb')) {
+      return NextResponse.json({ points_count: 0 }, { status: 200 });
     } else {
       return NextResponse.json({ error: 'Unsupported vector DB type' }, { status: 400 });
     }

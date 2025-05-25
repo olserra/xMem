@@ -10,7 +10,7 @@ interface ContextSourceListProps {
 
 interface Source {
   id: string;
-  name: string;
+  collection: string;
   itemCount?: number;
 }
 
@@ -34,7 +34,7 @@ const ContextSourceList: React.FC<ContextSourceListProps> = ({
   }, [projectId]);
 
   const filteredSources = sources.filter(source =>
-    source.name.toLowerCase().includes(searchTerm.toLowerCase())
+    source.collection.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <div className="p-4 text-center text-slate-400">Loading sources...</div>;
@@ -58,7 +58,7 @@ const ContextSourceList: React.FC<ContextSourceListProps> = ({
                   }`}>
                   <Database size={16} className="text-indigo-600" />
                 </div>
-                <span>{source.name}</span>
+                <span>{source.collection}</span>
               </div>
               <span className="bg-slate-100 px-2 py-0.5 rounded-full text-xs text-slate-600">
                 {source.itemCount ?? 0}

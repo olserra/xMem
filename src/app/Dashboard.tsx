@@ -24,54 +24,94 @@ const Dashboard: React.FC = () => {
     optimizer_status?: string;
   } | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState(false);
-  const [collection, setCollection] = useState('xmem_collection');
+  const [collection, setCollection] = useState<string>('__all__');
   const [collections, setCollections] = useState<string[]>([]);
+  const [memorySources, setMemorySources] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch Qdrant metrics from internal API route to avoid CORS
+    // Fetch all memory sources to build the collection dropdown
+    const fetchSources = async () => {
+      try {
+        const res = await fetch('/api/vector-sources');
+        if (res.ok) {
+          const data = await res.json();
+          setMemorySources(data);
+          const uniqueCollections = Array.from(new Set(data.map((s: any) => s.collection).filter(Boolean)));
+          setCollections(uniqueCollections);
+        }
+      } catch { }
+    };
+    fetchSources();
+  }, []);
+
+  useEffect(() => {
+    // Fetch metrics for the selected collection or all
     const fetchMetrics = async () => {
       setLoadingMetrics(true);
       try {
-        const res = await fetch('/api/qdrant-metrics');
-        if (res.ok) {
-          const data = await res.json();
-          setVectorDbMetrics(data);
+        if (collection === '__all__') {
+          // Aggregate metrics for all collections
+          let totalPoints = 0;
+          let totalIndexed = 0;
+          let totalSegments = 0;
+          let optimizerStatus = '';
+          for (const source of memorySources) {
+            if (!source.collection) continue;
+            const res = await fetch('/api/vector-collection-info', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                vectorDbUrl: source.vectorDbUrl,
+                apiKey: source.apiKey,
+                type: source.type,
+                collection: source.collection,
+              }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              totalPoints += data.points_count || 0;
+              totalIndexed += data.indexed_vectors_count || 0;
+              totalSegments += data.segments_count || 0;
+              if (data.optimizer_status) optimizerStatus = data.optimizer_status;
+            }
+          }
+          setVectorDbMetrics({
+            points_count: totalPoints,
+            indexed_vectors_count: totalIndexed,
+            segments_count: totalSegments,
+            optimizer_status: optimizerStatus,
+          });
         } else {
-          setVectorDbMetrics(null);
+          // Single collection
+          const source = memorySources.find(s => s.collection === collection);
+          if (!source) {
+            setVectorDbMetrics(null);
+            setLoadingMetrics(false);
+            return;
+          }
+          const res = await fetch('/api/vector-collection-info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vectorDbUrl: source.vectorDbUrl,
+              apiKey: source.apiKey,
+              type: source.type,
+              collection: source.collection,
+            }),
+          });
+          if (res.ok) {
+            setVectorDbMetrics(await res.json());
+          } else {
+            setVectorDbMetrics(null);
+          }
         }
       } catch {
         setVectorDbMetrics(null);
       }
       setLoadingMetrics(false);
     };
-    fetchMetrics();
-  }, []);
-
-  useEffect(() => {
-    // Fetch available collections from Qdrant
-    const fetchCollections = async () => {
-      try {
-        const qdrantUrl = process.env.NEXT_PUBLIC_QDRANT_URL;
-        const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
-        if (!qdrantUrl) return;
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (apiKey) headers['api-key'] = apiKey;
-        const res = await fetch(`${qdrantUrl.replace(/\/$/, '')}/collections`, { headers });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.result && Array.isArray(data.result.collections)) {
-          type Collection = { name?: string; collection_name?: string; id?: string };
-          const names = data.result.collections.map((c: Collection) => c.name || c.collection_name || c.id || c);
-          setCollections(names);
-          if (names.length && !names.includes(collection)) {
-            setCollection(names.includes('xmem_collection') ? 'xmem_collection' : names[0]);
-          }
-        }
-      } catch { }
-    };
-    fetchCollections();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (memorySources.length > 0) fetchMetrics();
+  }, [collection, memorySources]);
 
   const metrics: MetricCardProps[] = [
     {
@@ -114,7 +154,7 @@ const Dashboard: React.FC = () => {
           onChange={e => setCollection(e.target.value)}
           className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
         >
-          {collections.length === 0 && <option value={collection}>{collection}</option>}
+          <option value="__all__">All Collections</option>
           {collections.map((col) => (
             <option key={col} value={col}>{col}</option>
           ))}
@@ -135,7 +175,7 @@ const Dashboard: React.FC = () => {
               View Details <ArrowUpRight size={14} />
             </button>
           </div>
-          <MemoryUsageChart />
+          <MemoryUsageChart collection={collection === '__all__' ? undefined : collection} />
         </div>
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
@@ -144,7 +184,12 @@ const Dashboard: React.FC = () => {
               View Details <ArrowUpRight size={14} />
             </button>
           </div>
-          <ContextRelevanceChart collection={collection} />
+          <ContextRelevanceChart
+            collection={collection === '__all__' ? undefined : collection}
+            vectorDbUrl={collection === '__all__' ? undefined : (memorySources.find(s => s.collection === collection)?.vectorDbUrl)}
+            apiKey={collection === '__all__' ? undefined : (memorySources.find(s => s.collection === collection)?.apiKey)}
+            type={collection === '__all__' ? undefined : (memorySources.find(s => s.collection === collection)?.type)}
+          />
         </div>
       </div>
       {/* Recent queries table */}
@@ -155,7 +200,7 @@ const Dashboard: React.FC = () => {
             See All <ArrowUpRight size={14} />
           </button>
         </div>
-        <RecentQueriesTable collection={collection} />
+        <RecentQueriesTable collection={collection === '__all__' ? undefined : collection} />
       </div>
     </div>
   );

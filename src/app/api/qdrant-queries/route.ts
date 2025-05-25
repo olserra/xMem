@@ -2,73 +2,122 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_QDRANT_URL;
-  if (!baseUrl) {
-    return NextResponse.json({ error: 'Qdrant URL is not defined' }, { status: 500 });
-  }
-  const apiKey = process.env.NEXT_PUBLIC_QDRANT_API_KEY;
   const { searchParams } = new URL(req.url);
   const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
   const collection = searchParams.get('collection') || 'xmem_collection';
-  const url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (apiKey) headers['api-key'] = apiKey;
+  const vectorDbUrl = searchParams.get('vectorDbUrl');
+  const apiKey = searchParams.get('apiKey');
+  const type = searchParams.get('type');
 
-  const body = JSON.stringify({
-    limit: 20,
-    with_payload: true,
-    with_vector: false,
-    // Optionally, you could add sorting or filtering here
-  });
+  // Default to Qdrant env vars if not provided
+  const baseUrl = vectorDbUrl || process.env.NEXT_PUBLIC_QDRANT_URL;
+  const key = apiKey || process.env.NEXT_PUBLIC_QDRANT_API_KEY;
+  const dbType = type || 'qdrant';
 
-  try {
-    const res = await fetch(url, { method: 'POST', headers, body });
-    const text = await res.text();
-    if (res.ok) {
-      const data = JSON.parse(text);
-      const points: Array<{ id: string | number; payload?: Record<string, unknown> }> = data.result?.points || [];
-      if (relevanceOnly) {
-        // Return just the 'score' field (relevance score) from each payload, parsing as number if needed
-        let scores = points
-          .map((pt: { payload?: Record<string, unknown> }) => {
-            const val = pt.payload?.score;
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
-            return undefined;
-          })
-          .filter((n: unknown): n is number => typeof n === 'number' && !isNaN(n));
-        // If all scores are 0 or in a very small range, try to rescale for better chart granularity
-        if (scores.length > 0) {
-          const min = Math.min(...scores);
-          const max = Math.max(...scores);
-          // Only rescale if all values are 0 or max-min is very small
-          if (max === min) {
-            // All values are the same, set to 50 for visibility
-            scores = scores.map(() => 50);
-          } else if (max <= 1) {
-            // If scores are in [0,1], scale to [0,100]
-            scores = scores.map(s => Math.round(s * 100));
-          } else if (max <= 10) {
-            // If scores are in [0,10], scale to [0,100]
-            scores = scores.map(s => Math.round((s / 10) * 100));
-          } else if (max <= 100 && min >= 0) {
-            // If scores are in [0,100], keep as is
-          } else {
-            // Otherwise, normalize to [0,100]
-            scores = scores.map(s => Math.round(((s - min) / (max - min)) * 100));
+  if (!baseUrl) {
+    return NextResponse.json({ error: 'Vector DB URL is not defined' }, { status: 500 });
+  }
+
+  let url = '';
+  let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (key) headers['api-key'] = key;
+  let body: any = {};
+
+  if (dbType === 'qdrant' || baseUrl.toLowerCase().includes('qdrant')) {
+    url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
+    body = JSON.stringify({
+      limit: 20,
+      with_payload: true,
+      with_vector: false,
+    });
+    try {
+      const res = await fetch(url, { method: 'POST', headers, body });
+      const text = await res.text();
+      if (res.ok) {
+        const data = JSON.parse(text);
+        const points: Array<{ id: string | number; payload?: Record<string, unknown> }> = data.result?.points || [];
+        if (relevanceOnly) {
+          let scores = points
+            .map((pt: { payload?: Record<string, unknown> }) => {
+              const val = pt.payload?.score;
+              if (typeof val === 'number') return val;
+              if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
+              return undefined;
+            })
+            .filter((n: unknown): n is number => typeof n === 'number' && !isNaN(n));
+          if (scores.length > 0) {
+            const min = Math.min(...scores);
+            const max = Math.max(...scores);
+            if (max === min) {
+              scores = scores.map(() => 50);
+            } else if (max <= 1) {
+              scores = scores.map(s => Math.round(s * 100));
+            } else if (max <= 10) {
+              scores = scores.map(s => Math.round((s / 10) * 100));
+            } else if (max <= 100 && min >= 0) {
+            } else {
+              scores = scores.map(s => Math.round(((s - min) / (max - min)) * 100));
+            }
           }
+          return NextResponse.json({ scores });
         }
-        return NextResponse.json({ scores });
+        const queries = points.map((pt: { id: string | number; payload?: Record<string, unknown> }) => ({
+          id: pt.id,
+          ...pt.payload,
+        }));
+        return NextResponse.json({ queries });
       }
-      // Map to a frontend-friendly format
-      const queries = points.map((pt: { id: string | number; payload?: Record<string, unknown> }) => ({
-        id: pt.id,
-        ...pt.payload,
-      }));
-      return NextResponse.json({ queries });
+      return NextResponse.json({ queries: [] }, { status: 404 });
+    } catch {
+      return NextResponse.json({ error: 'Failed to fetch Qdrant queries' }, { status: 500 });
     }
-    return NextResponse.json({ queries: [] }, { status: 404 });
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch Qdrant queries' }, { status: 500 });
+  } else if (dbType === 'pinecone' || baseUrl.toLowerCase().includes('pinecone')) {
+    // Pinecone: fetch recent vectors (mock relevance scores from metadata.score)
+    url = `${baseUrl.replace(/\/$/, '')}/vectors/fetch`;
+    headers = { 'Content-Type': 'application/json', 'Api-Key': key };
+    body = JSON.stringify({ ids: Array.from({ length: 20 }, (_, i) => `mock-${i + 1}`) });
+    try {
+      console.log('Pinecone fetch debug:', { url, headers, body });
+      const res = await fetch(url, { method: 'POST', headers, body });
+      const text = await res.text();
+      console.log('Pinecone fetch response:', { status: res.status, body: text });
+      if (res.ok) {
+        const data = JSON.parse(text);
+        const vectors = Object.values(data.vectors || {}) as any[];
+        if (relevanceOnly) {
+          let scores = vectors
+            .map((v: any) => {
+              const val = v.metadata?.score;
+              if (typeof val === 'number') return val;
+              if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
+              return undefined;
+            })
+            .filter((n: unknown): n is number => typeof n === 'number' && !isNaN(n));
+          if (scores.length > 0) {
+            const min = Math.min(...scores);
+            const max = Math.max(...scores);
+            if (max === min) {
+              scores = scores.map(() => 50);
+            } else if (max <= 1) {
+              scores = scores.map(s => Math.round(s * 100));
+            } else if (max <= 10) {
+              scores = scores.map(s => Math.round((s / 10) * 100));
+            } else if (max <= 100 && min >= 0) {
+            } else {
+              scores = scores.map(s => Math.round(((s - min) / (max - min)) * 100));
+            }
+          }
+          return NextResponse.json({ scores });
+        }
+        const queries = vectors.map((v: any) => ({ id: v.id, ...v.metadata }));
+        return NextResponse.json({ queries });
+      }
+      return NextResponse.json({ queries: [] }, { status: 404 });
+    } catch (err) {
+      console.error('Error fetching Pinecone vectors:', err);
+      return NextResponse.json({ error: 'Failed to fetch Pinecone vectors' }, { status: 500 });
+    }
+  } else {
+    return NextResponse.json({ error: 'Unsupported vector DB type for relevance chart' }, { status: 400 });
   }
 } 

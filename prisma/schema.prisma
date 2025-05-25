@@ -81,7 +81,6 @@ model VerificationToken {
 
 model MemorySource {
   id             String    @id @default(cuid())
-  name           String
   type           String
   status         String
   itemCount      Int? // Optional, can be updated after sync
@@ -93,7 +92,9 @@ model MemorySource {
   maxCacheSize   Int
   sessionTtl     Int
   enableCache    Boolean
-  collection     String?
+  collection     String
+  metric         String?
+  dimensions     Int?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
   createdAt      DateTime  @default(now())

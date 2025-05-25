@@ -8,9 +8,12 @@ const CHART_WIDTH = 520;
 
 interface ContextRelevanceChartProps {
   collection?: string;
+  vectorDbUrl?: string;
+  apiKey?: string;
+  type?: string;
 }
 
-const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collection = 'xmem_collection' }) => {
+const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collection = 'xmem_collection', vectorDbUrl, apiKey, type }) => {
   const [scores, setScores] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +21,14 @@ const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collectio
     const fetchScores = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/qdrant-queries?relevanceOnly=true&collection=${encodeURIComponent(collection)}`);
+        const params = new URLSearchParams({
+          relevanceOnly: 'true',
+          collection: collection || '',
+        });
+        if (vectorDbUrl) params.append('vectorDbUrl', vectorDbUrl);
+        if (apiKey) params.append('apiKey', apiKey);
+        if (type) params.append('type', type);
+        const res = await fetch(`/api/qdrant-queries?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setScores(data.scores || []);
@@ -28,7 +38,7 @@ const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collectio
       setLoading(false);
     };
     fetchScores();
-  }, [collection]);
+  }, [collection, vectorDbUrl, apiKey, type]);
 
   if (loading) {
     return <div className="relative h-60 w-full flex items-center justify-center text-slate-400">Loading...</div>;

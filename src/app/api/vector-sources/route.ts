@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const data = await req.json();
+  if (!data.type) data.type = 'qdrant';
   if (data.checkConnection) {
     try {
       if (data.type === 'qdrant') {
@@ -58,6 +59,27 @@ export async function POST(req: NextRequest) {
           }
         }
         return NextResponse.json({ status: 'disconnected', error: 'Could not connect to the vector DB.', debug: allDebug }, { status: 400 });
+      } else if (data.type === 'pinecone') {
+        // Pinecone connection check
+        const baseUrl = data.url || data.vectorDbUrl;
+        const apiKey = data.apiKey;
+        if (!baseUrl || !apiKey) {
+          return NextResponse.json({ status: 'disconnected', error: 'Missing Pinecone URL or API key.' }, { status: 400 });
+        }
+        // Pinecone REST API expects: https://{index}-{env}.svc.{env}.pinecone.io
+        // /describe_index_stats endpoint
+        const url = `${baseUrl.replace(/\/$/, '')}/describe_index_stats`;
+        const headers = {
+          'Content-Type': 'application/json',
+          'Api-Key': apiKey,
+        };
+        const res = await fetch(url, { method: 'POST', headers });
+        const text = await res.text();
+        if (res.ok) {
+          return NextResponse.json({ status: 'connected', debug: { url, headers, status: res.status, statusText: res.statusText, body: text } });
+        } else {
+          return NextResponse.json({ status: 'disconnected', error: 'Could not connect to Pinecone.', debug: { url, headers, status: res.status, statusText: res.statusText, body: text } }, { status: 400 });
+        }
       } else {
         // Default to ChromaDB connection check
         const url = `${data.url.replace(/\/$/, '')}/api/v1/collections`;
@@ -80,7 +102,6 @@ export async function POST(req: NextRequest) {
   }
   const source = await prisma.memorySource.create({
     data: {
-      name: data.name,
       type: data.type,
       status: data.status || 'disconnected',
       itemCount: data.itemCount ?? null,
@@ -93,6 +114,8 @@ export async function POST(req: NextRequest) {
       sessionTtl: data.sessionTtl,
       enableCache: data.enableCache,
       collection: data.collection,
+      metric: data.metric,
+      dimensions: data.dimensions,
       user: { connect: { id: userId } },
       ...(data.projectId ? { project: { connect: { id: data.projectId } } } : {}),
     },
@@ -107,10 +130,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const data = await req.json();
+  if (!data.type) data.type = 'qdrant';
   const source = await prisma.memorySource.update({
     where: { id: data.id, userId },
     data: {
-      name: data.name,
       type: data.type,
       status: data.status,
       itemCount: data.itemCount,
@@ -123,6 +146,8 @@ export async function PUT(req: NextRequest) {
       sessionTtl: data.sessionTtl,
       enableCache: data.enableCache,
       collection: data.collection,
+      metric: data.metric,
+      dimensions: data.dimensions,
     },
   });
   return NextResponse.json({ success: true, id: source.id });

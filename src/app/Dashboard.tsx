@@ -16,6 +16,15 @@ interface MetricCardProps {
   icon: React.ReactNode;
 }
 
+interface MemorySource {
+  id: string;
+  collection: string;
+  vectorDbUrl: string;
+  apiKey: string;
+  type: string;
+  [key: string]: unknown;
+}
+
 const Dashboard: React.FC = () => {
   const [vectorDbMetrics, setVectorDbMetrics] = useState<{
     points_count?: number;
@@ -26,7 +35,7 @@ const Dashboard: React.FC = () => {
   const [loadingMetrics, setLoadingMetrics] = useState(false);
   const [collection, setCollection] = useState<string>('__all__');
   const [collections, setCollections] = useState<string[]>([]);
-  const [memorySources, setMemorySources] = useState<any[]>([]);
+  const [memorySources, setMemorySources] = useState<MemorySource[]>([]);
 
   useEffect(() => {
     // Fetch all memory sources to build the collection dropdown
@@ -34,9 +43,9 @@ const Dashboard: React.FC = () => {
       try {
         const res = await fetch('/api/vector-sources');
         if (res.ok) {
-          const data = await res.json();
+          const data: MemorySource[] = await res.json();
           setMemorySources(data);
-          const uniqueCollections = Array.from(new Set(data.map((s: any) => s.collection).filter(Boolean)));
+          const uniqueCollections = Array.from(new Set(data.map((s) => s.collection).filter(Boolean)));
           setCollections(uniqueCollections);
         }
       } catch { }
@@ -83,7 +92,7 @@ const Dashboard: React.FC = () => {
           });
         } else {
           // Single collection
-          const source = memorySources.find(s => s.collection === collection);
+          const source = memorySources.find((s) => s.collection === collection);
           if (!source) {
             setVectorDbMetrics(null);
             setLoadingMetrics(false);

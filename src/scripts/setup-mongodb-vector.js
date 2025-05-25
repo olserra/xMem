@@ -1,4 +1,6 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const dbName = process.env.MONGODB_DB || 'xmem';
@@ -19,55 +21,32 @@ function randomPhrase() {
   return phrases[Math.floor(Math.random() * phrases.length)];
 }
 
-async function main() {
-  const client = new MongoClient(uri);
-  try {
-    await client.connect();
-    const db = client.db(dbName);
+const client = new MongoClient(uri);
 
-    // Drop collection if it exists
-    const collections = await db.listCollections({ name: collectionName }).toArray();
-    if (collections.length > 0) {
-      await db.collection(collectionName).drop();
-      console.log(`Collection "${collectionName}" dropped.`);
-    }
-
-    // Create collection
-    await db.createCollection(collectionName);
-    console.log(`Collection "${collectionName}" created.`);
-
-    // Create vector index
-    await db.collection(collectionName).createIndex(
-      { [vectorField]: "vector" },
-      {
-        name: "embedding_vector_index",
-        dimensions,
-        similarity
-      }
-    );
-    console.log(`Vector index created on "${vectorField}" with ${dimensions} dimensions and "${similarity}" similarity.`);
-
-    // Insert mock data
-    const docs = Array.from({ length: numDocs }, (_, i) => {
-      const phrase = randomPhrase();
-      return {
-        _id: i + 1,
-        [vectorField]: randomVector(dimensions),
-        text: phrase,
-        source: phrase,
-        score: Math.floor(Math.random() * 100),
-        size: phrase.length,
-        flag: Math.random() < 0.5
-      };
-    });
-    await db.collection(collectionName).insertMany(docs);
-    console.log(`${numDocs} mock documents inserted.`);
-  } finally {
-    await client.close();
-  }
-}
-
-main().catch(err => {
-  console.error(err);
+try {
+  await client.connect();
+  const db = client.db(dbName);
+  // Drop and recreate collection
+  await db.collection(collectionName).drop().catch(() => {});
+  await db.createCollection(collectionName);
+  await db.collection(collectionName).createIndex({ [vectorField]: '2dsphere' });
+  // Insert mock data
+  const docs = Array.from({ length: numDocs }, (_, i) => {
+    const phrase = randomPhrase();
+    return {
+      embedding: randomVector(dimensions),
+      text: phrase,
+      source: phrase,
+      score: Math.floor(Math.random() * 100),
+      size: phrase.length,
+      flag: Math.random() < 0.5
+    };
+  });
+  await db.collection(collectionName).insertMany(docs);
+  console.log('Inserted mock data into MongoDB vector collection.');
+} catch (err) {
+  console.error('MongoDB vector setup error:', err);
   process.exit(1);
-}); 
+} finally {
+  await client.close();
+} 

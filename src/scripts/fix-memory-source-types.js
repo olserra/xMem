@@ -1,7 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-function detectType(url) {
+function detectType(url: string) {
   if (!url) return 'qdrant';
   const u = url.toLowerCase();
   if (u.includes('qdrant')) return 'qdrant';
@@ -19,10 +19,9 @@ async function main() {
       where: { id: source.id },
       data: { type: newType },
     });
-    console.log(`Updated source ${source.id}: type 'vectorDb' -> '${newType}'`);
+    console.log(`Updated source ${source.id} to type ${newType}`);
   }
-  console.log('Done.');
   await prisma.$disconnect();
 }
 
-main().catch(e => { console.error(e); process.exit(1); }); 
+await main(); 

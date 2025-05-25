@@ -1,10 +1,11 @@
-const fetch = require('node-fetch');
-require('dotenv').config();
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const apiKey = process.env.PINECONE_API_KEY;
-const indexName = process.env.PINECONE_INDEX;
 const host = process.env.PINECONE_HOST;
-const VECTOR_DIM = 1024;
+const indexName = process.env.PINECONE_INDEX;
+const VECTOR_DIM = 4;
 const NUM_VECTORS = 50;
 
 if (!apiKey || !host || !indexName) {
@@ -25,40 +26,36 @@ function randomPhrase() {
   return phrases[Math.floor(Math.random() * phrases.length)];
 }
 
-async function main() {
-  const vectors = Array.from({ length: NUM_VECTORS }, (_, i) => {
-    const phrase = randomPhrase();
-    return {
-      id: `mock-${i + 1}`,
-      values: randomVector(VECTOR_DIM),
-      metadata: {
-        text: phrase,
-        source: phrase,
-        score: Math.floor(Math.random() * 100),
-        size: phrase.length,
-        flag: Math.random() < 0.5
-      }
-    };
-  });
-
-  const body = JSON.stringify({ vectors });
-  const headers = {
-    'Content-Type': 'application/json',
-    'Api-Key': apiKey,
-  };
-
-  try {
-    const res = await fetch(endpoint, { method: 'POST', headers, body });
-    const text = await res.text();
-    if (!res.ok) {
-      console.error('Pinecone upsert failed:', res.status, text);
-      process.exit(1);
+const vectors = Array.from({ length: NUM_VECTORS }, (_, i) => {
+  const phrase = randomPhrase();
+  return {
+    id: `mock-${i + 1}`,
+    values: randomVector(VECTOR_DIM),
+    metadata: {
+      text: phrase,
+      source: phrase,
+      score: Math.floor(Math.random() * 100),
+      size: phrase.length,
+      flag: Math.random() < 0.5
     }
-    console.log('Pinecone upsert result:', text);
-  } catch (err) {
-    console.error('Error upserting to Pinecone:', err);
+  };
+});
+
+const body = JSON.stringify({ vectors });
+const headers = {
+  'Content-Type': 'application/json',
+  'Api-Key': apiKey,
+};
+
+try {
+  const res = await fetch(endpoint, { method: 'POST', headers, body });
+  const text = await res.text();
+  if (!res.ok) {
+    console.error('Pinecone upsert failed:', res.status, text);
     process.exit(1);
   }
-}
-
-main(); 
+  console.log('Pinecone upsert result:', text);
+} catch (err) {
+  console.error('Error upserting to Pinecone:', err);
+  process.exit(1);
+} 

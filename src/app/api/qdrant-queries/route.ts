@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   let url = '';
   let headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (key) headers['api-key'] = key;
-  let body: any = {};
+  let body = "";
 
   if (dbType === 'qdrant' || baseUrl.toLowerCase().includes('qdrant')) {
     url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
@@ -34,11 +34,11 @@ export async function GET(req: NextRequest) {
       const res = await fetch(url, { method: 'POST', headers, body });
       const text = await res.text();
       if (res.ok) {
-        const data = JSON.parse(text);
-        const points: Array<{ id: string | number; payload?: Record<string, unknown> }> = data.result?.points || [];
+        const data: { result?: { points?: Array<{ id: string | number; payload?: Record<string, unknown> }> } } = JSON.parse(text);
+        const points = data.result?.points ?? [];
         if (relevanceOnly) {
           let scores = points
-            .map((pt) => {
+            .map((pt: { payload?: Record<string, unknown> }) => {
               const val = pt.payload?.score;
               if (typeof val === 'number') return val;
               if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
@@ -61,20 +61,20 @@ export async function GET(req: NextRequest) {
           }
           return NextResponse.json({ scores });
         }
-        const queries = points.map((pt) => ({
+        const queries = points.map((pt: { id: string | number; payload?: Record<string, unknown> }) => ({
           id: pt.id,
           ...pt.payload,
         }));
         return NextResponse.json({ queries });
       }
       return NextResponse.json({ queries: [] }, { status: 404 });
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: 'Failed to fetch Qdrant queries' }, { status: 500 });
     }
   } else if (dbType === 'pinecone' || baseUrl.toLowerCase().includes('pinecone')) {
     // Pinecone: fetch recent vectors (mock relevance scores from metadata.score)
     url = `${baseUrl.replace(/\/$/, '')}/vectors/fetch`;
-    headers = { 'Content-Type': 'application/json', 'Api-Key': key };
+    headers = { 'Content-Type': 'application/json', 'Api-Key': key || "" };
     body = JSON.stringify({ ids: Array.from({ length: 20 }, (_, i) => `mock-${i + 1}`), namespace: 'default' });
     try {
       console.log('Pinecone fetch debug:', { url, headers, body });
@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
         const vectors = Object.values(data.vectors || {}) as Array<{ id: string; metadata?: Record<string, unknown> }>;
         if (relevanceOnly) {
           let scores = vectors
-            .map((v) => {
+            .map((v: { id: string; metadata?: Record<string, unknown> }) => {
               const val = v.metadata?.score;
               if (typeof val === 'number') return val;
               if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
@@ -109,12 +109,12 @@ export async function GET(req: NextRequest) {
           }
           return NextResponse.json({ scores });
         }
-        const queries = vectors.map((v) => ({ id: v.id, ...v.metadata }));
+        const queries = vectors.map((v: { id: string; metadata?: Record<string, unknown> }) => ({ id: v.id, ...v.metadata }));
         return NextResponse.json({ queries });
       }
       return NextResponse.json({ queries: [] }, { status: 404 });
-    } catch (err) {
-      console.error('Error fetching Pinecone vectors:', err);
+    } catch {
+      console.error('Error fetching Pinecone vectors');
       return NextResponse.json({ error: 'Failed to fetch Pinecone vectors' }, { status: 500 });
     }
   } else {

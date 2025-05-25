@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import ContextManager from '../../ContextManager';
 import { PlusCircle, Edit, Trash2, Check, X } from 'lucide-react';
@@ -19,20 +19,7 @@ export default function ContextPage() {
     const [error, setError] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchProjects();
-        // eslint-disable-next-line
-    }, []);
-
-    if (status === 'unauthenticated') {
-        return (
-            <div className="p-8 text-center text-slate-500">
-                Please <button className="text-indigo-600 underline" onClick={() => signIn()}>log in</button> to manage your projects.
-            </div>
-        );
-    }
-
-    const fetchProjects = () => {
+    const fetchProjects = useCallback(() => {
         setLoading(true);
         fetch('/api/projects')
             .then(async res => {
@@ -58,7 +45,29 @@ export default function ContextPage() {
                 setSelectedProject(null);
             })
             .finally(() => setLoading(false));
-    };
+    }, [selectedProject]);
+
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
+
+    const handleDelete = useCallback(async (id: string) => {
+        if (!window.confirm('Delete this project? This cannot be undone.')) return;
+        setDeleting(id);
+        try {
+            await fetch('/api/projects', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id }),
+            });
+            if (selectedProject === id) setSelectedProject(null);
+            fetchProjects();
+        } catch {
+            setError('Failed to delete project');
+        } finally {
+            setDeleting(null);
+        }
+    }, [selectedProject, fetchProjects]);
 
     const openCreateModal = () => {
         setModalMode('create');
@@ -75,49 +84,6 @@ export default function ContextPage() {
         setEditId(project.id);
         setShowModal(true);
         setError(null);
-    };
-    const handleModalSave = async () => {
-        setError(null);
-        if (!modalName.trim()) {
-            setError('Project name is required');
-            return;
-        }
-        try {
-            if (modalMode === 'create') {
-                await fetch('/api/projects', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: modalName, description: modalDesc }),
-                });
-            } else if (modalMode === 'edit' && editId) {
-                await fetch('/api/projects', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: editId, name: modalName, description: modalDesc }),
-                });
-            }
-            setShowModal(false);
-            fetchProjects();
-        } catch {
-            setError('Failed to save project');
-        }
-    };
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Delete this project? This cannot be undone.')) return;
-        setDeleting(id);
-        try {
-            await fetch('/api/projects', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id }),
-            });
-            if (selectedProject === id) setSelectedProject(null);
-            fetchProjects();
-        } catch {
-            setError('Failed to delete project');
-        } finally {
-            setDeleting(null);
-        }
     };
 
     // Memoize dashboard content to avoid re-renders from modal state
@@ -147,7 +113,42 @@ export default function ContextPage() {
             </div>
             {selectedProject && !showModal && <ContextManager projectId={selectedProject} />}
         </div>
-    ), [projects, selectedProject, deleting, showModal]);
+    ), [projects, selectedProject, deleting, showModal, handleDelete]);
+
+    if (status === 'unauthenticated') {
+        return (
+            <div className="p-8 text-center text-slate-500">
+                Please <button className="text-indigo-600 underline" onClick={() => signIn()}>log in</button> to manage your projects.
+            </div>
+        );
+    }
+
+    const handleModalSave = async () => {
+        setError(null);
+        if (!modalName.trim()) {
+            setError('Project name is required');
+            return;
+        }
+        try {
+            if (modalMode === 'create') {
+                await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: modalName, description: modalDesc }),
+                });
+            } else if (modalMode === 'edit' && editId) {
+                await fetch('/api/projects', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: editId, name: modalName, description: modalDesc }),
+                });
+            }
+            setShowModal(false);
+            fetchProjects();
+        } catch {
+            setError('Failed to save project');
+        }
+    };
 
     return (
         <>

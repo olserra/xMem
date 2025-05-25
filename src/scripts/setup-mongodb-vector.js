@@ -7,7 +7,6 @@ const dbName = process.env.MONGODB_DB || 'xmem';
 const collectionName = process.env.MONGODB_COLLECTION || 'vectors';
 const vectorField = 'embedding';
 const dimensions = 3; // Change to your embedding size for production
-const similarity = 'cosine';
 const numDocs = 50;
 
 function randomVector(dim) {
@@ -31,7 +30,7 @@ try {
   await db.createCollection(collectionName);
   await db.collection(collectionName).createIndex({ [vectorField]: '2dsphere' });
   // Insert mock data
-  const docs = Array.from({ length: numDocs }, (_, i) => {
+  const docs = Array.from({ length: numDocs }, () => {
     const phrase = randomPhrase();
     return {
       embedding: randomVector(dimensions),

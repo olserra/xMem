@@ -15,6 +15,8 @@ interface MemorySource {
   sessionTtl: number;
   enableCache: boolean;
   collection: string;
+  metric?: string;
+  dimensions?: number;
 }
 
 interface MemorySourceCardProps {

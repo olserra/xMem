@@ -1,5 +1,5 @@
 import { VectorStore } from '../xmem';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 export type MongoDBVectorConfig = {
   uri: string;
@@ -25,8 +25,7 @@ export class MongoDBVectorAdapter implements VectorStore {
     const db = this.client.db(this.dbName);
     const collection = db.collection(this.collectionName);
     await collection.updateOne(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { _id: data.id as any },
+      { _id: data.id as unknown as ObjectId },
       { $set: { _id: data.id, $vector: data.embedding, ...(data.metadata || {}) } },
       { upsert: true }
     );
@@ -70,7 +69,6 @@ export class MongoDBVectorAdapter implements VectorStore {
     await this.client.connect();
     const db = this.client.db(this.dbName);
     const collection = db.collection(this.collectionName);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await collection.deleteOne({ _id: id as any });
+    await collection.deleteOne({ _id: id as unknown as ObjectId });
   }
 } 

@@ -1,6 +1,10 @@
 import React from 'react';
 
-const MemoryUsageChart: React.FC = () => {
+interface MemoryUsageChartProps {
+  collection?: string;
+}
+
+const MemoryUsageChart: React.FC<MemoryUsageChartProps> = (/* { collection } */) => {
   // This is a placeholder for an actual chart component
   // In a real implementation, you would use a chart library like Chart.js, Recharts, etc.
 

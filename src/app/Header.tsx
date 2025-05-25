@@ -105,9 +105,9 @@ const Header: React.FC = () => {
 
     const headerClass = `w-full h-16 fixed top-0 left-0 z-30 transition-colors duration-300 ${scrolled ? 'bg-slate-100/50 text-slate-900 shadow-lg backdrop-blur-md' : 'bg-slate-900 text-white shadow-md'} flex items-center justify-between px-8`;
 
-    // Always include Dashboard and Documentation in navLinks
-    const staticNavLinks = [
-        { href: '/dashboard', label: 'Dashboard' },
+    // Always include Documentation in navLinks; Dashboard only if user is present
+    const navLinks = [
+        ...(user ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
         { href: '/docs', label: 'Documentation' },
     ];
 
@@ -118,13 +118,16 @@ const Header: React.FC = () => {
             </div>
             {/* Desktop nav */}
             <nav className="hidden md:flex flex-1 items-center gap-6 justify-end">
-                {staticNavLinks.map(link => (
+                {navLinks.map(link => (
                     <Link
                         key={link.href}
                         href={link.href}
-                        className={`font-medium px-3 py-2 rounded transition-colors ${pathname.startsWith(link.href) ? 'border-b-2 border-teal-500 underline-offset-4 bg-transparent text-white' : 'hover:text-teal-400 text-slate-200'}`}
+                        className={`font-medium px-3 py-2 transition-colors flex flex-col items-center justify-center ${pathname.startsWith(link.href) ? 'text-white' : 'hover:text-teal-400 text-slate-200 rounded'}`}
                     >
-                        {link.label}
+                        <span>{link.label}</span>
+                        {pathname.startsWith(link.href) && (
+                            <span className="border-b-2 border-teal-500 w-3/4 mt-1.5 inline-block mx-auto"></span>
+                        )}
                     </Link>
                 ))}
             </nav>
@@ -243,14 +246,17 @@ const Header: React.FC = () => {
                         {/* Only show nav links if NOT on landing */}
                         {!isLanding && (
                             <nav className="flex flex-col gap-3">
-                                {staticNavLinks.map(link => (
+                                {navLinks.map(link => (
                                     <Link
                                         key={link.href}
                                         href={link.href}
-                                        className={`font-medium px-3 py-2 rounded transition-colors ${pathname.startsWith(link.href) ? 'bg-teal-600 text-white' : 'hover:bg-teal-400/20 text-slate-200'}`}
+                                        className={`font-medium px-3 py-2 transition-colors flex flex-col items-center justify-center ${pathname.startsWith(link.href) ? 'text-white' : 'hover:bg-teal-400/20 text-slate-200 rounded'}`}
                                         onClick={() => setMobileNavOpen(false)}
                                     >
-                                        {link.label}
+                                        <span>{link.label}</span>
+                                        {pathname.startsWith(link.href) && (
+                                            <span className="border-b-2 border-teal-400 w-3/4 mt-1.5 inline-block mx-auto"></span>
+                                        )}
                                     </Link>
                                 ))}
                             </nav>

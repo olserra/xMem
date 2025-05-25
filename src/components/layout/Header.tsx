@@ -12,6 +12,7 @@ import { Check } from 'lucide-react';
 interface Organization {
     id: string;
     name: string;
+    description: string | null;
 }
 interface Project {
     id: string;

@@ -17,7 +17,7 @@ interface APIKey {
 interface Organization {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
   createdAt: string;
   updatedAt: string;
   role?: string;

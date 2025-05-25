@@ -7,7 +7,7 @@ import type { Session } from 'next-auth';
 interface Organization {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
   createdAt: string;
   updatedAt: string;
   role?: string;

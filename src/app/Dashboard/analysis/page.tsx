@@ -54,7 +54,9 @@ export default function AnalysisPage() {
                 });
                 const trendsData = await trendsRes.json();
                 // Convert trends to chart data
-                const trendRows: TopicTrend[] = Object.entries(trendsData.trend || {}).map(([date, topics]: [string, Record<string, number>]) => ({ date, ...topics }));
+                const trendRows: TopicTrend[] = Object.entries(trendsData.trend || {}).map(
+                    ([date, topics]) => ({ date, ...(topics as Record<string, number>) })
+                );
                 setTopicTrends(trendRows || []);
                 // 4. Anomalies
                 const anomaliesRes = await fetch(`${apiUrl}/anomalies`, {

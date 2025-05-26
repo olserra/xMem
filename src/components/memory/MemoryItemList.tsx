@@ -62,7 +62,6 @@ const MemoryItemList: React.FC = () => {
     const fetchTags = async () => {
       const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
       if (!process.env.NEXT_PUBLIC_ML_API_URL) {
-        // eslint-disable-next-line no-console
         console.warn('NEXT_PUBLIC_ML_API_URL is not set. Using http://localhost:8000 as fallback. Tags may not work in production.');
       }
       const newTagsMap: Record<string, string[]> = {};
@@ -71,7 +70,6 @@ const MemoryItemList: React.FC = () => {
           const text = item.text || item.title || item.content || '';
           if (!text) return;
           try {
-            // eslint-disable-next-line no-console
             console.log('Fetching tags for', item.id, 'with text:', text, 'using', apiUrl);
             const res = await fetch(`${apiUrl}/tags`, {
               method: 'POST',
@@ -82,12 +80,10 @@ const MemoryItemList: React.FC = () => {
               const data = await res.json();
               newTagsMap[item.id] = data.tags || [];
             } else {
-              // eslint-disable-next-line no-console
               console.error('Failed to fetch tags for', item.id, res.status);
               newTagsMap[item.id] = [];
             }
           } catch (err) {
-            // eslint-disable-next-line no-console
             console.error('Error fetching tags for', item.id, err);
             newTagsMap[item.id] = [];
           }

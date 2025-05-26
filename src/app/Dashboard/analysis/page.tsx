@@ -29,9 +29,9 @@ export default function AnalysisPage() {
                 const res = await fetch("/api/qdrant-queries?limit=1000");
                 if (!res.ok) throw new Error("Failed to fetch memory items");
                 const data = await res.json();
-                const items = data.queries || [];
-                const texts: string[] = items.map((item: any) => item.text || item.title || item.content || "").filter((t: string) => t);
-                const timestamps: string[] = items.map((item: any) => item.createdAt || item.created_at || item.timestamp || "");
+                const items: { text?: string; title?: string; content?: string; createdAt?: string; created_at?: string; timestamp?: string }[] = data.queries || [];
+                const texts: string[] = items.map((item) => item.text || item.title || item.content || "").filter((t) => t);
+                const timestamps: string[] = items.map((item) => item.createdAt || item.created_at || item.timestamp || "");
                 const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
                 // 2. Topic distribution
                 const topicsRes = await fetch(`${apiUrl}/topics`, {
@@ -72,8 +72,8 @@ export default function AnalysisPage() {
                 });
                 const coverageData = await coverageRes.json();
                 setCoverage(coverageData);
-            } catch (e: any) {
-                setError(e.message || "Unknown error");
+            } catch (e: unknown) {
+                setError(e instanceof Error ? e.message : "Unknown error");
             } finally {
                 setLoading(false);
             }

@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -5,10 +6,12 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# Allow all origins for dev; restrict in prod
+# Use env var for allowed origins, default to * for dev
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

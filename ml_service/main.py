@@ -1,9 +1,16 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from services.sentiment import analyze_sentiment
 from services.tagging import tag_memory_item
 from schemas import TextIn
+from typing import List, Optional
+from services.topics import (
+    extract_topics,
+    topic_trends,
+    detect_anomalies,
+    topic_coverage,
+)
 
 app = FastAPI()
 
@@ -41,3 +48,34 @@ def sentiment_endpoint(data: TextIn) -> dict:
 def tags_endpoint(data: TextIn) -> dict:
     """Extract tags for the provided memory item text."""
     return tag_memory_item(data)
+
+
+@app.post("/topics")
+def topics_endpoint(texts: List[str] = Body(..., embed=True)) -> dict:
+    """Extract topics for a list of texts using BERTopic."""
+    return extract_topics(texts)
+
+
+@app.post("/topic-trends")
+def topic_trends_endpoint(
+    texts: List[str] = Body(..., embed=True),
+    timestamps: Optional[List[str]] = Body(None, embed=True),
+    time_format: str = Body("%Y-%m-%d", embed=True),
+) -> dict:
+    """Get topic trends over time for a list of texts and timestamps."""
+    return topic_trends(texts, timestamps, time_format)
+
+
+@app.post("/anomalies")
+def anomalies_endpoint(texts: List[str] = Body(..., embed=True)) -> dict:
+    """Detect anomalies in a list of texts using Isolation Forest."""
+    return detect_anomalies(texts)
+
+
+@app.post("/coverage")
+def coverage_endpoint(
+    texts: List[str] = Body(..., embed=True),
+    expected_topics: Optional[List[str]] = Body(None, embed=True),
+) -> dict:
+    """Analyze topic coverage and gaps for a list of texts."""
+    return topic_coverage(texts, expected_topics)

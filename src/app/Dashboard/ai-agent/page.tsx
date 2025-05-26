@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Sparkles, ChevronDown, Database, MessageCircle } from "lucide-react";
+import { ChevronDown, Database, MessageCircle } from "lucide-react";
 
 // Placeholder: Replace with actual LLM model list fetch if needed
 const LLM_MODELS = [
@@ -11,9 +11,11 @@ const LLM_MODELS = [
     { id: "openchat", name: "OpenChat" },
 ];
 
+type Source = { id: string; name?: string; collection?: string };
+
 export default function AIAgentPage() {
     const [selectedModel, setSelectedModel] = useState(LLM_MODELS[0].id);
-    const [sources, setSources] = useState([]); // All available sources
+    const [sources, setSources] = useState<Source[]>([]); // All available sources
     const [selectedSources, setSelectedSources] = useState<string[]>([]); // Selected source IDs
     const [chat, setChat] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
@@ -47,7 +49,7 @@ export default function AIAgentPage() {
             if (!res.ok) throw new Error("Agent service error");
             const data = await res.json();
             setChat((c) => [...c, { role: "agent", content: data.reply }]);
-        } catch (err: any) {
+        } catch {
             setError("Failed to get agent response");
         } finally {
             setInput("");
@@ -55,7 +57,7 @@ export default function AIAgentPage() {
         }
     };
 
-    const handleSelectAll = () => setSelectedSources(sources.map((s: any) => s.id));
+    const handleSelectAll = () => setSelectedSources(sources.map((s) => s.id));
     const handleDeselectAll = () => setSelectedSources([]);
 
     return (
@@ -96,7 +98,7 @@ export default function AIAgentPage() {
                         >Deselect All</button>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {sources.map((source: any) => (
+                        {sources.map((source) => (
                             <label key={source.id} className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 rounded px-2 py-1">
                                 <input
                                     type="checkbox"

@@ -1,3 +1,27 @@
+# Unified Local Development (One Command)
+
+To run the entire app (Next.js dashboard, ML backend, and database) in local development mode with hot reload and full traceability:
+
+```sh
+make up
+```
+
+- This will start all services using Docker Compose (see docker-compose.dev.yml).
+- To stop everything:
+  ```sh
+  make down
+  ```
+- To follow logs for all services:
+  ```sh
+  make logs
+  ```
+- To see status of all services:
+  ```sh
+  make ps
+  ```
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

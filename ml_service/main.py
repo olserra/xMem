@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from services.sentiment import analyze_sentiment
 from services.tagging import tag_memory_item
-from schemas import TextIn
+from schemas import TextIn, AgentChatRequest, AgentChatResponse
 from typing import List, Optional
 from services.topics import (
     extract_topics,
@@ -11,6 +11,7 @@ from services.topics import (
     detect_anomalies,
     topic_coverage,
 )
+from services.agent import chat_with_agent
 
 app = FastAPI()
 
@@ -79,3 +80,9 @@ def coverage_endpoint(
 ) -> dict:
     """Analyze topic coverage and gaps for a list of texts."""
     return topic_coverage(texts, expected_topics)
+
+
+@app.post("/agent-chat", response_model=AgentChatResponse)
+def agent_chat_endpoint(request: AgentChatRequest) -> AgentChatResponse:
+    """Chat with the AI Agent using the selected model and sources."""
+    return chat_with_agent(request)

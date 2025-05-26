@@ -1,7 +1,7 @@
 "use client";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import { Database, Cpu, Clock, Settings, Sparkles, BarChart } from "lucide-react";
+import { Database, Cpu, Clock, Settings, Sparkles, BarChart, MessageCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
@@ -11,6 +11,7 @@ const navItems = [
     { id: "context", label: "Context Manager", icon: <Clock size={20} /> },
     { id: "integrationhub", label: "Integration Hub", icon: <Sparkles size={20} /> },
     { id: "analysis", label: "Analysis", icon: <BarChart size={20} /> },
+    { id: "ai-agent", label: "AI Agent", icon: <MessageCircle size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
 ];
 

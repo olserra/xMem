@@ -210,6 +210,18 @@ files = [
 ]
 
 [[package]]
+name = "diskcache"
+version = "5.6.3"
+description = "Disk Cache -- Disk and file backed persistent cache."
+optional = false
+python-versions = ">=3"
+groups = ["main"]
+files = [
+    {file = "diskcache-5.6.3-py3-none-any.whl", hash = "sha256:5e31b2d5fbad117cc363ebaf6b689474db18a1f6438bc82358b024abd4c2ca19"},
+    {file = "diskcache-5.6.3.tar.gz", hash = "sha256:2c3a3fa2743d8535d832ec61c2054a1641f41775aa7c556758a109941e33e4fc"},
+]
+
+[[package]]
 name = "fastapi"
 version = "0.115.12"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -463,6 +475,29 @@ spacy = ["spacy (>=3.0.1)"]
 test = ["black (>=19.3b0)", "flake8 (>=3.6.0)", "pre-commit (>=2.2.0)", "pytest (>=5.4.3)", "pytest-cov (>=2.6.1)"]
 tgi = ["huggingface-hub (>=0.23.3)", "pydantic (>=2.7.4)"]
 use = ["tensorflow", "tensorflow_hub", "tensorflow_text"]
+
+[[package]]
+name = "llama-cpp-python"
+version = "0.2.90"
+description = "Python bindings for the llama.cpp library"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "llama_cpp_python-0.2.90.tar.gz", hash = "sha256:419b041c62dbdb9f7e67883a6ef2f247d583d08417058776be0bff05b4ec9e3d"},
+]
+
+[package.dependencies]
+diskcache = ">=5.6.1"
+jinja2 = ">=2.11.3"
+numpy = ">=1.20.0"
+typing-extensions = ">=4.5.0"
+
+[package.extras]
+all = ["llama_cpp_python[dev,server,test]"]
+dev = ["black (>=23.3.0)", "httpx (>=0.24.1)", "mkdocs (>=1.4.3)", "mkdocs-material (>=9.1.18)", "mkdocstrings[python] (>=0.22.0)", "pytest (>=7.4.0)", "twine (>=4.0.2)"]
+server = ["PyYAML (>=5.1)", "fastapi (>=0.100.0)", "pydantic-settings (>=2.0.1)", "sse-starlette (>=1.6.1)", "starlette-context (>=0.3.6,<0.4)", "uvicorn (>=0.22.0)"]
+test = ["fastapi (>=0.100.0)", "httpx (>=0.24.1)", "pydantic-settings (>=2.0.1)", "pytest (>=7.4.0)", "scipy (>=1.10)", "sse-starlette (>=1.6.1)", "starlette-context (>=0.3.6,<0.4)"]
 
 [[package]]
 name = "llvmlite"
@@ -2223,4 +2258,4 @@ requests = "*"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "f3ddb6f13084f1202cbf1c286d1095712b2849bf2074f28840c942bd5e085748"
+content-hash = "2b0e2949aa53f451a9c4439c407251b2aabd58d0b28540068fac6ae55d376e9f"

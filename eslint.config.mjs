@@ -21,6 +21,8 @@ const eslintConfig = [
       'yarn.lock',
       'coverage',
       '**/*.d.ts',
+      'src/generated/prisma/**',
+      'src/generated/prisma/runtime/**',
     ],
   },
 ];

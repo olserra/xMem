@@ -23,10 +23,21 @@ const getIcon = (type: string | undefined) => {
   return <File size={16} className="text-indigo-600" />;
 };
 
+const tagColors = [
+  'bg-blue-100 text-blue-800',
+  'bg-green-100 text-green-800',
+  'bg-yellow-100 text-yellow-800',
+  'bg-purple-100 text-purple-800',
+  'bg-pink-100 text-pink-800',
+  'bg-indigo-100 text-indigo-800',
+  'bg-teal-100 text-teal-800',
+];
+
 const MemoryItemList: React.FC = () => {
   const [items, setItems] = useState<MemoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tagsMap, setTagsMap] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -46,6 +57,37 @@ const MemoryItemList: React.FC = () => {
     fetchItems();
   }, []);
 
+  useEffect(() => {
+    // Fetch tags for each item (by id)
+    const fetchTags = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
+      const newTagsMap: Record<string, string[]> = {};
+      await Promise.all(
+        items.map(async (item) => {
+          const text = item.text || item.title || item.content || '';
+          if (!text) return;
+          try {
+            const res = await fetch(`${apiUrl}/tags`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              newTagsMap[item.id] = data.tags || [];
+            } else {
+              newTagsMap[item.id] = [];
+            }
+          } catch {
+            newTagsMap[item.id] = [];
+          }
+        })
+      );
+      setTagsMap(newTagsMap);
+    };
+    if (items.length) fetchTags();
+  }, [items]);
+
   if (loading) return <div className="px-6 py-4 text-slate-400">Loading...</div>;
   if (error) return <div className="px-6 py-4 text-rose-500">{error}</div>;
   if (!items.length) return <div className="px-6 py-4 text-slate-400">No memory items found.</div>;
@@ -61,6 +103,7 @@ const MemoryItemList: React.FC = () => {
           const createdAt = item.createdAt || item.created_at || item.timestamp || null;
           const size = item.size || (item.text ? `${item.text.length} chars` : null);
           const icon = getIcon(type);
+          const tags = tagsMap[item.id] || [];
           return (
             <li key={item.id} className="hover:bg-slate-50 transition-colors">
               <div className="px-6 py-4 flex items-center justify-between">
@@ -77,6 +120,18 @@ const MemoryItemList: React.FC = () => {
                       {type && <><span className="mx-2 text-slate-300">•</span><span className="text-xs text-slate-500">{type}</span></>}
                       {createdAt && <><span className="mx-2 text-slate-300">•</span><span className="text-xs text-slate-500 flex items-center"><Clock size={12} className="mr-1" />{createdAt}</span></>}
                     </div>
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {tags.map((tag, i) => (
+                          <span
+                            key={tag}
+                            className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tagColors[i % tagColors.length]}`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="ml-4 flex items-center space-x-4">

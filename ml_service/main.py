@@ -1,8 +1,9 @@
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from pydantic import BaseModel
+from services.sentiment import analyze_sentiment
+from services.tagging import tag_memory_item
+from schemas import TextIn
 
 app = FastAPI()
 
@@ -16,12 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-analyzer = SentimentIntensityAnalyzer()
-
-
-class TextIn(BaseModel):
-    text: str
 
 
 @app.get("/")
@@ -37,17 +32,12 @@ def health_check() -> dict:
 
 
 @app.post("/sentiment")
-def analyze_sentiment(data: TextIn) -> dict:
+def sentiment_endpoint(data: TextIn) -> dict:
     """Analyze sentiment of the provided text."""
-    text = data.text.strip()
-    if not text:
-        raise HTTPException(status_code=400, detail="Text input cannot be empty.")
-    vs = analyzer.polarity_scores(text)
-    compound = vs["compound"]
-    if compound >= 0.05:
-        sentiment = "positive"
-    elif compound <= -0.05:
-        sentiment = "negative"
-    else:
-        sentiment = "neutral"
-    return {"sentiment": sentiment, "score": compound}
+    return analyze_sentiment(data)
+
+
+@app.post("/tags")
+def tags_endpoint(data: TextIn) -> dict:
+    """Extract tags for the provided memory item text."""
+    return tag_memory_item(data)

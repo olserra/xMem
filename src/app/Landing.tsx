@@ -5,6 +5,7 @@ import { signIn, useSession } from 'next-auth/react';
 import Header from './Header';
 import Footer from '../components/layout/Footer';
 import SessionProviderWrapper from '../components/SessionProviderWrapper';
+import { version } from '../version';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -446,6 +447,7 @@ const Landing: React.FC = () => {
 
             {/* Footer */}
             <Footer />
+            <div className="w-full text-center text-xs text-slate-400 mt-8">v{version}</div>
         </div>
     );
 };

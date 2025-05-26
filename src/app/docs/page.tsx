@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearch } from './SearchContext';
 import { sections } from './DocsSidebar';
 import { docContentIndex } from './docContentIndex';
+import { version } from '../../version';
 
 // Build a flat index of all docs from the sidebar structure
 const docSummaries: Record<string, string> = {
@@ -127,6 +128,7 @@ export default function DocsHome() {
                     ))}
                 </div>
             )}
+            <div className="w-full text-center text-xs text-slate-400 mt-8">v{version}</div>
         </div>
     );
 } 

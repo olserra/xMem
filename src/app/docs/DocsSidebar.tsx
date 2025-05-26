@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { version } from '../../version';
 
 const sections = [
     { label: 'Quickstart', href: '/docs/get-started' },
@@ -60,6 +61,7 @@ export default function DocsSidebar() {
                     )
                 )}
             </ul>
+            <div className="mt-auto text-xs text-slate-400 px-4 pb-4">v{version}</div>
         </nav>
     );
 } 

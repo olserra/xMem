@@ -1,4 +1,5 @@
 import React from 'react';
+import { version } from '../../version';
 
 interface NavItem {
   id: string;
@@ -37,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ navItems, currentPage, onNavigate }) 
 
       {/* Footer */}
       <div className="p-6 text-xs text-slate-500">
-        <p>Version 1.0.0</p>
+        <p>Version {version}</p>
         <p>© 2025 xmem</p>
       </div>
     </div>

@@ -25,6 +25,8 @@ jobs:
         run: pnpm lint
       - name: Type Check
         run: pnpm exec tsc --noEmit
+      - name: Sync version to src/version.ts
+        run: node src/scripts/sync-version.js
       - name: Build
         run: pnpm build
       # - name: Test

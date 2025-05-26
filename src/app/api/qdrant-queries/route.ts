@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
   const vectorDbUrl = searchParams.get('vectorDbUrl');
   const apiKey = searchParams.get('apiKey');
   const type = searchParams.get('type');
+  const limit = parseInt(searchParams.get('limit') || '20', 10);
 
   // Default to Qdrant env vars if not provided
   const baseUrl = vectorDbUrl || process.env.NEXT_PUBLIC_QDRANT_URL;
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
   if (dbType === 'qdrant' || baseUrl.toLowerCase().includes('qdrant')) {
     url = `${baseUrl.replace(/\/$/, '')}/collections/${collection}/points/scroll`;
     body = JSON.stringify({
-      limit: 20,
+      limit,
       with_payload: true,
       with_vector: false,
     });
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest) {
     // Pinecone: fetch recent vectors (mock relevance scores from metadata.score)
     url = `${baseUrl.replace(/\/$/, '')}/vectors/fetch`;
     headers = { 'Content-Type': 'application/json', 'Api-Key': key || "" };
-    body = JSON.stringify({ ids: Array.from({ length: 20 }, (_, i) => `mock-${i + 1}`), namespace: 'default' });
+    body = JSON.stringify({ ids: Array.from({ length: limit }, (_, i) => `mock-${i + 1}`), namespace: 'default' });
     try {
       console.log('Pinecone fetch debug:', { url, headers, body });
       const res = await fetch(url, { method: 'POST', headers, body });

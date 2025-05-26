@@ -1,22 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-    PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LineChart, Line, Legend,
+    PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, XAxis, YAxis, LineChart, Line, Legend,
 } from "recharts";
 
 const COLORS = [
     "#6366f1", "#10b981", "#f59e42", "#a78bfa", "#f43f5e", "#3b82f6", "#fbbf24", "#14b8a6", "#eab308", "#f472b6"
 ];
 
+// Define types for state
+interface TopicDist { name: string; value: number; }
+interface TopicTrend { date: string;[topic: string]: number | string; }
+
 export default function AnalysisPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [texts, setTexts] = useState<string[]>([]);
-    const [timestamps, setTimestamps] = useState<string[]>([]);
-    const [topicDist, setTopicDist] = useState<any[]>([]);
-    const [topicTrends, setTopicTrends] = useState<any[]>([]);
-    const [anomalies, setAnomalies] = useState<any[]>([]);
-    const [coverage, setCoverage] = useState<any>(null);
+    const [topicDist, setTopicDist] = useState<TopicDist[]>([]);
+    const [topicTrends, setTopicTrends] = useState<TopicTrend[]>([]);
+    const [anomalies, setAnomalies] = useState<string[]>([]);
+    const [coverage, setCoverage] = useState<{ missing_topics?: string[] } | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,14 +26,12 @@ export default function AnalysisPage() {
             setError(null);
             try {
                 // 1. Fetch memory/query items
-                const res = await fetch("/api/qdrant-queries");
+                const res = await fetch("/api/qdrant-queries?limit=1000");
                 if (!res.ok) throw new Error("Failed to fetch memory items");
                 const data = await res.json();
                 const items = data.queries || [];
-                const texts = items.map((item: any) => item.text || item.title || item.content || "").filter((t: string) => t);
-                const timestamps = items.map((item: any) => item.createdAt || item.created_at || item.timestamp || "");
-                setTexts(texts);
-                setTimestamps(timestamps);
+                const texts: string[] = items.map((item: any) => item.text || item.title || item.content || "").filter((t: string) => t);
+                const timestamps: string[] = items.map((item: any) => item.createdAt || item.created_at || item.timestamp || "");
                 const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
                 // 2. Topic distribution
                 const topicsRes = await fetch(`${apiUrl}/topics`, {
@@ -45,7 +45,7 @@ export default function AnalysisPage() {
                 (topicsData.topic_labels || []).forEach((label: string) => {
                     topicCounts[label] = (topicCounts[label] || 0) + 1;
                 });
-                setTopicDist(Object.entries(topicCounts).map(([name, value]) => ({ name, value })) || []);
+                setTopicDist(Object.entries(topicCounts).map(([name, value]) => ({ name, value: value as number })) || []);
                 // 3. Topic trends
                 const trendsRes = await fetch(`${apiUrl}/topic-trends`, {
                     method: "POST",
@@ -54,7 +54,7 @@ export default function AnalysisPage() {
                 });
                 const trendsData = await trendsRes.json();
                 // Convert trends to chart data
-                const trendRows = Object.entries(trendsData.trend || {}).map(([date, topics]: any) => ({ date, ...topics }));
+                const trendRows: TopicTrend[] = Object.entries(trendsData.trend || {}).map(([date, topics]: [string, Record<string, number>]) => ({ date, ...topics }));
                 setTopicTrends(trendRows || []);
                 // 4. Anomalies
                 const anomaliesRes = await fetch(`${apiUrl}/anomalies`, {

@@ -61,12 +61,18 @@ const MemoryItemList: React.FC = () => {
     // Fetch tags for each item (by id)
     const fetchTags = async () => {
       const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
+      if (!process.env.NEXT_PUBLIC_ML_API_URL) {
+        // eslint-disable-next-line no-console
+        console.warn('NEXT_PUBLIC_ML_API_URL is not set. Using http://localhost:8000 as fallback. Tags may not work in production.');
+      }
       const newTagsMap: Record<string, string[]> = {};
       await Promise.all(
         items.map(async (item) => {
           const text = item.text || item.title || item.content || '';
           if (!text) return;
           try {
+            // eslint-disable-next-line no-console
+            console.log('Fetching tags for', item.id, 'with text:', text, 'using', apiUrl);
             const res = await fetch(`${apiUrl}/tags`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -76,9 +82,13 @@ const MemoryItemList: React.FC = () => {
               const data = await res.json();
               newTagsMap[item.id] = data.tags || [];
             } else {
+              // eslint-disable-next-line no-console
+              console.error('Failed to fetch tags for', item.id, res.status);
               newTagsMap[item.id] = [];
             }
-          } catch {
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error('Error fetching tags for', item.id, err);
             newTagsMap[item.id] = [];
           }
         })
@@ -91,6 +101,9 @@ const MemoryItemList: React.FC = () => {
   if (loading) return <div className="px-6 py-4 text-slate-400">Loading...</div>;
   if (error) return <div className="px-6 py-4 text-rose-500">{error}</div>;
   if (!items.length) return <div className="px-6 py-4 text-slate-400">No memory items found.</div>;
+  if (!process.env.NEXT_PUBLIC_ML_API_URL) {
+    return <div className="px-6 py-4 text-rose-500">Warning: NEXT_PUBLIC_ML_API_URL is not set. Tagging will not work unless the ML API URL is configured.</div>;
+  }
 
   return (
     <div className="overflow-hidden">

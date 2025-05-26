@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 from collections import Counter
 from datetime import datetime
+import re
 
 # For now, use a singleton topic model (can be improved with persistence)
 topic_model = BERTopic(verbose=False)
@@ -19,16 +20,17 @@ def extract_topics(texts: List[str]) -> Dict:
         raise HTTPException(
             status_code=400, detail="No texts provided for topic modeling."
         )
-    topics, probs = topic_model.fit_transform(texts)
-    topic_info = topic_model.get_topic_info()
-    topic_labels = [
-        topic_model.get_topic(topic)[0][0] if topic != -1 else "Other"
-        for topic in topics
-    ]
+    # Simple keyword frequency analysis for demo purposes
+    all_words = []
+    for text in texts:
+        words = re.findall(r"\b\w{4,}\b", text.lower())  # words with 4+ chars
+        all_words.extend(words)
+    most_common = Counter(all_words).most_common(5)
+    topic_labels = [w for w, _ in most_common]
     return {
-        "topics": topics,
+        "topics": topic_labels,
         "topic_labels": topic_labels,
-        "topic_info": topic_info.to_dict(orient="records"),
+        "topic_info": most_common,
     }
 
 

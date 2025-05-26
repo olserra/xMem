@@ -87,10 +87,11 @@ export default function AnalysisPage() {
             {loading && <div className="text-slate-400">Loading analysis...</div>}
             {error && <div className="text-red-500">{error}</div>}
             {!loading && !error && (
-                <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Topic Distribution */}
-                    <div className="bg-white rounded-lg shadow p-6 mb-8">
+                    <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-xl font-semibold mb-2">Topic Distribution</h2>
+                        <div className="text-slate-500 text-sm mb-2">Shows the most common topics found in your memory items.</div>
                         {Array.isArray(topicDist) && topicDist.length > 0 ? (
                             <ResponsiveContainer width="100%" height={300}>
                                 <PieChart>
@@ -100,6 +101,7 @@ export default function AnalysisPage() {
                                         ))}
                                     </Pie>
                                     <RechartsTooltip />
+                                    <Legend verticalAlign="bottom" height={36} />
                                 </PieChart>
                             </ResponsiveContainer>
                         ) : (
@@ -107,15 +109,16 @@ export default function AnalysisPage() {
                         )}
                     </div>
                     {/* Topic Trends */}
-                    <div className="bg-white rounded-lg shadow p-6 mb-8">
+                    <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-xl font-semibold mb-2">Topic Trends Over Time</h2>
+                        <div className="text-slate-500 text-sm mb-2">Tracks how often each topic appears over time.</div>
                         {Array.isArray(topicTrends) && topicTrends.length > 0 && Array.isArray(topicDist) && topicDist.length > 0 ? (
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={topicTrends}>
-                                    <XAxis dataKey="date" />
-                                    <YAxis allowDecimals={false} />
+                                    <XAxis dataKey="date" label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }} />
+                                    <YAxis allowDecimals={false} label={{ value: 'Mentions', angle: -90, position: 'insideLeft' }} />
                                     <RechartsTooltip />
-                                    <Legend />
+                                    <Legend verticalAlign="top" height={36} />
                                     {(topicDist || []).map((t, i) => (
                                         <Line key={t.name} type="monotone" dataKey={t.name} stroke={COLORS[i % COLORS.length]} strokeWidth={2} />
                                     ))}
@@ -126,7 +129,7 @@ export default function AnalysisPage() {
                         )}
                     </div>
                     {/* Anomalies */}
-                    <div className="bg-white rounded-lg shadow p-6 mb-8">
+                    <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-xl font-semibold mb-2">Anomalies (Outlier Items)</h2>
                         {Array.isArray(anomalies) && anomalies.length === 0 ? (
                             <div className="text-slate-400">No anomalies detected.</div>
@@ -139,7 +142,7 @@ export default function AnalysisPage() {
                         )}
                     </div>
                     {/* Coverage */}
-                    <div className="bg-white rounded-lg shadow p-6 mb-8">
+                    <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-xl font-semibold mb-2">Topic Coverage</h2>
                         {coverage && (
                             <>
@@ -156,7 +159,7 @@ export default function AnalysisPage() {
                             </>
                         )}
                     </div>
-                </>
+                </div>
             )}
         </div>
     );

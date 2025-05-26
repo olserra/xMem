@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 from fastapi import HTTPException
 import pandas as pd
 from sklearn.ensemble import IsolationForest
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime
 import re
 
@@ -43,13 +43,16 @@ def topic_trends(
         raise HTTPException(
             status_code=400, detail="No texts provided for trend analysis."
         )
-    topics, _ = topic_model.fit_transform(texts)
     if timestamps is None:
         timestamps = [datetime.now().strftime(time_format)] * len(texts)
-    df = pd.DataFrame({"topic": topics, "timestamp": timestamps})
-    df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime(time_format)
-    trend = df.groupby(["timestamp", "topic"]).size().unstack(fill_value=0)
-    return {"trend": trend.to_dict()}
+    # Group texts by timestamp
+    trend = defaultdict(Counter)
+    for text, ts in zip(texts, timestamps):
+        words = re.findall(r"\b\w{4,}\b", text.lower())
+        trend[ts].update(words)
+    # For each timestamp, get the top 3 words
+    trend_dict = {ts: dict(cnt.most_common(3)) for ts, cnt in trend.items()}
+    return {"trend": trend_dict}
 
 
 def detect_anomalies(texts: List[str]) -> Dict:
@@ -57,12 +60,12 @@ def detect_anomalies(texts: List[str]) -> Dict:
         raise HTTPException(
             status_code=400, detail="No texts provided for anomaly detection."
         )
-    # Use KeyBERT to get embeddings
-    kw_model = KeyBERT()
-    embeddings = [kw_model.model.encode(text) for text in texts]
-    clf = IsolationForest(contamination=0.1, random_state=42)
-    preds = clf.fit_predict(embeddings)
-    anomalies = [i for i, p in enumerate(preds) if p == -1]
+    # Simple anomaly: texts that are much longer or shorter than the median
+    lengths = [len(t) for t in texts]
+    if not lengths:
+        return {"anomaly_indices": [], "anomaly_texts": []}
+    median = sorted(lengths)[len(lengths) // 2]
+    anomalies = [i for i, l in enumerate(lengths) if l > median * 2 or l < median * 0.5]
     return {
         "anomaly_indices": anomalies,
         "anomaly_texts": [texts[i] for i in anomalies],
@@ -76,11 +79,12 @@ def topic_coverage(
         raise HTTPException(
             status_code=400, detail="No texts provided for coverage analysis."
         )
-    topics, _ = topic_model.fit_transform(texts)
-    topic_info = topic_model.get_topic_info()
-    found_topics = set(topic_info["Name"]) - {"-1_other"}
+    all_words = []
+    for text in texts:
+        words = re.findall(r"\b\w{4,}\b", text.lower())
+        all_words.extend(words)
+    found_topics = set([w for w, _ in Counter(all_words).most_common(20)])
     if expected_topics is None:
-        # Use all found topics as expected if not provided
         expected_topics = list(found_topics)
     missing_topics = set(expected_topics) - found_topics
     coverage = {t: (t in found_topics) for t in expected_topics}

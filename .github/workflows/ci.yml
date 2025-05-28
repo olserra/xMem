@@ -31,3 +31,14 @@ jobs:
         run: pnpm build
       # - name: Test
       #   run: pnpm test # Uncomment if you add tests
+
+  check-poetry-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate poetry.lock in container (Python 3.11)
+        run: |
+          docker run --rm -v "$PWD/ml_service":/app -w /app python:3.11-slim /bin/bash -c "pip install poetry && poetry lock"
+      - name: Check for changes in poetry.lock
+        run: |
+          git diff --exit-code ml_service/poetry.lock

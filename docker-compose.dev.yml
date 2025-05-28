@@ -1,5 +1,21 @@
 version: "3.8"
 services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+  chromadb:
+    image: chromadb/chroma
+    container_name: chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/.chroma/index
+
   dashboard:
     build:
       context: .
@@ -12,10 +28,14 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
+      - OLLAMA_URL=http://ollama:11434
+      - CHROMA_URL=http://chromadb:8000
       - NEXT_PUBLIC_ML_API_URL=http://ml_service:8000
     depends_on:
       - db
       - ml_service
+      - ollama
+      - chromadb
 
   db:
     image: postgres:15
@@ -42,3 +62,5 @@ services:
 
 volumes:
   pgdata:
+  ollama-data:
+  chroma-data:

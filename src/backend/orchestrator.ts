@@ -3,6 +3,7 @@ import { ChromaDBAdapter } from './adapters/chromadb';
 import { QdrantAdapter } from './adapters/qdrant';
 import { PineconeAdapter } from './adapters/pinecone';
 import { MongoDBVectorAdapter } from './adapters/mongodb';
+import { OllamaAdapter } from './adapters/ollama';
 // import { RedisAdapter } from './adapters/redis';
 
 // Create orchestrator instance
@@ -33,6 +34,13 @@ orchestrator.registerProvider('vector', 'mongodb', new MongoDBVectorAdapter({
   dbName: process.env.MONGODB_DB || 'xmem',
   collectionName: process.env.MONGODB_COLLECTION || 'vectors',
 }));
+
+// Register Ollama LLM provider
+orchestrator.registerProvider('llm', 'ollama', new OllamaAdapter({
+  apiUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+  model: process.env.OLLAMA_MODEL || 'llama3',
+}));
+orchestrator.setDefaultProvider('llm', 'ollama');
 
 // Set default vector provider
 orchestrator.setDefaultProvider('vector', 'chromadb');

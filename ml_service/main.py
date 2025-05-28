@@ -11,7 +11,6 @@ from services.topics import (
     detect_anomalies,
     topic_coverage,
 )
-from services.agent import chat_with_agent
 
 app = FastAPI()
 
@@ -80,9 +79,3 @@ def coverage_endpoint(
 ) -> dict:
     """Analyze topic coverage and gaps for a list of texts."""
     return topic_coverage(texts, expected_topics)
-
-
-@app.post("/agent-chat", response_model=AgentChatResponse)
-def agent_chat_endpoint(request: AgentChatRequest) -> AgentChatResponse:
-    """Chat with the AI Agent using the selected model and sources."""
-    return chat_with_agent(request)

@@ -1,26 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { ChevronDown, Database, MessageCircle } from "lucide-react";
+import { Database, MessageCircle } from "lucide-react";
 
-// Placeholder: Replace with actual LLM model list fetch if needed
-const LLM_MODELS = [
-    { id: "llama2", name: "Llama 2" },
-    { id: "mistral", name: "Mistral" },
-    { id: "vicuna", name: "Vicuna" },
-    { id: "falcon", name: "Falcon" },
-    { id: "openchat", name: "OpenChat" },
-];
+// Use environment variable for default model (client-safe)
+const DEFAULT_MODEL_ID = process.env.NEXT_PUBLIC_DEFAULT_MODEL_ID || "llama2";
 
 type Source = { id: string; name?: string; collection?: string };
 
 export default function AIAgentPage() {
-    const [selectedModel, setSelectedModel] = useState(LLM_MODELS[0].id);
     const [sources, setSources] = useState<Source[]>([]); // All available sources
     const [selectedSources, setSelectedSources] = useState<string[]>([]); // Selected source IDs
     const [chat, setChat] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const defaultModel = DEFAULT_MODEL_ID;
 
     useEffect(() => {
         // Fetch available sources from API
@@ -40,7 +34,7 @@ export default function AIAgentPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    model: selectedModel,
+                    model: defaultModel,
                     sources: selectedSources,
                     history,
                     user_input: input,
@@ -66,22 +60,6 @@ export default function AIAgentPage() {
                 <MessageCircle size={28} className="text-teal-500" /> AI Agent
             </h1>
             <div className="bg-white rounded-lg shadow-sm p-6 w-full h-[calc(100vh-8rem)] flex flex-col space-y-6">
-                {/* Model Selector */}
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">LLM Model</label>
-                    <div className="relative w-full max-w-xs">
-                        <select
-                            value={selectedModel}
-                            onChange={e => setSelectedModel(e.target.value)}
-                            className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9 w-full appearance-none"
-                        >
-                            {LLM_MODELS.map(model => (
-                                <option key={model.id} value={model.id}>{model.name}</option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-2 top-2.5 text-slate-400 pointer-events-none" size={18} />
-                    </div>
-                </div>
                 {/* Source Selector */}
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Sources</label>
@@ -154,8 +132,8 @@ export default function AIAgentPage() {
                 </div>
                 {/* Memory Storage Note */}
                 <div className="text-xs text-slate-500 mt-2">
-                    {/* Suggestion: Store conversation memory in a dedicated vector collection (e.g., 'agent-conversations') to avoid mixing with user data sources. */}
-                    Conversation memory will be stored separately from your selected sources to keep your data clean.
+                    Conversation memory will be stored separately from your selected sources to keep your data clean.<br />
+                    <span className="font-semibold">Default model in use:</span> <span className="font-mono">{DEFAULT_MODEL_ID}</span>
                 </div>
             </div>
         </div>

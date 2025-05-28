@@ -1,26 +1,29 @@
 version: "3.8"
 services:
-  app:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    # Optionally, pull a model on startup (uncomment and adjust as needed):
+    # entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull llama2:7b && wait"]
+
+  backend:
     build: .
-    ports:
-      - "3000:3000"
+    container_name: backend
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/xmem
+      - OLLAMA_URL=http://ollama:11434
+      # Add any other env vars your backend needs here
+    ports:
+      - "3000:3000" # Change if your backend uses a different port
     depends_on:
-      - mongo
+      - ollama
     volumes:
-      - .:/app
-      - /app/node_modules
-  mongo:
-    image: mongo:6
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-  ml_service:
-    build: ./ml_service
-    ports:
-      - "8000:8000"
+      - .:/app # For local dev: mount your code for hot-reloading
+    # command: npm run dev # For local dev
+    # command: npm run start # For production (uncomment and adjust as needed)
+
 volumes:
-  mongo-data:
+  ollama-data:

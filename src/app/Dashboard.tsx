@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
           </button>
         </div>
         <RecentQueriesTable collection={collection === '__all__' ? undefined : collection} />
-      </div>
+Re      </div>
     </div>
   );
 };

@@ -447,7 +447,6 @@ const Landing: React.FC = () => {
 
             {/* Footer */}
             <Footer />
-            <div className="w-full text-center text-xs text-slate-400 mt-8">v{version}</div>
         </div>
     );
 };

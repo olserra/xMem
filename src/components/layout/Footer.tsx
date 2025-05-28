@@ -2,24 +2,94 @@ import React from 'react';
 // import { MdOutlineMemory } from 'react-icons/md';
 import navLinks from './navLinks';
 import Logo from '../ui/Logo';
+import { FaGithub, FaTwitter, FaDiscord } from 'react-icons/fa6';
+import { version } from '../../version';
+
+const footerLinks = [
+    {
+        title: 'Product',
+        links: [
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'API', href: '#' },
+            { label: 'Docs', href: '#' },
+        ],
+    },
+    {
+        title: 'Company',
+        links: [
+            { label: 'About', href: '#' },
+            { label: 'Blog', href: '#' },
+            { label: 'Contact', href: '#' },
+        ],
+    },
+    {
+        title: 'Legal',
+        links: [
+            { label: 'Privacy', href: '#' },
+            { label: 'Terms', href: '#' },
+        ],
+    },
+];
+
+const socialLinks = [
+    { icon: <FaGithub />, href: 'https://github.com/olserra/xmem', label: 'GitHub' },
+    { icon: <FaTwitter />, href: 'https://twitter.com/', label: 'Twitter' },
+    { icon: <FaDiscord />, href: 'https://discord.com/', label: 'Discord' },
+];
+
+const year = 2024; // Use a static year to avoid hydration mismatch
 
 const Footer: React.FC = () => (
-    <footer className="border-t border-slate-700">
-        <div className="container mx-auto px-6 py-12">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-                <div className="flex items-center gap-2 mb-4 md:mb-0">
-                    <Logo size={24} boldText textClassName="text-white font-bold text-xl" />
+    <footer className="bg-slate-950 border-t border-slate-800 text-slate-400">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-12 md:gap-0">
+                {/* Brand & Social */}
+                <div className="flex flex-col items-center md:items-start gap-4 md:w-1/3">
+                    <Logo size={32} boldText textClassName="text-white font-bold text-2xl" />
+                    <span className="text-xs text-slate-500 mt-1 mb-2 text-center md:text-left max-w-xs">
+                        Hybrid memory for LLMs: long-term, session, and context management.
+                    </span>
+                    <div className="flex gap-4 mt-2">
+                        {socialLinks.map((item) => (
+                            <a
+                                key={item.label}
+                                href={item.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={item.label}
+                                className="text-slate-500 hover:text-white transition-colors text-xl"
+                            >
+                                {item.icon}
+                            </a>
+                        ))}
+                    </div>
                 </div>
-                <div className="flex gap-6 text-slate-400">
-                    {navLinks.map((item) => (
-                        <a key={item.label} href={item.href} className="hover:text-white transition-colors">
-                            {item.label}
-                        </a>
+                {/* Navigation Columns */}
+                <div className="flex flex-col sm:flex-row gap-8 md:gap-16 md:w-2/3 justify-end">
+                    {footerLinks.map((section) => (
+                        <div key={section.title} className="min-w-[120px]">
+                            <div className="text-slate-300 font-semibold mb-3 text-sm tracking-wide uppercase">
+                                {section.title}
+                            </div>
+                            <ul className="space-y-2">
+                                {section.links.map((link) => (
+                                    <li key={link.label}>
+                                        <a
+                                            href={link.href}
+                                            className="hover:text-white transition-colors text-base"
+                                        >
+                                            {link.label}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     ))}
                 </div>
             </div>
-            <div className="mt-8 text-center text-slate-500 text-sm">
-                2025 xmem. All rights reserved.
+            <div className="mt-12 border-t border-slate-800 pt-6 flex flex-col md:flex-row md:justify-between items-center text-slate-500 text-xs gap-2">
+                <span>&copy; {year} xmem. All rights reserved.</span>
+                <span className="text-slate-600 md:text-right">v{version}</span>
             </div>
         </div>
     </footer>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 // import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { ExternalLink } from 'lucide-react';
+import { useTagContext } from '../tags/TagContext';
 
 interface Query {
   id: string | number;
@@ -29,7 +30,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
   const [recentQueries, setRecentQueries] = useState<Query[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tagsMap, setTagsMap] = useState<Record<string | number, string[]>>({});
+  const { getTagsForId } = useTagContext();
 
   useEffect(() => {
     const fetchQueries = async () => {
@@ -47,38 +48,6 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
     };
     fetchQueries();
   }, [collection]);
-
-  useEffect(() => {
-    // Fetch tags for each query
-    const fetchTags = async () => {
-      const newTagsMap: Record<string | number, string[]> = {};
-      let errorOccurred = false;
-      for (const query of recentQueries) {
-        if (errorOccurred) break;
-        const text = query.text || '';
-        if (!text.trim()) continue;
-        try {
-          const res = await fetch('/api/tags', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            newTagsMap[query.id] = data.tags || [];
-          } else {
-            errorOccurred = true;
-            setError('Failed to fetch tags. Tagging is temporarily disabled.');
-          }
-        } catch {
-          errorOccurred = true;
-          setError('Failed to fetch tags. Tagging is temporarily disabled.');
-        }
-      }
-      setTagsMap(newTagsMap);
-    };
-    if (recentQueries.length) fetchTags();
-  }, [recentQueries]);
 
   return (
     <div className="w-full">
@@ -119,7 +88,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
               </tr>
             ) : (
               recentQueries.map((query) => {
-                const tags = tagsMap[query.id] || [];
+                const tags = getTagsForId(query.id.toString());
                 return (
                   <tr key={query.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 max-w-xs truncate">
@@ -167,7 +136,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
           <div className="text-center text-slate-400 py-4">No recent queries found.</div>
         ) : (
           recentQueries.map((query) => {
-            const tags = tagsMap[query.id] || [];
+            const tags = getTagsForId(query.id.toString());
             return (
               <div key={query.id} className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-2 border border-slate-200">
                 <div className="font-semibold text-slate-800 text-sm mb-1">Query</div>

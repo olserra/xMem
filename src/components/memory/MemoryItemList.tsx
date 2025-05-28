@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, File, MessageSquare, Clock } from 'lucide-react';
+import { useTagContext } from '../tags/TagContext';
 
 interface MemoryItem {
   id: string;
@@ -37,7 +38,7 @@ const MemoryItemList: React.FC = () => {
   const [items, setItems] = useState<MemoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tagsMap, setTagsMap] = useState<Record<string, string[]>>({});
+  const { getTagsForId } = useTagContext();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -57,38 +58,6 @@ const MemoryItemList: React.FC = () => {
     fetchItems();
   }, []);
 
-  useEffect(() => {
-    // Fetch tags for each item (by id)
-    const fetchTags = async () => {
-      const newTagsMap: Record<string, string[]> = {};
-      let errorOccurred = false;
-      for (const item of items) {
-        if (errorOccurred) break;
-        const text = item.text || item.title || item.content || '';
-        if (!text) continue;
-        try {
-          const res = await fetch('/api/tags', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            newTagsMap[item.id] = data.tags || [];
-          } else {
-            errorOccurred = true;
-            setError('Failed to fetch tags. Tagging is temporarily disabled.');
-          }
-        } catch {
-          errorOccurred = true;
-          setError('Failed to fetch tags. Tagging is temporarily disabled.');
-        }
-      }
-      setTagsMap(newTagsMap);
-    };
-    if (items.length) fetchTags();
-  }, [items]);
-
   if (loading) return <div className="px-6 py-4 text-slate-400">Loading...</div>;
   if (error) return <div className="px-6 py-4 text-rose-500">{error}</div>;
   if (!items.length) return <div className="px-6 py-4 text-slate-400">No memory items found.</div>;
@@ -104,7 +73,7 @@ const MemoryItemList: React.FC = () => {
           const createdAt = item.createdAt || item.created_at || item.timestamp || null;
           const size = item.size || (item.text ? `${item.text.length} chars` : null);
           const icon = getIcon(type);
-          const tags = tagsMap[item.id] || [];
+          const tags = getTagsForId(item.id.toString());
           return (
             <li key={item.id} className="hover:bg-slate-50 transition-colors">
               <div className="px-6 py-4 flex items-center justify-between">

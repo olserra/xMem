@@ -9,6 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Logo from '../components/ui/Logo';
 import Image from 'next/image';
 import { Check, Menu, X } from 'lucide-react';
+import { useTagContext } from '../components/tags/TagContext';
 
 // Define types for organization and project
 interface Organization {
@@ -44,6 +45,7 @@ const Header: React.FC = () => {
     const [orgsLoading, setOrgsLoading] = useState(false);
     const [projectsLoading, setProjectsLoading] = useState(false);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
+    const { clearTags } = useTagContext();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -205,6 +207,7 @@ const Header: React.FC = () => {
                                     className="w-full text-left px-4 py-2 hover:bg-slate-100"
                                     onClick={async () => {
                                         await signOut({ callbackUrl: '/', redirect: false });
+                                        clearTags();
                                         window.location.href = '/';
                                     }}
                                 >
@@ -279,7 +282,7 @@ const Header: React.FC = () => {
                                 </div>
                             )}
                             {!loading && user && (
-                                <button className="flex items-center gap-2 text-slate-200 hover:text-teal-400" onClick={async () => { await signOut({ callbackUrl: '/', redirect: false }); window.location.href = '/'; }}>
+                                <button className="flex items-center gap-2 text-slate-200 hover:text-teal-400" onClick={async () => { await signOut({ callbackUrl: '/', redirect: false }); clearTags(); window.location.href = '/'; }}>
                                     <Avatar imageUrl={user.image ?? undefined} name={user.name || user.email || 'User'} size={32} />
                                     <span>Sign out</span>
                                 </button>

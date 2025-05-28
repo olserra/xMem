@@ -5,6 +5,7 @@ import MetricCard from '../components/dashboard/MetricCard';
 import MemoryUsageChart from '../components/dashboard/MemoryUsageChart';
 import ContextRelevanceChart from '../components/dashboard/ContextRelevanceChart';
 import RecentQueriesTable from '../components/dashboard/RecentQueriesTable';
+import { useTagContext } from '../components/tags/TagContext';
 
 // Remove the import for MetricCardProps and define the type locally
 // interface MetricCardProps is not exported from MetricCard, so define it here
@@ -36,6 +37,7 @@ const Dashboard: React.FC = () => {
   const [collection, setCollection] = useState<string>('__all__');
   const [collections, setCollections] = useState<string[]>([]);
   const [memorySources, setMemorySources] = useState<MemorySource[]>([]);
+  const { setBulkTags } = useTagContext();
 
   useEffect(() => {
     // Fetch all memory sources to build the collection dropdown
@@ -52,6 +54,34 @@ const Dashboard: React.FC = () => {
     };
     fetchSources();
   }, []);
+
+  // Fetch all queries and their tags once on dashboard load
+  useEffect(() => {
+    const fetchTagsForAllQueries = async () => {
+      try {
+        const res = await fetch('/api/qdrant-queries');
+        if (!res.ok) return;
+        const data = await res.json();
+        const queries = data.queries || [];
+        const tagsMap: Record<string, string[]> = {};
+        for (const query of queries) {
+          const text = query.text || '';
+          if (!text.trim()) continue;
+          const tagRes = await fetch('/api/tags', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+          });
+          if (tagRes.ok) {
+            const tagData = await tagRes.json();
+            tagsMap[query.id] = tagData.tags || [];
+          }
+        }
+        setBulkTags(tagsMap);
+      } catch { }
+    };
+    fetchTagsForAllQueries();
+  }, [setBulkTags]);
 
   useEffect(() => {
     // Fetch metrics for the selected collection or all

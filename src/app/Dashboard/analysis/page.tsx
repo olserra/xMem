@@ -35,7 +35,7 @@ export default function AnalysisPage() {
                 const items: { text?: string; title?: string; content?: string; createdAt?: string; created_at?: string; timestamp?: string }[] = data.queries || [];
                 const texts: string[] = items.map((item) => item.text || item.title || item.content || "").filter((t) => t);
                 const timestamps: string[] = items.map((item) => item.createdAt || item.created_at || item.timestamp || "");
-                const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
+                const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL; // Should point to your Hugging Face endpoint
                 // 2. Topic distribution
                 const topicsRes = await fetch(`${apiUrl}/topics`, {
                     method: "POST",

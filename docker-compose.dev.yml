@@ -30,10 +30,9 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - OLLAMA_URL=http://ollama:11434
       - CHROMA_URL=http://chromadb:8000
-      - NEXT_PUBLIC_ML_API_URL=http://ml_service:8000
+      - NEXT_PUBLIC_ML_API_URL=https://your-hf-space-url.hf.space
     depends_on:
       - db
-      - ml_service
       - ollama
       - chromadb
 
@@ -48,17 +47,6 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  ml_service:
-    build:
-      context: ./ml_service
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./ml_service:/app
-    environment:
-      - PYTHONUNBUFFERED=1
 
 volumes:
   pgdata:

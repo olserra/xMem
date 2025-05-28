@@ -1,9 +1,13 @@
 # Makefile for unified local dev and traceability
 
-.PHONY: up down logs ps
+.PHONY: up down logs ps lock
+
+# Regenerate poetry.lock for ml_service in a Python 3.11 container
+lock:
+	docker run --rm -v "$(PWD)/ml_service":/app -w /app python:3.11-slim /bin/bash -c "pip install poetry && poetry lock"
 
 # Start the full dev stack (Next.js, ML backend, Postgres)
-up:
+up: lock
 	docker compose -f docker-compose.dev.yml up --build
 
 # Stop all running containers

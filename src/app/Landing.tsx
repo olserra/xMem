@@ -236,9 +236,9 @@ const Landing: React.FC = () => {
                 </div>
             </div>
 
-            {/* Happy Path Flow: Animated xmem Data Flow Illustration */}
+            {/* Data Flow: Animated xmem Data Flow Illustration */}
             <div className="container mx-auto px-6 py-12">
-                <h2 className="text-2xl font-bold text-white text-center mb-8">xmem Data Flow (Happy Path)</h2>
+                <h2 className="text-2xl font-bold text-white text-center mb-8">Data Flow</h2>
                 <AnimatedXmemFlow />
             </div>
             {/* Benefits */}
@@ -454,79 +454,81 @@ const Landing: React.FC = () => {
 
 // --- AnimatedXmemFlow Component ---
 
-const FLOW_PATHS = [
-    // [from, to, SVG path, color, duration (ms), delay (ms)]
+const CIRCLE_NODES = [
     {
-        id: 'user-orch',
-        d: 'M 300 80 Q 300 180 400 240',
-        color: '#fbbf24',
-        duration: 1800,
-        delay: 0,
+        id: 'user',
+        label: 'User',
+        icon: <Users size={36} className="text-amber-400" />,
+        desc: 'Sends prompt',
+        color: 'from-amber-400 to-yellow-300',
     },
     {
-        id: 'orch-session',
-        d: 'M 400 240 Q 180 260 120 360',
-        color: '#a78bfa',
-        duration: 1600,
-        delay: 200,
+        id: 'session',
+        label: 'Session Store',
+        icon: <Database size={36} className="text-purple-400" />,
+        desc: 'Redis, MongoDB',
+        color: 'from-purple-400 to-indigo-400',
     },
     {
-        id: 'orch-vector',
-        d: 'M 400 240 Q 620 260 680 360',
-        color: '#6366f1',
-        duration: 1600,
-        delay: 400,
+        id: 'orchestrator',
+        label: 'Orchestrator',
+        icon: <Cpu size={48} className="text-teal-300 drop-shadow-lg" />,
+        desc: '',
+        color: 'from-teal-400 to-indigo-400',
     },
     {
-        id: 'session-orch',
-        d: 'M 120 360 Q 180 420 400 400',
-        color: '#a78bfa',
-        duration: 1400,
-        delay: 600,
+        id: 'vector',
+        label: 'Vector DB',
+        icon: <Database size={36} className="text-indigo-400" />,
+        desc: 'Qdrant, ChromaDB, Pinecone',
+        color: 'from-indigo-400 to-purple-400',
     },
     {
-        id: 'vector-orch',
-        d: 'M 680 360 Q 620 420 400 400',
-        color: '#6366f1',
-        duration: 1400,
-        delay: 800,
-    },
-    {
-        id: 'orch-llm',
-        d: 'M 400 400 Q 400 500 400 560',
-        color: '#14b8a6',
-        duration: 1800,
-        delay: 1000,
-    },
-    {
-        id: 'llm-orch',
-        d: 'M 400 560 Q 400 500 400 400',
-        color: '#14b8a6',
-        duration: 1800,
-        delay: 1200,
-    },
-    {
-        id: 'orch-user',
-        d: 'M 400 240 Q 300 180 300 80',
-        color: '#fbbf24',
-        duration: 1800,
-        delay: 1400,
+        id: 'llm',
+        label: 'LLM Provider',
+        icon: <Sparkles size={36} className="text-teal-400" />,
+        desc: 'Llama.cpp, Ollama, OpenAI',
+        color: 'from-teal-400 to-amber-400',
     },
 ];
 
+const CIRCLE_PATHS = [
+    // [from, to, color]
+    { from: 0, to: 2, color: '#fbbf24' }, // User -> Orchestrator
+    { from: 2, to: 1, color: '#a78bfa' }, // Orchestrator -> Session
+    { from: 2, to: 3, color: '#6366f1' }, // Orchestrator -> Vector
+    { from: 2, to: 4, color: '#14b8a6' }, // Orchestrator -> LLM
+    { from: 1, to: 2, color: '#a78bfa' }, // Session -> Orchestrator
+    { from: 3, to: 2, color: '#6366f1' }, // Vector -> Orchestrator
+    { from: 4, to: 2, color: '#14b8a6' }, // LLM -> Orchestrator
+];
+
+const CIRCLE_RADIUS = 240;
+const CENTER_X = 400;
+const CENTER_Y = 320;
+
 const AnimatedXmemFlow = () => {
-    const [progress, setProgress] = useState<number[]>(Array(FLOW_PATHS.length).fill(0));
+    const [progress, setProgress] = useState<number[]>(CIRCLE_PATHS.map(() => 0));
+    const [hasMounted, setHasMounted] = useState(false);
     const rafRef = useRef<number | null>(null);
     const startRef = useRef<number | null>(null);
 
     useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!hasMounted) return;
         let running = true;
         function animate(ts: number) {
             if (!startRef.current) startRef.current = ts;
             const elapsed = ts - (startRef.current as number);
-            setProgress(FLOW_PATHS.map((p) => {
-                const t = Math.max(0, elapsed - p.delay);
-                return (t % p.duration) / p.duration;
+            setProgress(CIRCLE_PATHS.map((_, i) => {
+                // Each path animates in a loop, staggered
+                const duration = 1800 + i * 200;
+                const delay = i * 200;
+                const t = Math.max(0, elapsed - delay);
+                return (t % duration) / duration;
             }));
             if (running) rafRef.current = requestAnimationFrame(animate);
         }
@@ -536,91 +538,112 @@ const AnimatedXmemFlow = () => {
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
             startRef.current = null;
         };
-    }, []);
+    }, [hasMounted]);
 
-    // Helper to get point along path
-    const getPoint = (d: string, t: number) => {
-        if (typeof window === 'undefined') return { x: 0, y: 0 };
-        const svgNS = 'http://www.w3.org/2000/svg';
-        const tempPath = document.createElementNS(svgNS, 'path');
-        tempPath.setAttribute('d', d);
-        document.body.appendChild(tempPath);
-        const len = tempPath.getTotalLength();
-        const pt = tempPath.getPointAtLength(t * len);
-        document.body.removeChild(tempPath);
-        return pt;
+    // Get node positions in a circle
+    const getNodePos = (idx: number) => {
+        const angle = (2 * Math.PI * idx) / CIRCLE_NODES.length - Math.PI / 2;
+        return {
+            x: CENTER_X + CIRCLE_RADIUS * Math.cos(angle),
+            y: CENTER_Y + CIRCLE_RADIUS * Math.sin(angle),
+        };
+    };
+
+    // Get point along a straight line between two nodes
+    const getLinePoint = (fromIdx: number, toIdx: number, t: number) => {
+        const from = getNodePos(fromIdx);
+        const to = getNodePos(toIdx);
+        return {
+            x: from.x + (to.x - from.x) * t,
+            y: from.y + (to.y - from.y) * t,
+        };
     };
 
     return (
         <div className="relative w-full max-w-3xl mx-auto h-[640px] md:h-[640px]">
-            {/* SVG Paths */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" width="800" height="640">
-                {FLOW_PATHS.map((p) => (
-                    <path
-                        key={p.id}
-                        d={p.d}
-                        stroke={p.color}
-                        strokeWidth={4}
-                        fill="none"
-                        opacity={0.18}
-                        style={{ filter: `drop-shadow(0 0 8px ${p.color})` }}
-                    />
-                ))}
-                {/* Animated Orbs */}
-                {FLOW_PATHS.map((p, i) => {
-                    const pt = getPoint(p.d, progress[i]);
+                {/* Draw lines between nodes */}
+                {CIRCLE_PATHS.map((p, i) => {
+                    const from = getNodePos(p.from);
+                    const to = getNodePos(p.to);
                     return (
-                        <circle
-                            key={p.id + '-orb'}
-                            cx={pt.x}
-                            cy={pt.y}
-                            r={12}
-                            fill={p.color}
-                            opacity={0.85}
-                            style={{ filter: `drop-shadow(0 0 16px ${p.color}) blur(1px)` }}
+                        <line
+                            key={`line-${i}`}
+                            x1={from.x}
+                            y1={from.y}
+                            x2={to.x}
+                            y2={to.y}
+                            stroke={p.color}
+                            strokeWidth={4}
+                            opacity={0.18}
+                            style={{ filter: `drop-shadow(0 0 8px ${p.color})` }}
                         />
                     );
                 })}
+                {/* Animated Orbs (client only) */}
+                {hasMounted
+                    ? CIRCLE_PATHS.map((p, i) => {
+                        const pt = getLinePoint(p.from, p.to, progress[i]);
+                        return (
+                            <circle
+                                key={`orb-${i}`}
+                                cx={pt.x}
+                                cy={pt.y}
+                                r={14}
+                                fill={p.color}
+                                opacity={0.85}
+                                style={{ filter: `drop-shadow(0 0 16px ${p.color}) blur(1px)` }}
+                            />
+                        );
+                    })
+                    // Static orbs for SSR (server only)
+                    : CIRCLE_PATHS.map((p, i) => {
+                        const pt = getLinePoint(p.from, p.to, 0);
+                        return (
+                            <circle
+                                key={`orb-ssr-${i}`}
+                                cx={pt.x}
+                                cy={pt.y}
+                                r={14}
+                                fill={p.color}
+                                opacity={0.85}
+                                style={{ filter: `drop-shadow(0 0 16px ${p.color}) blur(1px)` }}
+                            />
+                        );
+                    })
+                }
             </svg>
-            {/* Nodes */}
-            {/* User (Top) */}
-            <div className="absolute left-[37%] md:left-[37%] top-0 flex flex-col items-center">
-                <div className="bg-slate-800/60 rounded-full p-4 border border-slate-700 animate-pulse">
-                    <Users size={36} className="text-amber-400" />
-                </div>
-                <div className="mt-2 text-white font-semibold text-center text-sm">User<br /><span className="text-xs text-slate-400 font-normal">Sends prompt</span></div>
-            </div>
-            {/* Orchestrator (Center) */}
-            <div className="absolute left-1/2 top-[38%] -translate-x-1/2 flex flex-col items-center">
-                <div className="bg-gradient-to-br from-teal-500/40 via-indigo-500/40 to-purple-500/40 rounded-full p-8 border-4 border-slate-700 shadow-xl animate-pulse">
-                    <Cpu size={48} className="text-teal-300 drop-shadow-lg" />
-                </div>
-                <div className="mt-2 text-white font-bold text-center text-lg drop-shadow">Orchestrator</div>
-            </div>
-            {/* LLM (Bottom) */}
-            <div className="absolute left-1/2 bottom-0 -translate-x-1/2 flex flex-col items-center">
-                <div className="bg-slate-800/60 rounded-full p-4 border border-slate-700 animate-pulse">
-                    <Sparkles size={36} className="text-teal-400" />
-                </div>
-                <div className="mt-2 text-white font-semibold text-center text-sm">LLM Provider<br /><span className="text-xs text-slate-400 font-normal">Llama.cpp, Ollama, OpenAI</span></div>
-            </div>
-            {/* Session Store (Left) */}
-            <div className="absolute left-[2%] top-[55%] flex flex-col items-center">
-                <div className="bg-slate-800/60 rounded-full p-4 border border-slate-700 animate-pulse">
-                    <Database size={36} className="text-purple-400" />
-                </div>
-                <div className="mt-2 text-white font-semibold text-center text-sm">Session Store<br /><span className="text-xs text-slate-400 font-normal">Redis, MongoDB</span></div>
-            </div>
-            {/* Vector DB (Right) */}
-            <div className="absolute right-[2%] top-[55%] flex flex-col items-center">
-                <div className="bg-slate-800/60 rounded-full p-4 border border-slate-700 animate-pulse">
-                    <Database size={36} className="text-indigo-400" />
-                </div>
-                <div className="mt-2 text-white font-semibold text-center text-sm">Vector DB<br /><span className="text-xs text-slate-400 font-normal">Qdrant, ChromaDB, Pinecone</span></div>
-            </div>
-            {/* Animated Orbs for Data Movement (center glow) */}
-            <div className="absolute left-1/2 top-[38%] -translate-x-1/2 z-0 pointer-events-none">
-                <div className="w-32 h-32 bg-gradient-to-br from-teal-400/20 via-indigo-400/20 to-purple-400/20 rounded-full blur-2xl animate-pulse" />
+            {/* Nodes in a circle */}
+            {CIRCLE_NODES.map((node, i) => {
+                const pos = getNodePos(i);
+                return (
+                    <div
+                        key={node.id}
+                        className={`absolute flex flex-col items-center select-none`}
+                        style={{
+                            left: pos.x - 48,
+                            top: pos.y - 48,
+                            width: 96,
+                            height: 96,
+                        }}
+                    >
+                        <div className={`bg-slate-800/70 rounded-full p-4 border-2 border-slate-700 shadow-xl mb-2 flex items-center justify-center animate-pulse`}
+                            style={{ boxShadow: `0 0 24px 0 ${node.id === 'orchestrator' ? '#14b8a6' : '#0002'}` }}
+                        >
+                            {node.icon}
+                        </div>
+                        <div className="text-white font-semibold text-center text-sm leading-tight">
+                            {node.label}
+                        </div>
+                        {node.desc && (
+                            <div className="text-xs text-slate-400 font-normal text-center mt-1">{node.desc}</div>
+                        )}
+                    </div>
+                );
+            })}
+            {/* Center Glow */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none">
+                <div className="w-40 h-40 bg-gradient-to-br from-teal-400/20 via-indigo-400/20 to-purple-400/20 rounded-full blur-2xl animate-pulse" />
             </div>
         </div>
     );

@@ -60,35 +60,30 @@ const MemoryItemList: React.FC = () => {
   useEffect(() => {
     // Fetch tags for each item (by id)
     const fetchTags = async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
-      if (!process.env.NEXT_PUBLIC_ML_API_URL) {
-        console.warn('NEXT_PUBLIC_ML_API_URL is not set. Using http://localhost:8000 as fallback. Tags may not work in production.');
-      }
       const newTagsMap: Record<string, string[]> = {};
-      await Promise.all(
-        items.map(async (item) => {
-          const text = item.text || item.title || item.content || '';
-          if (!text) return;
-          try {
-            console.log('Fetching tags for', item.id, 'with text:', text, 'using', apiUrl);
-            const res = await fetch(`${apiUrl}/tags`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text }),
-            });
-            if (res.ok) {
-              const data = await res.json();
-              newTagsMap[item.id] = data.tags || [];
-            } else {
-              console.error('Failed to fetch tags for', item.id, res.status);
-              newTagsMap[item.id] = [];
-            }
-          } catch (err) {
-            console.error('Error fetching tags for', item.id, err);
-            newTagsMap[item.id] = [];
+      let errorOccurred = false;
+      for (const item of items) {
+        if (errorOccurred) break;
+        const text = item.text || item.title || item.content || '';
+        if (!text) continue;
+        try {
+          const res = await fetch('/api/tags', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            newTagsMap[item.id] = data.tags || [];
+          } else {
+            errorOccurred = true;
+            setError('Failed to fetch tags. Tagging is temporarily disabled.');
           }
-        })
-      );
+        } catch {
+          errorOccurred = true;
+          setError('Failed to fetch tags. Tagging is temporarily disabled.');
+        }
+      }
       setTagsMap(newTagsMap);
     };
     if (items.length) fetchTags();
@@ -97,9 +92,6 @@ const MemoryItemList: React.FC = () => {
   if (loading) return <div className="px-6 py-4 text-slate-400">Loading...</div>;
   if (error) return <div className="px-6 py-4 text-rose-500">{error}</div>;
   if (!items.length) return <div className="px-6 py-4 text-slate-400">No memory items found.</div>;
-  if (!process.env.NEXT_PUBLIC_ML_API_URL) {
-    return <div className="px-6 py-4 text-rose-500">Warning: NEXT_PUBLIC_ML_API_URL is not set. Tagging will not work unless the ML API URL is configured.</div>;
-  }
 
   return (
     <div className="overflow-hidden">

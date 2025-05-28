@@ -51,29 +51,30 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
   useEffect(() => {
     // Fetch tags for each query
     const fetchTags = async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
       const newTagsMap: Record<string | number, string[]> = {};
-      await Promise.all(
-        recentQueries.map(async (query) => {
-          const text = query.text || '';
-          if (!text.trim()) return;
-          try {
-            const res = await fetch(`${apiUrl}/tags`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text }),
-            });
-            if (res.ok) {
-              const data = await res.json();
-              newTagsMap[query.id] = data.tags || [];
-            } else {
-              newTagsMap[query.id] = [];
-            }
-          } catch {
-            newTagsMap[query.id] = [];
+      let errorOccurred = false;
+      for (const query of recentQueries) {
+        if (errorOccurred) break;
+        const text = query.text || '';
+        if (!text.trim()) continue;
+        try {
+          const res = await fetch('/api/tags', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            newTagsMap[query.id] = data.tags || [];
+          } else {
+            errorOccurred = true;
+            setError('Failed to fetch tags. Tagging is temporarily disabled.');
           }
-        })
-      );
+        } catch {
+          errorOccurred = true;
+          setError('Failed to fetch tags. Tagging is temporarily disabled.');
+        }
+      }
       setTagsMap(newTagsMap);
     };
     if (recentQueries.length) fetchTags();

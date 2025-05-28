@@ -18,6 +18,7 @@ export default function ContextPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [isClient, setIsClient] = useState(false);
 
     const fetchProjects = useCallback(() => {
         setLoading(true);
@@ -50,6 +51,8 @@ export default function ContextPage() {
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
+
+    useEffect(() => { setIsClient(true); }, []);
 
     const handleDelete = useCallback(async (id: string) => {
         if (!window.confirm('Delete this project? This cannot be undone.')) return;
@@ -163,7 +166,7 @@ export default function ContextPage() {
                 </div>
             )}
             {!loading && !error && projects.length > 0 && dashboardContent}
-            {showModal && typeof window !== 'undefined' && ReactDOM.createPortal(
+            {showModal && isClient && ReactDOM.createPortal(
                 <ProjectModal
                     mode={modalMode}
                     name={modalName}

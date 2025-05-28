@@ -36,7 +36,7 @@ export default function AIAgentPage() {
         setError(null);
         const history = [...chat, { role: "user", content: input }];
         try {
-            const res = await fetch("http://localhost:8000/agent-chat", {
+            const res = await fetch("/api/agent-chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

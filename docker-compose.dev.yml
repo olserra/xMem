@@ -12,7 +12,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
-      - ML_API_URL=http://ml_service:8000
+      - NEXT_PUBLIC_ML_API_URL=http://ml_service:8000
     depends_on:
       - db
       - ml_service

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const mlApiUrl = process.env.NEXT_PUBLIC_ML_API_URL;
+  const mlApiUrl = process.env.ML_API_URL;
   if (!mlApiUrl) {
-    console.error('NEXT_PUBLIC_ML_API_URL is not set');
-    return NextResponse.json({ error: 'NEXT_PUBLIC_ML_API_URL is not set' }, { status: 500 });
+    console.error('ML_API_URL is not set');
+    return NextResponse.json({ error: 'ML_API_URL is not set' }, { status: 500 });
   }
 
   try {

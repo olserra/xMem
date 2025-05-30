@@ -1,32 +1,56 @@
+<!-- Banner -->
+<p align="center">
+  <img src="public/xmem-banner.svg" alt="xmem banner" width="600"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Olserra/xmem/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="https://huggingface.co/spaces/Olserra/xmem"><img src="https://img.shields.io/badge/HuggingFace-Spaces-yellow" alt="Hugging Face"></a>
+  <a href="https://github.com/Olserra/xmem"><img src="https://img.shields.io/github/stars/Olserra/xmem?style=social" alt="GitHub stars"></a>
+</p>
+
+---
+
 # xmem
 
 Hybrid memory orchestrator for LLMs: combines long-term, session, and real-time context management for smarter, more relevant AI. Open-source, privacy-first, and easy to integrate.
 
 ---
 
+## Quickstart
+
+```js
+const orchestrator = new xmem({
+  vectorStore: chromadb,
+  sessionStore: redis,
+  llmProvider: mistral,
+});
+const response = await orchestrator.query({
+  input: "Tell me about our previous discussion",
+});
+```
+
+---
+
 ## Features
 
-- **Hybrid Memory**: Long-term, session, and context memory for LLMs
-- **Open-Source First**: Works with any open-source LLM (Llama, Mistral, etc.) and vector DB
-- **Effortless Integration**: Simple API and dashboard for seamless integration and monitoring
-- **Vector DB Support**: Qdrant, ChromaDB, Pinecone, and more
-- **Session Store**: Redis, MongoDB, and others
-- **LLM Provider Agnostic**: Llama.cpp, Ollama, and more (OpenAI supported, but open-source preferred)
-- **Public ML Service**: Consumes the public ML service at [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/)
+| Feature                | Description                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| Hybrid Memory          | Long-term, session, and context memory for LLMs                                  |
+| Open-Source First      | Works with any open-source LLM (Llama, Mistral, etc.) and vector DB              |
+| Effortless Integration | Simple API and dashboard for seamless integration and monitoring                 |
+| Vector DB Support      | Qdrant, ChromaDB, Pinecone, and more                                             |
+| Session Store          | Redis, MongoDB, and others                                                       |
+| LLM Provider Agnostic  | Llama.cpp, Ollama, and more (OpenAI supported, but open-source preferred)        |
+| Public ML Service      | [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/) |
 
 ---
 
 ## Architecture
 
-- **Next.js Dashboard**: Modern UI for managing memory, sessions, and integrations
-- **ML Backend**: Connects to open-source LLMs and vector DBs
-- **API**: RESTful endpoints for memory operations
-
----
-
-## ML Service
-
-xmem leverages the public ML service hosted at [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/). This service provides open, reproducible memory and LLM orchestration for research and production use.
+<p align="center">
+  <em>System context and container diagram (see <code>architecture.xml</code> for source)</em>
+</p>
 
 ---
 
@@ -86,3 +110,4 @@ The xmem name and logo are trademarks of their respective owners.
 ## Links
 
 - [Hugging Face Space: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/)
+- [GitHub](https://github.com/Olserra/xmem)

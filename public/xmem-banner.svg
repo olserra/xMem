@@ -1,0 +1,11 @@
+<svg width="800" height="180" viewBox="0 0 800 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="xmemGradient" x1="0" y1="0" x2="800" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#9333EA"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="180" rx="32" fill="url(#xmemGradient)"/>
+  <text x="50%" y="60" text-anchor="middle" font-size="56" font-family="'Segoe UI', Arial, sans-serif" font-weight="bold" fill="#fff" dy=".3em">xmem</text>
+  <text x="50%" y="120" text-anchor="middle" font-size="28" font-family="'Segoe UI', Arial, sans-serif" fill="#E0E7FF">Hybrid Memory Orchestrator for LLMs</text>
+</svg> 

@@ -1,60 +1,81 @@
-# Unified Local Development (One Command)
+# xmem
 
-To run the entire app (Next.js dashboard, ML backend, and database) in local development mode with hot reload and full traceability:
-
-```sh
-make up
-```
-
-- This will start all services using Docker Compose (see docker-compose.dev.yml).
-- To stop everything:
-  ```sh
-  make down
-  ```
-- To follow logs for all services:
-  ```sh
-  make logs
-  ```
-- To see status of all services:
-  ```sh
-  make ps
-  ```
+Hybrid memory orchestrator for LLMs: combines long-term, session, and real-time context management for smarter, more relevant AI. Open-source, privacy-first, and easy to integrate.
 
 ---
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Features
+
+- **Hybrid Memory**: Long-term, session, and context memory for LLMs
+- **Open-Source First**: Works with any open-source LLM (Llama, Mistral, etc.) and vector DB
+- **Effortless Integration**: Simple API and dashboard for seamless integration and monitoring
+- **Vector DB Support**: Qdrant, ChromaDB, Pinecone, and more
+- **Session Store**: Redis, MongoDB, and others
+- **LLM Provider Agnostic**: Llama.cpp, Ollama, and more (OpenAI supported, but open-source preferred)
+- **Public ML Service**: Consumes the public ML service at [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/)
+
+---
+
+## Architecture
+
+- **Next.js Dashboard**: Modern UI for managing memory, sessions, and integrations
+- **ML Backend**: Connects to open-source LLMs and vector DBs
+- **API**: RESTful endpoints for memory operations
+
+---
+
+## ML Service
+
+xmem leverages the public ML service hosted at [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/). This service provides open, reproducible memory and LLM orchestration for research and production use.
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
 
-```bash
-npm run dev
+```sh
+pnpm install
+# or
+yarn install
+# or
+npm install
+# or
+bun install
+```
+
+Run the development server:
+
+```sh
+pnpm dev
 # or
 yarn dev
 # or
-pnpm dev
+npm run dev
 # or
 bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contributing
 
-## Learn More
+Contributions are welcome! Please open issues or pull requests. For major changes, discuss them first in an issue.
 
-To learn more about Next.js, take a look at the following resources:
+- Follow the [Contributor Covenant](https://www.contributor-covenant.org/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+xmem is licensed under the Apache License, Version 2.0. See [LICENSE](./LICENSE) for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The xmem name and logo are trademarks of their respective owners.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Links
+
+- [Hugging Face Space: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/)

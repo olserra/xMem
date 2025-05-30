@@ -7,7 +7,6 @@ import Link from 'next/link';
 import Logo from '../ui/Logo';
 import { LuMenu } from 'react-icons/lu';
 import { Check, X } from 'lucide-react';
-import { FaGithub } from 'react-icons/fa6';
 
 // Define types for organization and project
 interface Organization {
@@ -152,13 +151,6 @@ const Header: React.FC = () => {
                     >
                         Documentation
                     </Link>
-                    {/* GitHub and Product Hunt logos */}
-                    <a href={githubLink} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="ml-2 text-slate-400 hover:text-white text-2xl transition-colors flex items-center">
-                        <FaGithub />
-                    </a>
-                    <a href={productHuntLink} target="_blank" rel="noopener noreferrer" aria-label="Product Hunt" className="ml-2">
-                        <img src="/producthunt-badge.svg" alt="Product Hunt" className="h-7 w-auto" />
-                    </a>
                     {user ? (
                         <div className="relative ml-4" ref={dropdownRef}>
                             <button className="focus:outline-none cursor-pointer" onClick={() => setDropdownOpen((v) => !v)}>
@@ -209,13 +201,6 @@ const Header: React.FC = () => {
                                 >
                                     <span>Documentation</span>
                                 </Link>
-                                {/* GitHub and Product Hunt logos (mobile) */}
-                                <a href={githubLink} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="mt-4 text-slate-400 hover:text-white text-2xl transition-colors flex items-center">
-                                    <FaGithub />
-                                </a>
-                                <a href={productHuntLink} target="_blank" rel="noopener noreferrer" aria-label="Product Hunt" className="mt-2">
-                                    <img src="/producthunt-badge.svg" alt="Product Hunt" className="h-7 w-auto" />
-                                </a>
                             </nav>
                             <div className="mt-8 flex flex-col gap-4">
                                 {/* User/org/project controls (mobile) */}

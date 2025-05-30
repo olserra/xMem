@@ -15,6 +15,7 @@ export default function AIAgentPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const defaultModel = DEFAULT_MODEL_ID;
+    const [chatMemoryVectorProvider, setChatMemoryVectorProvider] = useState('chromadb');
 
     useEffect(() => {
         // Fetch available sources from API
@@ -38,6 +39,7 @@ export default function AIAgentPage() {
                     sources: selectedSources,
                     history,
                     user_input: input,
+                    chatMemoryVectorProvider,
                 }),
             });
             if (!res.ok) throw new Error("Agent service error");

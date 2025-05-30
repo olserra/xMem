@@ -45,7 +45,6 @@ const Header: React.FC = () => {
     const [projectsLoading, setProjectsLoading] = useState(false);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-    const productHuntLink = 'https://www.producthunt.com/posts/xmem';
     const githubLink = 'https://github.com/olserra/xmem';
 
     useEffect(() => {
@@ -147,22 +146,25 @@ const Header: React.FC = () => {
                     )
                 ))}
                 {/* GitHub and Product Hunt logos */}
-                <a
-                    href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-4"
-                    style={{ display: 'flex', alignItems: 'center' }}
-                >
-                    <Image
-                        src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
-                        alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
-                        width={150}
-                        height={32}
-                        style={{ width: 150, height: 32 }}
-                        priority
-                    />
-                </a>
+                {/* Only show Product Hunt logo in nav if not on landing or user is signed in */}
+                {(!isLanding || user) && (
+                    <a
+                        href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-4"
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                        <Image
+                            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                            alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                            width={150}
+                            height={32}
+                            style={{ width: 150, height: 32 }}
+                            priority
+                        />
+                    </a>
+                )}
             </nav>
             {/* Burger menu button (mobile only) */}
             <button className="md:hidden p-2 rounded focus:outline-none text-white" onClick={() => setMobileNavOpen(v => !v)} aria-label="Open menu">
@@ -249,12 +251,6 @@ const Header: React.FC = () => {
                 )}
                 {!loading && !user && (isLanding || pathname.startsWith('/docs')) && (
                     <>
-                        <button
-                            className="ml-4 px-4 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors cursor-pointer"
-                            onClick={() => router.push('/api/auth/signin')}
-                        >
-                            Get started
-                        </button>
                         <a
                             href="https://www.producthunt.com/posts/xmem?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-xmem"
                             target="_blank"
@@ -271,6 +267,12 @@ const Header: React.FC = () => {
                                 priority
                             />
                         </a>
+                        <button
+                            className="ml-4 px-4 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors cursor-pointer"
+                            onClick={() => router.push('/api/auth/signin')}
+                        >
+                            Get started
+                        </button>
                     </>
                 )}
             </div>

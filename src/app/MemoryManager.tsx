@@ -805,3 +805,4 @@ const MemoryManager: React.FC = () => {
 };
 
 export default MemoryManager;
+export { VECTOR_DB_PROVIDERS };

@@ -66,6 +66,13 @@ Contributions are welcome! Please open issues or pull requests. For major change
 
 - Follow the [Contributor Covenant](https://www.contributor-covenant.org/)
 
+### Branching & Pull Requests
+
+- Always branch from the `develop` branch.
+- Use descriptive branch names, prefixed with `feature/` for new features (e.g. `feature/new-feature-name`) or `fix/` for bug fixes (e.g. `fix/some-fix`).
+- Open pull requests from your feature/fix branch **into** the `develop` branch.
+- Releases are managed by the maintainer, who will merge `develop` into `main` as needed.
+
 ---
 
 ## License

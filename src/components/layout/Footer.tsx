@@ -4,6 +4,7 @@ import React from 'react';
 import Logo from '../ui/Logo';
 import { FaGithub, FaTwitter, FaDiscord } from 'react-icons/fa6';
 import { version } from '../../version';
+import Image from 'next/image';
 
 const footerLinks = [
     {
@@ -31,10 +32,13 @@ const footerLinks = [
     },
 ];
 
+const productHuntLink = 'https://www.producthunt.com/posts/xmem';
+const githubLink = 'https://github.com/olserra/xmem';
+
 const socialLinks = [
-    { icon: <FaGithub />, href: 'https://github.com/olserra/xmem', label: 'GitHub' },
+    { icon: <FaGithub />, href: githubLink, label: 'GitHub' },
     { icon: <FaTwitter />, href: 'https://twitter.com/', label: 'Twitter' },
-    { icon: <FaDiscord />, href: 'https://discord.com/', label: 'Discord' },
+    { icon: <FaDiscord />, href: 'https://discord.gg/SPGpcqA2', label: 'Discord' },
 ];
 
 const year = 2024; // Use a static year to avoid hydration mismatch
@@ -44,24 +48,42 @@ const Footer: React.FC = () => (
         <div className="max-w-7xl mx-auto px-6 py-16">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-12 md:gap-0">
                 {/* Brand & Social */}
-                <div className="flex flex-col items-center md:items-start gap-4 md:w-1/3">
+                <div className="flex flex-col items-start gap-4 md:w-1/3">
                     <Logo size={32} boldText textClassName="text-white font-bold text-2xl" />
-                    <span className="text-xs text-slate-500 mt-1 mb-2 text-center md:text-left max-w-xs">
+                    <span className="text-xs text-slate-500 mt-1 mb-2 text-left max-w-xs">
                         Hybrid memory for LLMs: long-term, session, and context management.
                     </span>
-                    <div className="flex gap-4 mt-2">
-                        {socialLinks.map((item) => (
-                            <a
-                                key={item.label}
-                                href={item.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={item.label}
-                                className="text-slate-500 hover:text-white transition-colors text-xl"
-                            >
-                                {item.icon}
-                            </a>
-                        ))}
+                    <div className="flex flex-col items-start gap-4">
+                        <div className="flex flex-row gap-4">
+                            {socialLinks.map((item) => (
+                                <a
+                                    key={item.label}
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={item.label}
+                                    className="text-slate-500 hover:text-white transition-colors text-xl"
+                                >
+                                    {item.icon}
+                                </a>
+                            ))}
+                        </div>
+                        <a
+                            href={productHuntLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Product Hunt"
+                            style={{ display: 'flex', alignItems: 'center' }}
+                        >
+                            <Image
+                                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
+                                alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
+                                width={150}
+                                height={32}
+                                style={{ width: 150, height: 32 }}
+                                priority
+                            />
+                        </a>
                     </div>
                 </div>
                 {/* Navigation Columns */}

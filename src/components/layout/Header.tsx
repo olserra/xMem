@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Logo from '../ui/Logo';
 import { LuMenu } from 'react-icons/lu';
 import { Check, X } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa6';
 
 // Define types for organization and project
 interface Organization {
@@ -35,6 +36,9 @@ const Header: React.FC = () => {
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
     const orgDropdownRef = useRef<HTMLDivElement>(null);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+    const productHuntLink = 'https://www.producthunt.com/posts/xmem';
+    const githubLink = 'https://github.com/olserra/xmem';
 
     // Fetch orgs and projects for dropdown
     useEffect(() => {
@@ -148,6 +152,13 @@ const Header: React.FC = () => {
                     >
                         Documentation
                     </Link>
+                    {/* GitHub and Product Hunt logos */}
+                    <a href={githubLink} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="ml-2 text-slate-400 hover:text-white text-2xl transition-colors flex items-center">
+                        <FaGithub />
+                    </a>
+                    <a href={productHuntLink} target="_blank" rel="noopener noreferrer" aria-label="Product Hunt" className="ml-2">
+                        <img src="/producthunt-badge.svg" alt="Product Hunt" className="h-7 w-auto" />
+                    </a>
                     {user ? (
                         <div className="relative ml-4" ref={dropdownRef}>
                             <button className="focus:outline-none cursor-pointer" onClick={() => setDropdownOpen((v) => !v)}>
@@ -191,16 +202,20 @@ const Header: React.FC = () => {
                                 <Logo size={28} />
                             </div>
                             <nav className="flex flex-col gap-3">
-                                {navItems.map(item => (
-                                    <Link
-                                        key={item.id}
-                                        href={item.href}
-                                        className={`font-medium px-3 py-2 rounded transition-colors ${item.href === '/' + location.pathname.split('/')[1] ? 'bg-teal-600 text-white' : 'hover:bg-teal-400/20 text-slate-200'}`}
-                                        onClick={() => setMobileNavOpen(false)}
-                                    >
-                                        {item.label}
-                                    </Link>
-                                ))}
+                                <Link
+                                    href="/docs"
+                                    className="font-medium px-3 py-2 transition-colors flex flex-col items-center justify-center hover:text-teal-400 text-slate-200 rounded"
+                                    onClick={() => setMobileNavOpen(false)}
+                                >
+                                    <span>Documentation</span>
+                                </Link>
+                                {/* GitHub and Product Hunt logos (mobile) */}
+                                <a href={githubLink} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="mt-4 text-slate-400 hover:text-white text-2xl transition-colors flex items-center">
+                                    <FaGithub />
+                                </a>
+                                <a href={productHuntLink} target="_blank" rel="noopener noreferrer" aria-label="Product Hunt" className="mt-2">
+                                    <img src="/producthunt-badge.svg" alt="Product Hunt" className="h-7 w-auto" />
+                                </a>
                             </nav>
                             <div className="mt-8 flex flex-col gap-4">
                                 {/* User/org/project controls (mobile) */}
@@ -218,8 +233,8 @@ const Header: React.FC = () => {
                                     </button>
                                 )}
                             </div>
+                            <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
                         </div>
-                        <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
                     </div>
                 )}
             </div>

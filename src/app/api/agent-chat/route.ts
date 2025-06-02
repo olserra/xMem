@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { orchestrator } from '@/backend/orchestrator';
 import type { LLMProvider } from '@/backend/xmem';
+import { OpenAIAdapter } from '@/backend/adapters/openai';
 
 interface AgentChatRequest {
   model: string;
@@ -17,6 +18,15 @@ interface AgentChatResponse {
 
 // System prompt to restrict the agent
 const SYSTEM_PROMPT = `You are an AI agent for xmem. Only answer questions using the provided context from the connected data sources. If the answer is not in the context, say you don't know. Keep answers short. Only answer questions about xmem, its data, or its business model. Do not answer unrelated or random questions.`;
+
+// Register OpenRouter provider if not already registered
+if (process.env.OPENROUTER_API_URL && process.env.OPENROUTER_API_KEY && process.env.OPENROUTER_MODEL) {
+  orchestrator.registerProvider('llm', 'openrouter', new OpenAIAdapter({
+    apiUrl: process.env.OPENROUTER_API_URL,
+    apiKey: process.env.OPENROUTER_API_KEY,
+    model: process.env.OPENROUTER_MODEL,
+  }));
+}
 
 export async function POST(req: NextRequest) {
   try {

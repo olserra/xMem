@@ -9,6 +9,7 @@ interface Query {
   text?: string;
   score?: number;
   size?: number;
+  url?: string; // Optional URL property for source link
   // Add more fields as needed
 }
 
@@ -143,6 +144,8 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
   const handleOpenSource = () => {
     if (selectedQuery && selectedQuery.url) {
       window.open(selectedQuery.url, '_blank');
+    } else {
+      alert('No source URL available for this query.');
     }
   };
 
@@ -216,6 +219,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
                 className="flex items-center gap-1 px-3 py-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm cursor-pointer"
                 onClick={handleOpenSource}
                 title="Open in Source"
+                disabled={!selectedQuery?.url}
               >
                 <Link size={16} /> Open Source
               </button>

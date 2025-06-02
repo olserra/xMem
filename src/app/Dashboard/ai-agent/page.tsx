@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Database, MessageCircle } from "lucide-react";
 
 // Use environment variable for default model (client-safe)
-const DEFAULT_MODEL_ID = process.env.NEXT_PUBLIC_DEFAULT_MODEL_ID || "llama2";
+const DEFAULT_MODEL_ID = process.env.NEXT_PUBLIC_OPENROUTER_MODEL || process.env.NEXT_PUBLIC_DEFAULT_MODEL_ID || "llama2";
 
 type Source = { id: string; name?: string; collection?: string };
 
@@ -100,7 +100,7 @@ export default function AIAgentPage() {
                 {/* Chat UI - take all available vertical space */}
                 <div className="border-t pt-4 mt-4 flex-1 flex flex-col min-h-0">
                     <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 rounded p-3 mb-3 flex flex-col gap-2">
-                        {chat.length === 0 && <div className="text-slate-400 text-sm">Start a conversation with your data...</div>}
+                        {chat.length === 0 && !loading && <div className="text-slate-400 text-sm">Start a conversation with your data...</div>}
                         {chat.map((msg, i) => (
                             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                 <div className={`rounded px-3 py-2 max-w-xs text-sm ${msg.role === "user" ? "bg-teal-100 text-teal-900" : "bg-slate-200 text-slate-800"}`}>
@@ -109,10 +109,8 @@ export default function AIAgentPage() {
                             </div>
                         ))}
                         {loading && (
-                            <div className="flex justify-start">
-                                <div className="rounded px-3 py-2 max-w-xs text-sm bg-slate-200 text-slate-800">
-                                    <AnimatedEllipsis />
-                                </div>
+                            <div className="flex justify-center items-center min-h-[2.5rem]">
+                                <AnimatedEllipsis />
                             </div>
                         )}
                     </div>
@@ -150,13 +148,30 @@ export default function AIAgentPage() {
 }
 
 function AnimatedEllipsis() {
-    const [dotCount, setDotCount] = React.useState(1);
-    React.useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const interval = setInterval(() => {
-            setDotCount((c) => (c % 3) + 1);
-        }, 400);
-        return () => clearInterval(interval);
-    }, []);
-    return <span aria-label="Loading" className="inline-block w-8 text-left">{'.'.repeat(dotCount)}</span>;
+    return (
+        <span aria-label="Loading" className="inline-block w-8 text-left align-middle">
+            <span className="dot dot-1" />
+            <span className="dot dot-2" />
+            <span className="dot dot-3" />
+            <style jsx>{`
+                .dot {
+                    display: inline-block;
+                    width: 0.5em;
+                    height: 0.5em;
+                    margin-right: 0.2em;
+                    background: #64748b;
+                    border-radius: 50%;
+                    opacity: 0.7;
+                    animation: bounce 1.2s infinite both;
+                }
+                .dot-1 { animation-delay: 0s; }
+                .dot-2 { animation-delay: 0.2s; }
+                .dot-3 { animation-delay: 0.4s; }
+                @keyframes bounce {
+                    0%, 80%, 100% { transform: scale(0.8); opacity: 0.7; }
+                    40% { transform: scale(1.2); opacity: 1; }
+                }
+            `}</style>
+        </span>
+    );
 } 

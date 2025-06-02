@@ -11,3 +11,7 @@ alwaysApply: false
 - Always try to use utility types.
 - Always use pnpm to install packages.
 - All the buttons and clickable items should have a style cursor-pointer.
+- Never install things locally. Always prefer to use things on a docker.
+- Case we need a LLM model, don't install local. Use it via API, in the lightest and free way.
+- Always choose for the open source solutions.
+- Always choose for the most common approach that top AI Engineers take.

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { orchestrator } from '@/backend/orchestrator';
+import type { LLMProvider } from '@/backend/xmem';
 
 interface AgentChatRequest {
   model: string;
   sources: string[];
   history: { role: string; content: string }[];
   user_input: string;
+  chatMemoryVectorProvider?: string;
 }
 
 interface AgentChatResponse {
@@ -13,43 +15,58 @@ interface AgentChatResponse {
   metadata: Record<string, unknown>;
 }
 
-const OPENROUTER_API_URL = process.env.OPENROUTER_API_URL!;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL!;
+// System prompt to restrict the agent
+const SYSTEM_PROMPT = `You are an AI agent for xmem. Only answer questions using the provided context from the connected data sources. If the answer is not in the context, say you don't know. Keep answers short. Only answer questions about xmem, its data, or its business model. Do not answer unrelated or random questions.`;
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as AgentChatRequest;
-    // Convert chat history to OpenAI format
-    const messages = [
-      ...body.history.map(h => ({ role: h.role, content: h.content })),
-      { role: 'user', content: body.user_input }
-    ];
-    // Call OpenRouter API (no API key required for free models)
-    const orRes = await fetch(OPENROUTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: OPENROUTER_MODEL,
-        messages
-      })
-    });
-    if (!orRes.ok) {
-      const errText = await orRes.text();
-      throw new Error(`OpenRouter API error: ${orRes.status} ${errText}`);
+    // Use the selected vector provider (from chatMemoryVectorProvider or sources[0])
+    const vectorProvider = body.chatMemoryVectorProvider || body.sources?.[0] || undefined;
+    // Optionally, use a sessionId (could be user/session based, here just a static string for demo)
+    const sessionId = 'agent-session';
+    // Retrieve relevant context from the selected vector DB
+    let contextResults: any[] = [];
+    try {
+      const results = await orchestrator.semanticSearch(body.user_input, {
+        vectorProvider,
+        topK: 5,
+      });
+      contextResults = Array.isArray(results) ? results : [];
+    } catch (err) {
+      contextResults = [];
     }
-    const orJson = await orRes.json();
-    const reply = orJson.choices?.[0]?.message?.content || '';
-
+    // Build a context string from the retrieved results
+    const contextText = contextResults.length > 0
+      ? contextResults.map((item, i) => `Context ${i + 1}: ${typeof item === 'string' ? item : JSON.stringify(item)}`).join('\n')
+      : '';
+    // Compose the prompt for the LLM
+    const prompt = [
+      SYSTEM_PROMPT,
+      contextText ? `\nContext:\n${contextText}` : '',
+      `\nUser: ${body.user_input}`,
+      'Agent:'
+    ].join('\n');
+    // Use the orchestrator's LLM provider (Ollama, Llama, etc.)
+    // Map frontend model to backend provider name
+    let llmProvider: string | undefined = undefined;
+    if (body.model && ['ollama', 'llama', 'llamacpp', 'mistral', 'huggingface', 'openai', 'gemini'].includes(body.model)) {
+      llmProvider = body.model;
+    } else if (body.model && body.model.toLowerCase().includes('llama')) {
+      llmProvider = 'ollama'; // Map 'llama2', 'llama3', etc. to 'ollama' if using Ollama backend
+    } else {
+      llmProvider = 'ollama'; // Default fallback
+    }
+    const llm = orchestrator.getProvider<LLMProvider>('llm', llmProvider);
+    const reply = await llm.generateResponse(prompt);
     const response: AgentChatResponse = {
       reply,
-      metadata: { model: OPENROUTER_MODEL },
+      metadata: { model: llmProvider, vectorProvider, contextCount: contextResults.length },
     };
     return NextResponse.json(response);
-  } catch (e) {
-    console.error('Agent chat error:', e);
-    return NextResponse.json({ error: 'Invalid request', details: String(e) }, { status: 400 });
+  } catch (e: unknown) {
+    const errMsg = e instanceof Error ? e.message : String(e);
+    console.error('Agent chat error:', errMsg);
+    return NextResponse.json({ error: 'Invalid request', details: errMsg }, { status: 400 });
   }
 } 

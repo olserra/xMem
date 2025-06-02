@@ -63,8 +63,9 @@ const Dashboard: React.FC = () => {
         if (!res.ok) return;
         const data = await res.json();
         const queries = data.queries || [];
+        const limitedQueries = queries.slice(0, 5);
         const tagsMap: Record<string, string[]> = {};
-        for (const query of queries) {
+        for (const query of limitedQueries) {
           const text = query.text || '';
           if (!text.trim()) continue;
           const tagRes = await fetch('/api/tags', {
@@ -75,6 +76,13 @@ const Dashboard: React.FC = () => {
           if (tagRes.ok) {
             const tagData = await tagRes.json();
             tagsMap[query.id] = tagData.tags || [];
+          } else {
+            // Log warning but do not retry or loop
+            if (tagRes.status === 502) {
+              console.warn('Tags service unavailable or not implemented. Skipping tags for query:', query.id);
+            } else {
+              console.warn('Failed to fetch tags for query:', query.id, 'Status:', tagRes.status);
+            }
           }
         }
         setBulkTags(tagsMap);
@@ -242,7 +250,7 @@ const Dashboard: React.FC = () => {
           </button>
         </div>
         <RecentQueriesTable collection={collection === '__all__' ? undefined : collection} />
-Re      </div>
+      </div>
     </div>
   );
 };

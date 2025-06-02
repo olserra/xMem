@@ -87,7 +87,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
                 <td colSpan={5} className="px-6 py-4 text-center text-slate-400">No recent queries found.</td>
               </tr>
             ) : (
-              recentQueries.map((query) => {
+              recentQueries.slice(0, 5).map((query) => {
                 const tags = getTagsForId(query.id.toString());
                 return (
                   <tr key={query.id} className="hover:bg-slate-50 transition-colors">
@@ -135,7 +135,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
         ) : recentQueries.length === 0 ? (
           <div className="text-center text-slate-400 py-4">No recent queries found.</div>
         ) : (
-          recentQueries.map((query) => {
+          recentQueries.slice(0, 5).map((query) => {
             const tags = getTagsForId(query.id.toString());
             return (
               <div key={query.id} className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-2 border border-slate-200">

@@ -49,7 +49,7 @@ const Footer: React.FC = () => (
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-12 md:gap-0">
                 {/* Brand & Social */}
                 <div className="flex flex-col items-start gap-4 md:w-1/3">
-                    <Logo size={32} boldText textClassName="text-white font-bold text-2xl" />
+                    <Logo size={32} />
                     <span className="text-xs text-slate-500 mt-1 mb-2 text-left max-w-xs">
                         Hybrid memory for LLMs: long-term, session, and context management.
                     </span>

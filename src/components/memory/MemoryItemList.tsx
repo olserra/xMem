@@ -48,7 +48,9 @@ const MemoryItemList: React.FC = () => {
         const res = await fetch('/api/qdrant-queries');
         if (!res.ok) throw new Error('Failed to fetch memory items');
         const data = await res.json();
-        setItems(data.queries || []);
+        const allItems = data.queries || [];
+        const limitedItems = allItems.slice(0, 5);
+        setItems(limitedItems);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : 'Error fetching items');
       } finally {

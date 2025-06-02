@@ -108,6 +108,13 @@ export default function AIAgentPage() {
                                 </div>
                             </div>
                         ))}
+                        {loading && (
+                            <div className="flex justify-start">
+                                <div className="rounded px-3 py-2 max-w-xs text-sm bg-slate-200 text-slate-800">
+                                    <AnimatedEllipsis />
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <form
                         className="flex gap-2"
@@ -140,4 +147,16 @@ export default function AIAgentPage() {
             </div>
         </div>
     );
+}
+
+function AnimatedEllipsis() {
+    const [dotCount, setDotCount] = React.useState(1);
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const interval = setInterval(() => {
+            setDotCount((c) => (c % 3) + 1);
+        }, 400);
+        return () => clearInterval(interval);
+    }, []);
+    return <span aria-label="Loading" className="inline-block w-8 text-left">{'.'.repeat(dotCount)}</span>;
 } 

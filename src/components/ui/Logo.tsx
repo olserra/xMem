@@ -16,7 +16,7 @@ const Logo: React.FC<LogoProps> = ({
 }) => (
     <span className="inline-flex items-center gap-2">
         <MdOutlineMemory size={size} className={iconClassName} />
-        <span className={boldText ? `${textClassName} font-bold` : textClassName}>xmem</span>
+        <span className={boldText ? `${textClassName} font-bold` : textClassName}>xMem</span>
     </span>
 );
 

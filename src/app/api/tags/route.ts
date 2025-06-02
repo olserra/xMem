@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const mlApiUrl = process.env.ML_API_URL;
+  const mlApiUrl = process.env.ML_API_URL || 'https://huggingface.co/spaces/Olserra/xmem';
   if (!mlApiUrl) {
-    console.error('ML_API_URL is not set');
+    console.error('ML_API_URL is not set and no default fallback.');
     return NextResponse.json({ error: 'ML_API_URL is not set' }, { status: 500 });
   }
 
   try {
     const body = await req.text();
-    const mlRes = await fetch(`${mlApiUrl.replace(/\/$/, '')}/tags`, {
+    let endpoint = mlApiUrl.replace(/\/$/, '');
+    if (!endpoint.endsWith('/tags')) {
+      endpoint += '/tags';
+    }
+    const mlRes = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': req.headers.get('content-type') || 'application/json',
@@ -20,6 +24,10 @@ export async function POST(req: NextRequest) {
     const contentType = mlRes.headers.get('content-type') || '';
     const mlResBody = await mlRes.text();
     if (!mlRes.ok) {
+      if (mlRes.status === 404) {
+        console.error('ML API /tags endpoint not found (404):', endpoint);
+        return NextResponse.json({ error: 'ML API /tags endpoint not found', status: 404 }, { status: 502 });
+      }
       console.error('ML API /tags error:', mlRes.status, mlResBody);
       return NextResponse.json({ error: 'ML API /tags error', status: mlRes.status, body: mlResBody }, { status: 500 });
     }

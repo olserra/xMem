@@ -10,6 +10,7 @@ interface Query {
   score?: number;
   size?: number;
   url?: string; // Optional URL property for source link
+  source?: string; // Add this line to fix the type error
   // Add more fields as needed
 }
 

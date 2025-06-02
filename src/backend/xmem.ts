@@ -2,9 +2,9 @@
 
 // --- Interfaces for pluggable backends ---
 export interface VectorStore {
-  addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown> }): Promise<void>;
-  searchEmbedding(query: number[], topK: number): Promise<unknown[]>;
-  deleteEmbedding(id: string): Promise<void>;
+  addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown>; collection?: string }): Promise<void>;
+  searchEmbedding(query: number[], topK: number, collection?: string): Promise<unknown[]>;
+  deleteEmbedding(id: string, collection?: string): Promise<void>;
 }
 
 export interface SessionStore {
@@ -59,37 +59,37 @@ export class XmemOrchestrator {
 
   // --- Core Methods (now with provider selection) ---
 
-  async addMemory(memory: { id: string; text: string; metadata?: Record<string, unknown>; sessionId?: string; vectorProvider?: string; sessionProvider?: string; llmProvider?: string; embeddingModel?: string }) {
+  async addMemory(memory: { id: string; text: string; metadata?: Record<string, unknown>; sessionId?: string; vectorProvider?: string; sessionProvider?: string; llmProvider?: string; embeddingModel?: string; collection?: string }) {
     const vectorStore = this.getProvider<VectorStore>('vector', memory.vectorProvider);
     const sessionStore = this.getProvider<SessionStore>('session', memory.sessionProvider);
     const llmProvider = this.getProvider<LLMProvider>('llm', memory.llmProvider);
 
     const embedding = await llmProvider.embed(memory.text, memory.embeddingModel);
-    await vectorStore.addEmbedding({ id: memory.id, embedding, metadata: memory.metadata });
+    await vectorStore.addEmbedding({ id: memory.id, embedding, metadata: memory.metadata, collection: memory.collection });
     if (memory.sessionId) await sessionStore.setSession(memory.sessionId, memory as Record<string, unknown>);
   }
 
-  async getMemoryByEmbedding(queryText: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string; embeddingModel?: string }) {
+  async getMemoryByEmbedding(query: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string; embeddingModel?: string; collection?: string }) {
     const llmProvider = this.getProvider<LLMProvider>('llm', opts?.llmProvider);
     const vectorStore = this.getProvider<VectorStore>('vector', opts?.vectorProvider);
-    const embedding = await llmProvider.embed(queryText, opts?.embeddingModel);
-    return vectorStore.searchEmbedding(embedding, opts?.topK || 5);
+    const embedding = await llmProvider.embed(query, opts?.embeddingModel);
+    return vectorStore.searchEmbedding(embedding, opts?.topK || 5, opts?.collection);
   }
 
-  async deleteMemory(id: string, opts?: { sessionId?: string; vectorProvider?: string; sessionProvider?: string }) {
+  async deleteMemory(id: string, opts?: { sessionId?: string; vectorProvider?: string; sessionProvider?: string; collection?: string }) {
     const vectorStore = this.getProvider<VectorStore>('vector', opts?.vectorProvider);
-    await vectorStore.deleteEmbedding(id);
+    await vectorStore.deleteEmbedding(id, opts?.collection);
     if (opts?.sessionId) {
       const sessionStore = this.getProvider<SessionStore>('session', opts.sessionProvider);
       await sessionStore.deleteSession(opts.sessionId);
     }
   }
 
-  async semanticSearch(query: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string }) {
+  async semanticSearch(query: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string; collection?: string }) {
     return this.getMemoryByEmbedding(query, opts);
   }
 
-  async assembleContext(sessionId: string, query: string, opts?: { vectorProvider?: string; sessionProvider?: string; llmProvider?: string }) {
+  async assembleContext(sessionId: string, query: string, opts?: { vectorProvider?: string; sessionProvider?: string; llmProvider?: string; collection?: string }) {
     const sessionStore = this.getProvider<SessionStore>('session', opts?.sessionProvider);
     const sessionMemory = await sessionStore.getSession(sessionId);
     const longTermMemory = await this.semanticSearch(query, { ...opts, topK: 5 });

@@ -20,10 +20,10 @@ export class MongoDBVectorAdapter implements VectorStore {
     this.client = new MongoClient(this.uri);
   }
 
-  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown> }): Promise<void> {
+  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown>; collection?: string }): Promise<void> {
     await this.client.connect();
     const db = this.client.db(this.dbName);
-    const collection = db.collection(this.collectionName);
+    const collection = db.collection(data.collection || this.collectionName);
     await collection.updateOne(
       { _id: data.id as unknown as ObjectId },
       { $set: { _id: data.id, $vector: data.embedding, ...(data.metadata || {}) } },
@@ -31,13 +31,13 @@ export class MongoDBVectorAdapter implements VectorStore {
     );
   }
 
-  async searchEmbedding(query: number[], topK: number): Promise<unknown[]> {
+  async searchEmbedding(query: number[], topK: number, collection?: string): Promise<unknown[]> {
     await this.client.connect();
     const db = this.client.db(this.dbName);
-    const collection = db.collection(this.collectionName);
+    const coll = db.collection(collection || this.collectionName);
     // Try Atlas $vectorSearch first
     try {
-      const results = await collection.aggregate([
+      const results = await coll.aggregate([
         {
           $vectorSearch: {
             queryVector: query,
@@ -51,7 +51,7 @@ export class MongoDBVectorAdapter implements VectorStore {
       return results;
     } catch {
       // Fallback: brute-force cosine similarity
-      const all = await collection.find({ $vector: { $exists: true } }).toArray();
+      const all = await coll.find({ $vector: { $exists: true } }).toArray();
       const cosine = (a: number[], b: number[]) => {
         const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
         const normA = Math.sqrt(a.reduce((sum, v) => sum + v * v, 0));
@@ -65,10 +65,10 @@ export class MongoDBVectorAdapter implements VectorStore {
     }
   }
 
-  async deleteEmbedding(id: string): Promise<void> {
+  async deleteEmbedding(id: string, collection?: string): Promise<void> {
     await this.client.connect();
     const db = this.client.db(this.dbName);
-    const collection = db.collection(this.collectionName);
-    await collection.deleteOne({ _id: id as unknown as ObjectId });
+    const coll = db.collection(collection || this.collectionName);
+    await coll.deleteOne({ _id: id as unknown as ObjectId });
   }
 } 

@@ -19,10 +19,10 @@ export class PineconeAdapter implements VectorStore {
     this.environment = config.environment;
     this.indexName = config.indexName;
     this.projectId = config.projectId;
-    this.baseUrl = `https://${this.indexName}-${this.environment}.svc.${this.environment}.pinecone.io`;
+    this.baseUrl = this.environment.startsWith('http') ? this.environment : `https://${this.environment}`;
   }
 
-  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown> }): Promise<void> {
+  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown>; collection?: string }): Promise<void> {
     const endpoint = `${this.baseUrl}/vectors/upsert`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export class PineconeAdapter implements VectorStore {
     }
   }
 
-  async searchEmbedding(query: number[], topK: number): Promise<unknown[]> {
+  async searchEmbedding(query: number[], topK: number, collection?: string): Promise<unknown[]> {
     const endpoint = `${this.baseUrl}/query`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export class PineconeAdapter implements VectorStore {
     return (json.matches || []).map((item: Record<string, unknown>) => item.metadata || {});
   }
 
-  async deleteEmbedding(id: string): Promise<void> {
+  async deleteEmbedding(id: string, collection?: string): Promise<void> {
     const endpoint = `${this.baseUrl}/vectors/delete`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

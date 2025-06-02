@@ -1,27 +1,34 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Database, MessageCircle } from "lucide-react";
+import { Suspense } from 'react';
 
 // Use environment variable for default model (client-safe)
-const DEFAULT_MODEL_ID = process.env.NEXT_PUBLIC_OPENROUTER_MODEL || process.env.NEXT_PUBLIC_DEFAULT_MODEL_ID || "llama2";
+const DEFAULT_MODEL_ID = process.env.NEXT_PUBLIC_OPENROUTER_MODEL || process.env.DEFAULT_MODEL_ID || "llama2";
 
 type Source = { id: string; name?: string; collection?: string };
 
-export default function AIAgentPage() {
+export interface AIAgentPageProps {
+    defaultModelId: string;
+}
+
+export function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
     const [sources, setSources] = useState<Source[]>([]); // All available sources
     const [selectedSources, setSelectedSources] = useState<string[]>([]); // Selected source IDs
     const [chat, setChat] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const defaultModel = DEFAULT_MODEL_ID;
+    const defaultModel = defaultModelId;
     const [chatMemoryVectorProvider, setChatMemoryVectorProvider] = useState('chromadb');
 
     useEffect(() => {
         // Fetch available sources from API
         fetch("/api/vector-sources")
             .then((res) => res.json())
-            .then((data) => setSources(data || []));
+            .then((data) => {
+                setSources(data || []);
+            });
     }, []);
 
     const handleSend = async () => {
@@ -155,4 +162,21 @@ function AnimatedEllipsis() {
             <span className="dot dot-3" />
         </span>
     );
-} 
+}
+
+// Server component wrapper to provide defaultModelId as a prop
+function getDefaultModelId() {
+    return process.env.NEXT_PUBLIC_OPENROUTER_MODEL || 'llama2';
+}
+
+const AIAgentPageWrapper = () => {
+    const defaultModelId = getDefaultModelId();
+    // Suspense is used in case you want to fetch other server-side data
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AIAgentPage defaultModelId={defaultModelId} />
+        </Suspense>
+    );
+};
+
+export default AIAgentPageWrapper; 

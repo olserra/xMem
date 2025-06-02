@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
-  const collection = searchParams.get('collection') || 'xmem_collection';
+  const collection = searchParams.get('collection') || process.env.NEXT_PUBLIC_QDRANT_COLLECTION || 'xmem_collection';
   const vectorDbUrl = searchParams.get('vectorDbUrl');
   const apiKey = searchParams.get('apiKey');
   const type = searchParams.get('type');

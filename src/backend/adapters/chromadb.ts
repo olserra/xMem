@@ -24,8 +24,9 @@ export class ChromaDBAdapter implements VectorStore {
     this.apiKey = config.apiKey;
   }
 
-  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown> }): Promise<void> {
-    await fetch(`${this.url}/api/v1/collections/${this.collection}/upsert`, {
+  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown>; collection?: string }): Promise<void> {
+    const collection = data.collection || this.collection;
+    await fetch(`${this.url}/api/v1/collections/${collection}/upsert`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,8 +40,9 @@ export class ChromaDBAdapter implements VectorStore {
     });
   }
 
-  async searchEmbedding(query: number[], topK: number): Promise<unknown[]> {
-    const res = await fetch(`${this.url}/api/v1/collections/${this.collection}/query`, {
+  async searchEmbedding(query: number[], topK: number, collection?: string): Promise<unknown[]> {
+    const coll = collection || this.collection;
+    const res = await fetch(`${this.url}/api/v1/collections/${coll}/query`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,8 +57,9 @@ export class ChromaDBAdapter implements VectorStore {
     return json.documents || [];
   }
 
-  async deleteEmbedding(id: string): Promise<void> {
-    await fetch(`${this.url}/api/v1/collections/${this.collection}/delete`, {
+  async deleteEmbedding(id: string, collection?: string): Promise<void> {
+    const coll = collection || this.collection;
+    await fetch(`${this.url}/api/v1/collections/${coll}/delete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

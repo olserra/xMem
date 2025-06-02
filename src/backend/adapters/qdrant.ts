@@ -17,8 +17,9 @@ export class QdrantAdapter implements VectorStore {
     this.apiKey = config.apiKey;
   }
 
-  async addEmbedding(data: { id: string; embedding: number[]; metadata?: Record<string, unknown> }): Promise<void> {
-    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${this.collection}/points?wait=true`;
+  async addEmbedding(data: { id: string | number; embedding: number[]; metadata?: Record<string, unknown>; collection?: string }): Promise<void> {
+    const collection = data.collection || this.collection;
+    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${collection}/points?wait=true`;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (this.apiKey) headers['api-key'] = this.apiKey;
     const body = JSON.stringify({
@@ -37,8 +38,9 @@ export class QdrantAdapter implements VectorStore {
     }
   }
 
-  async searchEmbedding(query: number[], topK: number): Promise<unknown[]> {
-    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${this.collection}/points/search`;
+  async searchEmbedding(query: number[], topK: number, collection?: string): Promise<unknown[]> {
+    const coll = collection || this.collection;
+    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${coll}/points/search`;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (this.apiKey) headers['api-key'] = this.apiKey;
     const body = JSON.stringify({
@@ -57,8 +59,9 @@ export class QdrantAdapter implements VectorStore {
     return (json.result || []).map((item: Record<string, unknown>) => item.payload || {});
   }
 
-  async deleteEmbedding(id: string): Promise<void> {
-    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${this.collection}/points/delete?wait=true`;
+  async deleteEmbedding(id: string, collection?: string): Promise<void> {
+    const coll = collection || this.collection;
+    const endpoint = `${this.url.replace(/\/$/, '')}/collections/${coll}/points/delete?wait=true`;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (this.apiKey) headers['api-key'] = this.apiKey;
     const body = JSON.stringify({ points: [id] });

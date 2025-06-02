@@ -104,7 +104,7 @@ export default function AIAgentPage() {
                         {chat.map((msg, i) => (
                             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                 <div className={`rounded px-3 py-2 max-w-xs text-sm ${msg.role === "user" ? "bg-teal-100 text-teal-900" : "bg-slate-200 text-slate-800"}`}>
-                                    {msg.content}
+                                    {msg.content && msg.content.trim() ? msg.content : (msg.role === 'agent' ? <span className="text-slate-400 italic">No response from agent</span> : null)}
                                 </div>
                             </div>
                         ))}
@@ -153,25 +153,6 @@ function AnimatedEllipsis() {
             <span className="dot dot-1" />
             <span className="dot dot-2" />
             <span className="dot dot-3" />
-            <style jsx>{`
-                .dot {
-                    display: inline-block;
-                    width: 0.5em;
-                    height: 0.5em;
-                    margin-right: 0.2em;
-                    background: #64748b;
-                    border-radius: 50%;
-                    opacity: 0.7;
-                    animation: bounce 1.2s infinite both;
-                }
-                .dot-1 { animation-delay: 0s; }
-                .dot-2 { animation-delay: 0.2s; }
-                .dot-3 { animation-delay: 0.4s; }
-                @keyframes bounce {
-                    0%, 80%, 100% { transform: scale(0.8); opacity: 0.7; }
-                    40% { transform: scale(1.2); opacity: 1; }
-                }
-            `}</style>
         </span>
     );
 } 

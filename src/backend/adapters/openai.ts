@@ -20,22 +20,42 @@ export class OpenAIAdapter implements LLMProvider {
   }
 
   async generateResponse(prompt: string, context?: Record<string, unknown>): Promise<string> {
-    const res = await fetch(`${this.apiUrl}/chat/completions`, {
+    const url = `${this.apiUrl}/chat/completions`;
+    const body = {
+      model: this.model,
+      messages: [
+        ...((Array.isArray(context?.messages) ? context.messages : []) as OpenAIChatMessage[]),
+        { role: 'user', content: prompt }
+      ]
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${this.apiKey}`
+    };
+    console.log('OpenRouter request URL:', url);
+    console.log('OpenRouter request headers:', headers);
+    console.log('OpenRouter request body:', JSON.stringify(body, null, 2));
+    const res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`
-      },
-      body: JSON.stringify({
-        model: this.model,
-        messages: [
-          ...((Array.isArray(context?.messages) ? context.messages : []) as OpenAIChatMessage[]),
-          { role: 'user', content: prompt }
-        ]
-      })
+      headers,
+      body: JSON.stringify(body)
     });
-    const json = await res.json();
-    return json.choices?.[0]?.message?.content || '';
+    let json: any;
+    try {
+      json = await res.json();
+    } catch (e) {
+      console.error('OpenAIAdapter: Failed to parse response JSON', e);
+      return 'Error: Failed to parse LLM response.';
+    }
+    if (!res.ok) {
+      console.error('OpenAIAdapter: LLM API error', json);
+      return `Error: LLM API error: ${json.error?.message || res.statusText}`;
+    }
+    if (json.error) {
+      console.error('OpenAIAdapter: LLM API returned error', json.error);
+      return `Error: LLM API error: ${json.error.message}`;
+    }
+    return json.choices?.[0]?.message?.content || 'Error: LLM returned no content.';
   }
 
   async embed(text: string, model?: string): Promise<number[]> {

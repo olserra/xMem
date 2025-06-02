@@ -20,12 +20,17 @@ interface AgentChatResponse {
 const SYSTEM_PROMPT = `You are an AI agent for xmem. Only answer questions using the provided context from the connected data sources. If the answer is not in the context, say you don't know. Keep answers short. Only answer questions about xmem, its data, or its business model. Do not answer unrelated or random questions.`;
 
 // Register OpenRouter provider if not already registered
-if (process.env.OPENROUTER_API_URL && process.env.OPENROUTER_API_KEY && process.env.OPENROUTER_MODEL) {
+if (
+  process.env.OPENROUTER_API_URL &&
+  process.env.OPENROUTER_API_KEY &&
+  process.env.OPENROUTER_MODEL
+) {
   orchestrator.registerProvider('llm', 'openrouter', new OpenAIAdapter({
     apiUrl: process.env.OPENROUTER_API_URL,
     apiKey: process.env.OPENROUTER_API_KEY,
     model: process.env.OPENROUTER_MODEL,
   }));
+  orchestrator.setDefaultProvider('llm', 'openrouter');
 }
 
 export async function POST(req: NextRequest) {
@@ -60,10 +65,10 @@ export async function POST(req: NextRequest) {
     // Use the orchestrator's LLM provider (Ollama, Llama, etc.)
     // Map frontend model to backend provider name
     let llmProvider: string | undefined = undefined;
-    if (body.model && ['ollama', 'llama', 'llamacpp', 'mistral', 'huggingface', 'openai', 'gemini'].includes(body.model)) {
+    if (process.env.OPENROUTER_API_URL && process.env.OPENROUTER_API_KEY && process.env.OPENROUTER_MODEL) {
+      llmProvider = 'openrouter';
+    } else if (body.model && ['ollama', 'llama', 'llamacpp', 'mistral', 'huggingface', 'openai', 'gemini'].includes(body.model)) {
       llmProvider = body.model;
-    } else if (body.model && body.model.toLowerCase().includes('llama')) {
-      llmProvider = 'ollama'; // Map 'llama2', 'llama3', etc. to 'ollama' if using Ollama backend
     } else {
       llmProvider = 'ollama'; // Default fallback
     }

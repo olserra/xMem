@@ -14,6 +14,7 @@ interface Query {
 
 interface RecentQueriesTableProps {
   collection?: string;
+  type?: string; // Add type prop to determine DB provider
 }
 
 const tagColors = [
@@ -26,11 +27,15 @@ const tagColors = [
   'bg-teal-100 text-teal-800',
 ];
 
-const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'xmem_collection' }) => {
+const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'xmem_collection', type }) => {
   const [recentQueries, setRecentQueries] = useState<Query[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getTagsForId } = useTagContext();
+
+  // Determine DB Provider
+  const dbProvider = (type && type.toLowerCase() === 'pinecone') ? 'Pinecone' : 'Qdrant';
+  const collectionName = collection || 'Unknown';
 
   useEffect(() => {
     const fetchQueries = async () => {
@@ -69,6 +74,15 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
                 Size
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Source
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                DB Provider
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Collection
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -76,19 +90,20 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
           <tbody className="bg-white divide-y divide-slate-200">
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-slate-400">Loading...</td>
+                <td colSpan={8} className="px-6 py-4 text-center text-slate-400">Loading...</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-rose-500">{error}</td>
+                <td colSpan={8} className="px-6 py-4 text-center text-rose-500">{error}</td>
               </tr>
             ) : recentQueries.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-slate-400">No recent queries found.</td>
+                <td colSpan={8} className="px-6 py-4 text-center text-slate-400">No recent queries found.</td>
               </tr>
             ) : (
               recentQueries.slice(0, 5).map((query) => {
                 const tags = getTagsForId(query.id.toString());
+                const source = query.source || query.collection || 'Unknown';
                 return (
                   <tr key={query.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 max-w-xs truncate">
@@ -115,6 +130,15 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
                       {typeof query.size === 'number' ? query.size : '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      {source}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      {dbProvider}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      {collectionName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                       <button className="text-indigo-600 hover:text-indigo-900">
                         <ExternalLink size={16} />
                       </button>
@@ -137,6 +161,7 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
         ) : (
           recentQueries.slice(0, 5).map((query) => {
             const tags = getTagsForId(query.id.toString());
+            const source = query.source || query.collection || 'Unknown';
             return (
               <div key={query.id} className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-2 border border-slate-200">
                 <div className="font-semibold text-slate-800 text-sm mb-1">Query</div>
@@ -153,9 +178,12 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
                     ))}
                   </div>
                 )}
-                <div className="flex items-center justify-between text-xs text-slate-500">
+                <div className="flex flex-col gap-1 text-xs text-slate-500">
                   <span><span className="font-medium text-slate-700">Score:</span> {typeof query.score === 'number' ? query.score : '—'}</span>
                   <span><span className="font-medium text-slate-700">Size:</span> {typeof query.size === 'number' ? query.size : '—'}</span>
+                  <span><span className="font-medium text-slate-700">Source:</span> {source}</span>
+                  <span><span className="font-medium text-slate-700">DB Provider:</span> {dbProvider}</span>
+                  <span><span className="font-medium text-slate-700">Collection:</span> {collectionName}</span>
                   <button className="text-indigo-600 hover:text-indigo-900 ml-2">
                     <ExternalLink size={16} />
                   </button>

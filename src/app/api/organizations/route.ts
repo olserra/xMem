@@ -65,7 +65,8 @@ export async function GET() {
       },
     });
     await prisma.user.update({ where: { id: userId }, data: { organizationId: hobbyOrg.id, role: 'OWNER' } });
-    orgs = [await prisma.organization.findUnique({ where: { id: hobbyOrg.id }, include: { users: { where: { id: userId }, select: { role: true } } } })];
+    const createdOrg = await prisma.organization.findUnique({ where: { id: hobbyOrg.id }, include: { users: { where: { id: userId }, select: { role: true } } } });
+    orgs = createdOrg ? [createdOrg] : [];
   }
   // Attach the current user's role to each org
   const orgsWithRole = orgs.map(org => {

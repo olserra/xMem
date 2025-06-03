@@ -36,14 +36,14 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d '{"content":":white_check_mark: CI passed for $GITHUB_REPOSITORY on branch $GITHUB_REF by $GITHUB_ACTOR. [View run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"}' \
+            -d "{\"content\":\":white_check_mark: CI passed for ${GITHUB_REPOSITORY} on branch ${GITHUB_REF} by ${GITHUB_ACTOR}. [View run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})\"}" \
             https://discord.com/api/webhooks/1379509677397905408/Ky0S_msUGa9Sd8LynjoFtuYft3IgCq8HiUwSEPu3G65t-8peMYW5ESIcSFK_4LqSt-17
       - name: Notify Discord on Failure
         if: failure()
         run: |
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d '{"content":":x: CI failed for $GITHUB_REPOSITORY on branch $GITHUB_REF by $GITHUB_ACTOR. [View run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"}' \
+            -d "{\"content\":\":x: CI failed for ${GITHUB_REPOSITORY} on branch ${GITHUB_REF} by ${GITHUB_ACTOR}. [View run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})\"}" \
             https://discord.com/api/webhooks/1379509677397905408/Ky0S_msUGa9Sd8LynjoFtuYft3IgCq8HiUwSEPu3G65t-8peMYW5ESIcSFK_4LqSt-17
 
   check-poetry-lock:

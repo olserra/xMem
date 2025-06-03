@@ -690,82 +690,55 @@ const MemoryManager: React.FC = () => {
           {errorMsg}
         </div>
       )}
-      {/* Tabs */}
+      {/* Tabs and Add Source Button in the same row */}
       <div className="border-b border-slate-200">
-        <nav className="flex space-x-8" aria-label="Memory Sources">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'all'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-          >
-            All Sources
-          </button>
-          <button
-            onClick={() => setActiveTab('vectorDb')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'vectorDb'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-          >
-            Vector DB
-          </button>
-          <button
-            onClick={() => setActiveTab('session')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'session'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-          >
-            Session Memory
-          </button>
-        </nav>
-      </div>
-
-      {/* Add Source Button */}
-      {activeTab !== 'session' && (
-        <div className="flex justify-end mt-4">
-          <button
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
-            onClick={handleAdd}
-          >
-            + Add Source
-          </button>
+        <div className="flex items-center justify-between">
+          <nav className="flex space-x-8" aria-label="Memory Sources">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm cursor-pointer ${activeTab === 'all'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+            >
+              All Sources
+            </button>
+            <button
+              onClick={() => setActiveTab('vectorDb')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm cursor-pointer ${activeTab === 'vectorDb'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+            >
+              Vector DB
+            </button>
+            <button
+              onClick={() => setActiveTab('session')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm cursor-pointer ${activeTab === 'session'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+            >
+              Session Memory
+            </button>
+          </nav>
+          {activeTab !== 'session' && (
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer ml-4"
+              onClick={handleAdd}
+            >
+              + Add Source
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Memory sources grid */}
       {activeTab === 'session' ? (
         <SessionMemoryManager />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Template Card */}
-          {(!isAddMode && !hasTemplate) && (
-            <MemorySourceCard
-              key="template"
-              source={{
-                id: 'template',
-                type: 'vectorDb',
-                status: 'disconnected',
-                itemCount: 0,
-                lastSync: '',
-                icon: <Database size={24} className="text-indigo-300" />,
-                vectorDbUrl: '',
-                apiKey: '',
-                embeddingModel: 'text-embedding-3-small',
-                maxCacheSize: 128,
-                sessionTtl: 3600,
-                enableCache: true,
-                collection: '',
-                metric: 'cosine',
-                dimensions: 1024,
-              }}
-              onEdit={handleAdd}
-              onDelete={() => { }}
-              onStatusChange={() => { }}
-            />
-          )}
+          {/* Removed Template Card for new users */}
           {loading ? (
             <div className="col-span-full text-center text-slate-400">Loading...</div>
           ) : filteredSources.map((source) => (

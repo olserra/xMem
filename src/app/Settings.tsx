@@ -24,6 +24,12 @@ interface Organization {
   role?: string;
 }
 
+// Utility to mask API keys (show first 4 and last 4 chars, rest as asterisks)
+function maskApiKey(key: string): string {
+  if (!key || key.length <= 8) return '****';
+  return key.slice(0, 4) + '*'.repeat(key.length - 8) + key.slice(-4);
+}
+
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'context' | 'api-key' | 'organization' | 'audit-log'>('api-key');
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
@@ -439,7 +445,10 @@ const Settings: React.FC = () => {
                                 {showKeyId === key.id ? <EyeOff size={16} /> : <Eye size={16} />} {showKeyId === key.id ? 'Hide' : 'View'}
                               </button>
                               {showKeyId === key.id && (
-                                <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs cursor-pointer select-all border border-slate-200" onClick={() => handleCopy(key.key, key.id)}>{key.key}</span>
+                                <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs cursor-pointer select-all border border-slate-200" onClick={() => handleCopy(key.key, key.id)}>
+                                  {/* Only show full key if it was just created, otherwise mask */}
+                                  {showNewKey === key.key ? key.key : maskApiKey(key.key)}
+                                </span>
                               )}
                               <button
                                 className="flex items-center gap-1 px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs cursor-pointer transition-colors"
@@ -473,7 +482,7 @@ const Settings: React.FC = () => {
                     disabled={creating}
                   />
                   <button
-                    className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleCreateKey}
                     disabled={creating || !newKeyName}
                   >

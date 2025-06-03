@@ -3,6 +3,14 @@ import { prisma } from '../../../../../prisma/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/auth';
 
+// Masking utility for sensitive fields
+function maskEmail(email: string | null | undefined): string | null | undefined {
+  if (!email) return email;
+  const [user, domain] = email.split('@');
+  if (!user || !domain) return email;
+  return user[0] + '***@' + domain;
+}
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || !['OWNER', 'ADMIN'].includes(session.user.role || '')) {
@@ -17,7 +25,9 @@ export async function GET(req: NextRequest) {
     select: { id: true, email: true, role: true },
     orderBy: { email: 'asc' },
   });
-  return NextResponse.json(users);
+  // Mask emails before returning
+  const maskedUsers = users.map(u => ({ ...u, email: maskEmail(u.email) }));
+  return NextResponse.json(maskedUsers);
 }
 
 export async function DELETE(req: NextRequest) {

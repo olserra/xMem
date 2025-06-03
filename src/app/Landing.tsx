@@ -508,11 +508,19 @@ const CENTER_Y = 320;
 const AnimatedXmemFlow = () => {
     const [progress, setProgress] = useState<number[]>(CIRCLE_PATHS.map(() => 0));
     const [hasMounted, setHasMounted] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const rafRef = useRef<number | null>(null);
     const startRef = useRef<number | null>(null);
 
     useEffect(() => {
         setHasMounted(true);
+        // Responsive check
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640); // Tailwind 'sm' breakpoint
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
     useEffect(() => {
@@ -538,13 +546,35 @@ const AnimatedXmemFlow = () => {
         };
     }, [hasMounted]);
 
-    // Get node positions in a circle
+    // Responsive values
+    const SVG_WIDTH = isMobile ? 320 : 800;
+    const SVG_HEIGHT = isMobile ? 340 : 640;
+    const CIRCLE_RADIUS_RESP = isMobile ? 90 : CIRCLE_RADIUS;
+    const CENTER_X_RESP = isMobile ? 160 : CENTER_X;
+    const CENTER_Y_RESP = isMobile ? 130 : CENTER_Y;
+    const NODE_SIZE = isMobile ? 48 : 96;
+    const ORB_RADIUS = isMobile ? 7 : 14;
+
+    // Get node positions: ellipse for mobile, circle for desktop
     const getNodePos = (idx: number) => {
-        const angle = (2 * Math.PI * idx) / CIRCLE_NODES.length - Math.PI / 2;
-        return {
-            x: CENTER_X + CIRCLE_RADIUS * Math.cos(angle),
-            y: CENTER_Y + CIRCLE_RADIUS * Math.sin(angle),
-        };
+        if (!isMobile) {
+            const angle = (2 * Math.PI * idx) / CIRCLE_NODES.length - Math.PI / 2;
+            return {
+                x: CENTER_X_RESP + CIRCLE_RADIUS_RESP * Math.cos(angle),
+                y: CENTER_Y_RESP + CIRCLE_RADIUS_RESP * Math.sin(angle),
+            };
+        } else {
+            // Arrange nodes along an ellipse for mobile
+            const ellipseA = 110; // horizontal radius
+            const ellipseB = 60;  // vertical radius
+            const centerX = SVG_WIDTH / 2;
+            const centerY = SVG_HEIGHT / 2 - 10;
+            const angle = (2 * Math.PI * idx) / CIRCLE_NODES.length - Math.PI / 2;
+            return {
+                x: centerX + ellipseA * Math.cos(angle),
+                y: centerY + ellipseB * Math.sin(angle),
+            };
+        }
     };
 
     // Get point along a straight line between two nodes
@@ -558,8 +588,16 @@ const AnimatedXmemFlow = () => {
     };
 
     return (
-        <div className="relative w-full max-w-3xl mx-auto h-[640px] md:h-[640px]">
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" width="800" height="640">
+        <div
+            className={`relative w-full mx-auto ${isMobile ? 'max-w-xs h-[340px]' : 'max-w-3xl h-[640px] md:h-[640px]'}`}
+            style={isMobile ? { minHeight: 320 } : {}}
+        >
+            <svg
+                className="absolute inset-0 w-full h-full pointer-events-none z-0"
+                width={SVG_WIDTH}
+                height={SVG_HEIGHT}
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+            >
                 {/* Draw lines between nodes */}
                 {CIRCLE_PATHS.map((p, i) => {
                     const from = getNodePos(p.from);
@@ -572,7 +610,7 @@ const AnimatedXmemFlow = () => {
                             x2={to.x}
                             y2={to.y}
                             stroke={p.color}
-                            strokeWidth={4}
+                            strokeWidth={isMobile ? 2 : 4}
                             opacity={0.18}
                             style={{ filter: `drop-shadow(0 0 8px ${p.color})` }}
                         />
@@ -587,7 +625,7 @@ const AnimatedXmemFlow = () => {
                                 key={`orb-${i}`}
                                 cx={pt.x}
                                 cy={pt.y}
-                                r={14}
+                                r={ORB_RADIUS}
                                 fill={p.color}
                                 opacity={0.85}
                                 style={{ filter: `drop-shadow(0 0 16px ${p.color}) blur(1px)` }}
@@ -602,7 +640,7 @@ const AnimatedXmemFlow = () => {
                                 key={`orb-ssr-${i}`}
                                 cx={pt.x}
                                 cy={pt.y}
-                                r={14}
+                                r={ORB_RADIUS}
                                 fill={p.color}
                                 opacity={0.85}
                                 style={{ filter: `drop-shadow(0 0 16px ${p.color}) blur(1px)` }}
@@ -611,7 +649,7 @@ const AnimatedXmemFlow = () => {
                     })
                 }
             </svg>
-            {/* Nodes in a circle */}
+            {/* Nodes in a circle or vertical stack */}
             {CIRCLE_NODES.map((node, i) => {
                 const pos = getNodePos(i);
                 return (
@@ -619,30 +657,39 @@ const AnimatedXmemFlow = () => {
                         key={node.id}
                         className={`absolute flex flex-col items-center select-none`}
                         style={{
-                            left: pos.x - 48,
-                            top: pos.y - 48,
-                            width: 96,
-                            height: 96,
+                            left: pos.x - NODE_SIZE / 2,
+                            top: pos.y - NODE_SIZE / 2,
+                            width: NODE_SIZE,
+                            height: NODE_SIZE,
                         }}
                     >
-                        <div className={`bg-slate-800/70 rounded-full p-4 border-2 border-slate-700 shadow-xl mb-2 flex items-center justify-center animate-pulse`}
-                            style={{ boxShadow: `0 0 24px 0 ${node.id === 'orchestrator' ? '#14b8a6' : '#0002'}` }}
+                        <div
+                            className={`bg-slate-800/70 rounded-full p-2 md:p-4 border-2 border-slate-700 shadow-xl mb-1 md:mb-2 flex items-center justify-center animate-pulse`}
+                            style={{ boxShadow: `0 0 16px 0 ${node.id === 'orchestrator' ? '#14b8a6' : '#0002'}` }}
                         >
-                            {node.icon}
+                            {React.cloneElement(node.icon, { size: isMobile ? 22 : 36 })}
                         </div>
-                        <div className="text-white font-semibold text-center text-sm leading-tight">
+                        <div className="text-white font-semibold text-center text-xs md:text-sm leading-tight">
                             {node.label}
                         </div>
                         {node.desc && (
-                            <div className="text-xs text-slate-400 font-normal text-center mt-1">{node.desc}</div>
+                            <div className="text-[10px] md:text-xs text-slate-400 font-normal text-center mt-0.5 md:mt-1">{node.desc}</div>
                         )}
                     </div>
                 );
             })}
-            {/* Center Glow */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none">
-                <div className="w-40 h-40 bg-gradient-to-br from-teal-400/20 via-indigo-400/20 to-purple-400/20 rounded-full blur-2xl animate-pulse" />
-            </div>
+            {/* Center Glow (hidden on mobile for clarity) */}
+            {!isMobile && (
+                <div
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
+                    style={{ width: 160, height: 160 }}
+                >
+                    <div
+                        className="bg-gradient-to-br from-teal-400/20 via-indigo-400/20 to-purple-400/20 rounded-full blur-2xl animate-pulse"
+                        style={{ width: 160, height: 160 }}
+                    />
+                </div>
+            )}
         </div>
     );
 };

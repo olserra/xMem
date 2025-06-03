@@ -19,10 +19,11 @@ interface ContextPreviewProps {
   sourceIds: string[];
   collection?: string;
   query: string;
+  rankingFactors: { similarity: number; recency: number; feedback: number };
   onContextItemsLoaded?: (items: ContextItem[]) => void;
 }
 
-const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceIds, collection = 'xmem_collection', query, onContextItemsLoaded }) => {
+const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceIds, collection = 'xmem_collection', query, rankingFactors, onContextItemsLoaded }) => {
   const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,8 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
         sourceIds,
         collection,
         method,
-        query
+        query,
+        rankingFactors
       })
     })
       .then(res => res.json())
@@ -49,7 +51,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceIds, collection, method, query, onContextItemsLoaded]);
+  }, [projectId, sourceIds, collection, method, query, rankingFactors, onContextItemsLoaded]);
 
   const handleFeedback = async (itemId: string, source: string, value: number) => {
     setFeedbacks(fb => ({ ...fb, [itemId]: value }));

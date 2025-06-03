@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const body = (await req.json()) as ContextPreviewRequest;
-  const { projectId, sourceIds, collection, method, query } = body;
+  const body = (await req.json()) as ContextPreviewRequest & { rankingFactors?: { similarity: number; recency: number; feedback: number } };
+  const { projectId, sourceIds, collection, method, query, rankingFactors } = body;
   if (!projectId || !Array.isArray(sourceIds) || sourceIds.length === 0) {
     return NextResponse.json({ queries: [] });
   }
@@ -74,7 +74,17 @@ export async function POST(req: NextRequest) {
   // Merge and rank results (simple sort by score, can be improved)
   let ranked = allResults;
   if (method === 'smart') {
-    ranked = allResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+    if (rankingFactors) {
+      ranked = allResults.map(item => ({
+        ...item,
+        combinedScore:
+          (item.score || 0) * rankingFactors.similarity +
+          (item.recency || 0) * rankingFactors.recency +
+          (item.feedbackScore || 0) * rankingFactors.feedback
+      })).sort((a, b) => (b.combinedScore || 0) - (a.combinedScore || 0));
+    } else {
+      ranked = allResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+    }
   } else if (method === 'recency') {
     ranked = allResults.sort((a, b) => (b.recency || 0) - (a.recency || 0));
   } else if (method === 'feedback') {

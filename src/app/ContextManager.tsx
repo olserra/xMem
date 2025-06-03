@@ -197,6 +197,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 sourceIds={selectedSources}
                 collection={collection}
                 query={query}
+                rankingFactors={contextConfig.rankingFactors}
                 onContextItemsLoaded={handleContextItemsLoaded}
               />
             </div>

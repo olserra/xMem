@@ -1,5 +1,9 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const pkgPath = resolve(__dirname, '../package.json');
 const versionFilePath = resolve(__dirname, '../src/version.ts');

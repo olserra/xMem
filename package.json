@@ -9,7 +9,8 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "setup:mongodb-vector": "node src/scripts/setup-mongodb-vector.js",
-    "sync:version": "node src/scripts/sync-version.js"
+    "sync:version": "pnpm exec tsx scripts/sync-version.ts",
+    "prebuild": "pnpm exec tsx scripts/sync-version.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",

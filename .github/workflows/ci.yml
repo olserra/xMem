@@ -26,7 +26,7 @@ jobs:
       - name: Type Check
         run: pnpm exec tsc --noEmit
       - name: Sync version to src/version.ts
-        run: node src/scripts/sync-version.js
+        run: pnpm exec tsx scripts/sync-version.ts
       - name: Build
         run: pnpm build
       # - name: Test

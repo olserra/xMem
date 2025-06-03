@@ -1,5 +1,5 @@
 "use client";
-import Header from "./Header";
+import DashboardHeader from "./DashboardHeader";
 import Sidebar from "./Sidebar";
 import { Database, Cpu, Clock, Settings, Sparkles, BarChart, MessageCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return (
         <>
             <div className="w-full max-w-full overflow-x-hidden">
-                <Header />
+                <DashboardHeader />
                 <div className="flex min-h-screen pt-16 w-full max-w-full overflow-x-hidden">
                     <Sidebar
                         navItems={navItems}

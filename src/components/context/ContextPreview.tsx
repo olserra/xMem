@@ -51,7 +51,7 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceIds, collection, method, query, rankingFactors, onContextItemsLoaded]);
+  }, [projectId, sourceIds, collection, method, query, JSON.stringify(rankingFactors), onContextItemsLoaded]);
 
   const handleFeedback = async (itemId: string, source: string, value: number) => {
     setFeedbacks(fb => ({ ...fb, [itemId]: value }));

@@ -10,7 +10,7 @@ const endpoints = [
         method: 'POST',
         path: '/api/query',
         description: 'Send a query and receive an LLM response with intelligently selected context.',
-        code: `fetch('/api/query', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ query: 'What is xmem?' })\n})`,
+        code: `fetch('https://www.xmem.xyz/api/query', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ query: 'What is xmem?' })\n})`,
     },
     {
         id: 'session',
@@ -18,7 +18,7 @@ const endpoints = [
         method: 'POST',
         path: '/api/sessions',
         description: 'Create and manage memory sessions for conversations.',
-        code: `fetch('/api/sessions', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ name: 'demo-session' })\n})`,
+        code: `fetch('https://www.xmem.xyz/api/sessions', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ name: 'demo-session' })\n})`,
     },
     {
         id: 'feedback',
@@ -26,7 +26,7 @@ const endpoints = [
         method: 'POST',
         path: '/api/feedback',
         description: 'Submit feedback on context relevance to improve future rankings.',
-        code: `fetch('/api/feedback', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ queryId: 'abc123', rating: 5 })\n})`,
+        code: `fetch('https://www.xmem.xyz/api/feedback', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ queryId: 'abc123', rating: 5 })\n})`,
     },
     {
         id: 'context',
@@ -34,7 +34,7 @@ const endpoints = [
         method: 'GET',
         path: '/api/context',
         description: 'Preview the context that would be selected for a given query.',
-        code: `fetch('/api/context?query=What+is+xmem?', { method: 'GET' })`,
+        code: `fetch('https://www.xmem.xyz/api/context?query=What+is+xmem?', { method: 'GET' })`,
     },
     {
         id: 'memory',
@@ -42,7 +42,7 @@ const endpoints = [
         method: 'POST',
         path: '/api/memory',
         description: 'Add, update, or delete items in the memory store.',
-        code: `fetch('/api/memory', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ action: 'add', data: { ... } })\n})`,
+        code: `fetch('https://www.xmem.xyz/api/memory', {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ action: 'add', data: { ... } })\n})`,
     },
 ];
 

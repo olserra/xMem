@@ -20,7 +20,7 @@ console.log(response);`} language="js" />
                     <h2 className="text-xl text-white font-semibold mb-2">Add Memory (Python)</h2>
                     <SimpleCodeBlock code={`import requests
 
-res = requests.post('http://localhost:3000/api/memory', json={
+res = requests.post('https://www.xmem.xyz/api/memory', json={
   'action': 'add',
   'data': { 'text': 'Remember this fact.' }
 })
@@ -28,7 +28,7 @@ print(res.json())`} language="python" />
                 </div>
                 <div>
                     <h2 className="text-xl text-white font-semibold mb-2">Session Management (cURL)</h2>
-                    <SimpleCodeBlock code={`curl -X POST http://localhost:3000/api/sessions \
+                    <SimpleCodeBlock code={`curl -X POST https://www.xmem.xyz/api/sessions \
   -H 'Content-Type: application/json' \
   -d '{"name": "my-session"}'`} language="bash" />
                 </div>

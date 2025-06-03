@@ -68,22 +68,6 @@ const Footer: React.FC = () => (
                                 </a>
                             ))}
                         </div>
-                        <a
-                            href={productHuntLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Product Hunt"
-                            style={{ display: 'flex', alignItems: 'center' }}
-                        >
-                            <Image
-                                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=652438&theme=light&t=1747929728997"
-                                alt="xmem - Streamline Knowledge Sharing Across Teams | Product Hunt"
-                                width={150}
-                                height={32}
-                                style={{ width: 150, height: 32 }}
-                                priority
-                            />
-                        </a>
                     </div>
                 </div>
                 {/* Navigation Columns */}

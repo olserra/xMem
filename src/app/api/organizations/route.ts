@@ -68,11 +68,13 @@ export async function GET() {
     orgs = [await prisma.organization.findUnique({ where: { id: hobbyOrg.id }, include: { users: { where: { id: userId }, select: { role: true } } } })];
   }
   // Attach the current user's role to each org
-  const orgsWithRole = orgs.map(org => ({
-    ...org,
-    role: org.users[0]?.role || null,
-    users: undefined, // remove users array from response
-  }));
+  const orgsWithRole = orgs.map(org => {
+    const { users, ...rest } = org;
+    return {
+      ...rest,
+      role: users[0]?.role || null,
+    };
+  });
   return NextResponse.json(orgsWithRole);
 }
 

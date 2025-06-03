@@ -138,3 +138,16 @@ model ProjectMemorySource {
 
   @@unique([projectId, memorySourceId])
 }
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  organizationId String?
+  action         String
+  resource       String
+  resourceId     String?
+  details        Json?
+  ipAddress      String?
+  userAgent      String?
+  timestamp      DateTime @default(now())
+}

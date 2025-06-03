@@ -16,6 +16,7 @@ export async function GET() {
   let orgs = await prisma.organization.findMany({
     where: { users: { some: { id: userId } } },
     orderBy: { createdAt: 'desc' },
+    include: { users: { where: { id: userId }, select: { role: true } } },
   });
   // If no orgs, create a default Hobby org for the user
   if (orgs.length === 0) {
@@ -27,9 +28,15 @@ export async function GET() {
       },
     });
     await prisma.user.update({ where: { id: userId }, data: { organizationId: hobbyOrg.id, role: 'OWNER' } });
-    orgs = [hobbyOrg];
+    orgs = [await prisma.organization.findUnique({ where: { id: hobbyOrg.id }, include: { users: { where: { id: userId }, select: { role: true } } } })];
   }
-  return NextResponse.json(orgs);
+  // Attach the current user's role to each org
+  const orgsWithRole = orgs.map(org => ({
+    ...org,
+    role: org.users[0]?.role || null,
+    users: undefined, // remove users array from response
+  }));
+  return NextResponse.json(orgsWithRole);
 }
 
 export async function POST(req: NextRequest) {

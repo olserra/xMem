@@ -111,3 +111,46 @@ The xmem name and logo are trademarks of their respective owners.
 
 - [Hugging Face Space: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/)
 - [GitHub](https://github.com/Olserra/xmem)
+
+## Audit Logging & Observability
+
+xmem now supports enterprise-grade audit logging for all sensitive actions (API key management, memory deletion, etc.).
+
+### How it works
+
+- All sensitive actions are logged to the `AuditLog` table (user, org, action, resource, details, IP, user agent, timestamp).
+- OWNER/ADMIN users can view audit logs in the Settings > Audit Logs tab.
+- Logs can be filtered by user, action, resource, and date via the API.
+
+### API
+
+- `GET /api/api-logs?userId=...&action=...&resource=...&from=...&to=...`
+- Only accessible to OWNER/ADMIN users in the same organization.
+
+### UI
+
+- Go to Settings > Audit Logs (visible for OWNER/ADMIN).
+- View recent actions, filter, and export as needed.
+
+### Schema
+
+```
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  organizationId String?
+  action         String
+  resource       String
+  resourceId     String?
+  details        Json?
+  ipAddress      String?
+  userAgent      String?
+  timestamp      DateTime @default(now())
+}
+```
+
+### Example Use Cases
+
+- Track who created, revoked, or used API keys
+- Track memory deletions and other sensitive actions
+- Export logs for compliance or security review

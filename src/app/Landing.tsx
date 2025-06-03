@@ -64,12 +64,12 @@ const Landing: React.FC = () => {
                         Go to dashboard <ArrowRight size={20} />
                     </a>
                 ) : (
-                    <button
+                    <a
+                        href="/login"
                         className="px-8 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors font-medium flex items-center gap-2 mb-6 cursor-pointer"
-                        onClick={handleSignIn}
                     >
                         Get Started Free <ArrowRight size={20} />
-                    </button>
+                    </a>
                 )}
                 {/* Visual Demo Placeholder */}
                 <div className="w-full max-w-4xl bg-white/10 backdrop-blur-sm rounded-xl border border-slate-700 p-6 mb-12">

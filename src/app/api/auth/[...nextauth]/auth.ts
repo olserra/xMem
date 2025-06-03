@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../../../prisma/prisma";
 import type { NextAuthOptions } from "next-auth";
 import type { DefaultSession } from "next-auth";
+import EmailProvider from 'next-auth/providers/email';
 
 declare module "next-auth" {
   interface Session {
@@ -17,8 +18,8 @@ declare module "next-auth" {
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
@@ -27,6 +28,17 @@ export const authOptions: NextAuthOptions = {
           response_type: "code",
         },
       },
+    }),
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: Number(process.env.EMAIL_SERVER_PORT),
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASS,
+        },
+      },
+      from: process.env.EMAIL_FROM,
     }),
   ],
   adapter: PrismaAdapter(prisma),

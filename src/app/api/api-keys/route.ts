@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/auth';
 import type { Session } from 'next-auth';
+import { logAudit } from '../auth/auditLog';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {
@@ -34,6 +35,15 @@ export async function POST(req: NextRequest) {
   const apiKey = await prisma.aPIKey.create({
     data: { name, key, userId },
   });
+  await logAudit({
+    userId,
+    organizationId: session?.user?.organizationId,
+    action: 'CREATE',
+    resource: 'api-key',
+    resourceId: apiKey.id,
+    details: { name },
+    req,
+  });
   return NextResponse.json({ ...apiKey, key });
 }
 
@@ -48,6 +58,14 @@ export async function DELETE(req: NextRequest) {
     where: { id, userId, revokedAt: null },
     data: { revokedAt: new Date() },
   });
+  await logAudit({
+    userId,
+    organizationId: session?.user?.organizationId,
+    action: 'DELETE',
+    resource: 'api-key',
+    resourceId: id,
+    req,
+  });
   return NextResponse.json({ success: true });
 }
 
@@ -61,6 +79,14 @@ export async function PATCH(req: NextRequest) {
   await prisma.aPIKey.updateMany({
     where: { id, userId, revokedAt: null },
     data: { lastUsed: new Date() },
+  });
+  await logAudit({
+    userId,
+    organizationId: session?.user?.organizationId,
+    action: 'USE',
+    resource: 'api-key',
+    resourceId: id,
+    req,
   });
   return NextResponse.json({ success: true });
 } 

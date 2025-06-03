@@ -202,6 +202,13 @@ const Settings: React.FC = () => {
       if (!res.ok) throw new Error('Failed to invite user');
       setInviteEmail('');
       setInviteRole('MEMBER');
+      // Re-fetch members after invite
+      if (org && (org.role === 'OWNER' || org.role === 'ADMIN')) {
+        fetch('/api/organizations/members')
+          .then(res => res.json())
+          .then(setOrgMembers)
+          .catch(() => setOrgMembers([]));
+      }
     } catch {
       setOrgError('Failed to invite user');
     } finally {
@@ -222,6 +229,22 @@ const Settings: React.FC = () => {
       }
     } finally {
       setPromoting(null);
+    }
+  };
+
+  // Remove member from organization
+  const handleRemoveMember = async (userId: string) => {
+    if (!window.confirm('Are you sure you want to remove this member from the organization?')) return;
+    try {
+      const res = await fetch('/api/organizations/members', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (!res.ok) throw new Error('Failed to remove member');
+      setOrgMembers(members => members.filter(m => m.id !== userId));
+    } catch {
+      setOrgError('Failed to remove member');
     }
   };
 
@@ -313,6 +336,15 @@ const Settings: React.FC = () => {
                                   disabled={promoting === member.id}
                                 >
                                   {promoting === member.id ? 'Promoting...' : 'Promote to Admin'}
+                                </button>
+                              )}
+                              {/* Remove button for OWNER/ADMIN, not for OWNER or self */}
+                              {(org.role === 'OWNER' || org.role === 'ADMIN') && member.role !== 'OWNER' && member.id !== currentUserId && (
+                                <button
+                                  className="ml-2 px-3 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs cursor-pointer transition-colors"
+                                  onClick={() => handleRemoveMember(member.id)}
+                                >
+                                  Remove
                                 </button>
                               )}
                             </td>

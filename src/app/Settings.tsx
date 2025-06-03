@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Lock, PlusCircle, Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 // Define APIKey type
 interface APIKey {
@@ -47,6 +48,8 @@ const Settings: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const [orgMembers, setOrgMembers] = useState<any[]>([]);
   const [promoting, setPromoting] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
 
   // Fetch API keys
   useEffect(() => {
@@ -60,7 +63,15 @@ const Settings: React.FC = () => {
     }
   }, [activeTab]);
 
-  // Fetch organization
+  // Fetch organization on mount (initial render)
+  useEffect(() => {
+    fetch('/api/organizations')
+      .then(res => res.json())
+      .then(data => setOrg(data[0] || null))
+      .catch(() => { });
+  }, []);
+
+  // Fetch organization when organization tab is active (keep this for tab-specific loading states)
   useEffect(() => {
     if (activeTab === 'organization') {
       setOrgsLoading(true);
@@ -238,7 +249,9 @@ const Settings: React.FC = () => {
               <div className="text-slate-500">Loading organization...</div>
             ) : org ? (
               <div className="border rounded-md p-6 bg-white">
-                <h2 className="text-lg font-medium text-slate-800 mb-1">{org.name}</h2>
+                <h2 className="text-lg font-bold text-slate-800 mb-1">
+                  Organization: {org.name} <span className="text-xs text-slate-400 font-normal">(ID: {org.id})</span>
+                </h2>
                 <p className="text-slate-500 mb-2">{org.description}</p>
                 <div className="mb-4 text-xs text-slate-400">Created: {new Date(org.createdAt).toLocaleDateString()}</div>
                 {/* Invite form (OWNER/ADMIN only) */}
@@ -288,7 +301,9 @@ const Settings: React.FC = () => {
                       <tbody className="bg-white divide-y divide-slate-200">
                         {orgMembers.map(member => (
                           <tr key={member.id}>
-                            <td className="px-2 py-2 whitespace-nowrap">{member.email}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">
+                              {member.email} {member.id === currentUserId && <span className="text-xs text-indigo-600 font-semibold">(you)</span>}
+                            </td>
                             <td className="px-2 py-2 whitespace-nowrap">{member.role}</td>
                             <td className="px-2 py-2 whitespace-nowrap">
                               {member.role !== 'ADMIN' && member.role !== 'OWNER' && (

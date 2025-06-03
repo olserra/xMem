@@ -1,12 +1,12 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
 # xmem Cursor Rules
 
 ## 1. Project Philosophy & Architecture
-- xmem is a memory orchestrator for LLMs, combining long-term (vector DB) and short-term (context/session) memory, with advanced RAG (retrieval-augmented generation) logic. All design and code should maximize xmem’s value and future-proof it in the LLM ecosystem.
+- xmem is a memory orchestrator for LLMs, combining long-term (vector DB) and short-term (context/session) memory, with advanced RAG (retrieval-augmented generation) logic. All design and code should maximize xmem's value and future-proof it in the LLM ecosystem.
 - Always prefer open-source solutions and APIs, especially for LLMs (e.g., Llama, Ollama, vLLM, etc.). Avoid proprietary or closed-source dependencies unless absolutely necessary.
 - Decouple logic for reusability and maintainability. Centralize reusable functions, constants, types, and interfaces.
 
@@ -17,9 +17,9 @@ alwaysApply: false
 - Use strict TypeScript settings (`strict: true` in `tsconfig.json`). Never use `any` unless absolutely unavoidable, and always document why.
 
 ## 3. Component & File Structure
-- Use the `app/` directory for Next.js 13+ features. Place all client components in their own folders and mark them with `'use client'` at the top.
-- Always add `'use client'` to the top of files that use client-only hooks (`useState`, `useEffect`, etc.) or browser APIs.
-- All buttons and clickable elements must have `cursor-pointer` styling for clear UX.
+- Use the `app/` directory for Next.js 13+ features. Place all client components in their own folders and mark them with 'use client' at the top.
+- Always add 'use client' to the top of files that use client-only hooks (`useState`, `useEffect`, etc.) or browser APIs.
+- All buttons and clickable elements must have cursor-pointer styling for clear UX.
 - Use semantic HTML and accessible ARIA attributes where appropriate.
 
 ## 4. SSR/CSR & Hydration
@@ -66,3 +66,8 @@ alwaysApply: false
 - Always check for existing solutions before building new ones.
 - Follow the most common and recommended approaches used by top AI and Next.js engineers.
 - Prioritize code readability, maintainability, and simplicity over cleverness.
+
+---
+
+**Tip:**
+If you encounter a recurring error (e.g., hydration mismatch, missing 'use client'), add a checklist or troubleshooting note to the project wiki or README to save time for the team.

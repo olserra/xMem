@@ -80,7 +80,7 @@ model VerificationToken {
 }
 
 model MemorySource {
-  id             String    @id @default(cuid())
+  id             String                @id @default(cuid())
   type           String
   status         String
   itemCount      Int? // Optional, can be updated after sync
@@ -95,12 +95,13 @@ model MemorySource {
   collection     String
   metric         String?
   dimensions     Int?
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  project        Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  project        Project?              @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId      String?
+  projects       ProjectMemorySource[]
 }
 
 model APIKey {
@@ -115,14 +116,25 @@ model APIKey {
 }
 
 model Project {
-  id             String         @id @default(cuid())
+  id             String                @id @default(cuid())
   name           String
   description    String?
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  memorySources  MemorySource[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  memorySources  ProjectMemorySource[]
   organizationId String?
-  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organization   Organization?         @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  MemorySource   MemorySource[]
+}
+
+model ProjectMemorySource {
+  id             String       @id @default(cuid())
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId      String
+  memorySource   MemorySource @relation(fields: [memorySourceId], references: [id], onDelete: Cascade)
+  memorySourceId String
+
+  @@unique([projectId, memorySourceId])
 }

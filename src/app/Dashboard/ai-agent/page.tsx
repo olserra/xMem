@@ -164,19 +164,15 @@ function AnimatedEllipsis() {
     );
 }
 
-// Server component wrapper to provide defaultModelId as a prop
 function getDefaultModelId() {
     return process.env.NEXT_PUBLIC_OPENROUTER_MODEL || 'llama2';
 }
 
-const AIAgentPageWrapper = () => {
+export default function Page() {
     const defaultModelId = getDefaultModelId();
-    // Suspense is used in case you want to fetch other server-side data
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <AIAgentPage defaultModelId={defaultModelId} />
         </Suspense>
     );
-};
-
-export default AIAgentPageWrapper; 
+} 

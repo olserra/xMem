@@ -40,7 +40,7 @@ const defaultContextConfig = {
 };
 
 const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
-  const [selectedSource, setSelectedSource] = useState('all');
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [rankingMethod, setRankingMethod] = useState('smart');
   const [currentSize, setCurrentSize] = useState(0);
   const [contextConfig, setContextConfig] = useState(defaultContextConfig);
@@ -49,6 +49,7 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [collection, setCollection] = useState('xmem_collection');
   const [collections, setCollections] = useState<string[]>([]);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     // Fetch available collections from Qdrant
@@ -130,10 +131,22 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                className="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs"
+                onClick={() => setSelectedSources(collections)}
+                type="button"
+              >Select All</button>
+              <button
+                className="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs"
+                onClick={() => setSelectedSources([])}
+                type="button"
+              >Deselect All</button>
+            </div>
           </div>
           <ContextSourceList
-            selectedSource={selectedSource}
-            onSourceSelect={setSelectedSource}
+            selectedSources={selectedSources}
+            onSourcesChange={setSelectedSources}
             projectId={projectId}
             searchTerm={searchTerm}
           />
@@ -141,28 +154,37 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
         {/* Main content area with context preview */}
         <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Context preview header */}
-          <div className="p-4 flex justify-between items-center border-b border-slate-200">
-            <h2 className="font-medium text-slate-800">Context Preview</h2>
-            <div className="flex items-center gap-2">
-              <button
-                className="flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                onClick={handleOpenSettings}
-              >
-                <Sliders size={14} />
-                <span>Settings</span>
-              </button>
-              <select
-                value={rankingMethod}
-                onChange={(e) => setRankingMethod(e.target.value)}
-                className="px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                {rankingMethods.map((method) => (
-                  <option key={method.id} value={method.id}>
-                    {method.name}
-                  </option>
-                ))}
-              </select>
+          <div className="p-4 flex flex-col gap-2 border-b border-slate-200">
+            <div className="flex justify-between items-center">
+              <h2 className="font-medium text-slate-800">Context Preview</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  className="flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={handleOpenSettings}
+                >
+                  <Sliders size={14} />
+                  <span>Settings</span>
+                </button>
+                <select
+                  value={rankingMethod}
+                  onChange={(e) => setRankingMethod(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  {rankingMethods.map((method) => (
+                    <option key={method.id} value={method.id}>
+                      {method.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Enter your semantic search query..."
+              className="mt-2 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
           </div>
           {/* Context preview and controls */}
           <div className="flex flex-col md:flex-row h-[calc(100%-57px)]">
@@ -172,8 +194,9 @@ const ContextManager: React.FC<ContextManagerProps> = ({ projectId }) => {
                 maxSize={contextConfig.maxSize}
                 currentSize={currentSize}
                 projectId={projectId}
-                sourceId={selectedSource}
+                sourceIds={selectedSources}
                 collection={collection}
+                query={query}
                 onContextItemsLoaded={handleContextItemsLoaded}
               />
             </div>

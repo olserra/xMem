@@ -17,13 +17,32 @@ export async function GET(req: NextRequest) {
   }
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get('projectId');
-  const where: Record<string, unknown> = { userId };
-  if (projectId) where.projectId = projectId;
-  const sources = await prisma.memorySource.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-  });
-  return NextResponse.json(sources);
+
+  if (projectId) {
+    // Fetch sources linked to the project (many-to-many) and global/user-level sources
+    const projectSources = await prisma.projectMemorySource.findMany({
+      where: { projectId },
+      include: { memorySource: true },
+    });
+    // Also fetch user-level sources not linked to any project
+    const globalSources = await prisma.memorySource.findMany({
+      where: { userId, projectId: null },
+      orderBy: { createdAt: 'desc' },
+    });
+    // Flatten and merge
+    const sources = [
+      ...projectSources.map(ps => ps.memorySource),
+      ...globalSources.filter(gs => !projectSources.some(ps => ps.memorySource.id === gs.id)),
+    ];
+    return NextResponse.json(sources);
+  } else {
+    // No projectId: return all sources owned by the user
+    const sources = await prisma.memorySource.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+    return NextResponse.json(sources);
+  }
 }
 
 export async function POST(req: NextRequest) {

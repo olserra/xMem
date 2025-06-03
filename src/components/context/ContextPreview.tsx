@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trash, Star, MoveUp, MoveDown, MoveHorizontal } from 'lucide-react';
+import { Trash, Star, MoveUp, MoveDown, MoveHorizontal, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface ContextItem {
   id: string;
@@ -16,21 +16,32 @@ interface ContextPreviewProps {
   maxSize: number;
   currentSize: number;
   projectId: string;
-  sourceId: string;
+  sourceIds: string[];
   collection?: string;
+  query: string;
   onContextItemsLoaded?: (items: ContextItem[]) => void;
 }
 
-const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceId, collection = 'xmem_collection', onContextItemsLoaded }) => {
+const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, currentSize, projectId, sourceIds, collection = 'xmem_collection', query, onContextItemsLoaded }) => {
   const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [feedbacks, setFeedbacks] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    // TODO: Update API to support filtering by projectId/sourceId if needed
-    fetch(`/api/qdrant-queries?collection=${encodeURIComponent(collection)}`)
+    fetch(`/api/context-preview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId,
+        sourceIds,
+        collection,
+        method,
+        query
+      })
+    })
       .then(res => res.json())
       .then(data => {
         setContextItems(data.queries || []);
@@ -38,7 +49,16 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
       })
       .catch(() => setError('Failed to load context items'))
       .finally(() => setLoading(false));
-  }, [projectId, sourceId, collection, onContextItemsLoaded]);
+  }, [projectId, sourceIds, collection, method, query, onContextItemsLoaded]);
+
+  const handleFeedback = async (itemId: string, source: string, value: number) => {
+    setFeedbacks(fb => ({ ...fb, [itemId]: value }));
+    await fetch('/api/context-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId, source, value }),
+    });
+  };
 
   // Calculate usage percentage
   const usagePercentage = (currentSize / maxSize) * 100;
@@ -103,6 +123,24 @@ const ContextPreview: React.FC<ContextPreviewProps> = ({ method, maxSize, curren
                     </button>
                   </>
                 )}
+
+                {/* Feedback buttons */}
+                <button
+                  className={`p-1 ${feedbacks[item.id] === 1 ? 'text-emerald-600' : 'text-slate-400 hover:text-emerald-600'} cursor-pointer`}
+                  title="Mark as relevant"
+                  onClick={() => handleFeedback(item.id, item.source || '', 1)}
+                  disabled={feedbacks[item.id] === 1}
+                >
+                  <ThumbsUp size={14} />
+                </button>
+                <button
+                  className={`p-1 ${feedbacks[item.id] === -1 ? 'text-rose-600' : 'text-slate-400 hover:text-rose-600'} cursor-pointer`}
+                  title="Mark as not relevant"
+                  onClick={() => handleFeedback(item.id, item.source || '', -1)}
+                  disabled={feedbacks[item.id] === -1}
+                >
+                  <ThumbsDown size={14} />
+                </button>
 
                 <button className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer" title="Remove from context">
                   <Trash size={14} />

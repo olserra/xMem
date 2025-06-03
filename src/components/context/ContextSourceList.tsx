@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Database } from 'lucide-react';
 
 interface ContextSourceListProps {
-  selectedSource: string;
-  onSourceSelect: (sourceId: string) => void;
+  selectedSources: string[];
+  onSourcesChange: (sourceIds: string[]) => void;
   projectId: string;
   searchTerm?: string;
 }
@@ -15,8 +15,8 @@ interface Source {
 }
 
 const ContextSourceList: React.FC<ContextSourceListProps> = ({
-  selectedSource,
-  onSourceSelect,
+  selectedSources,
+  onSourcesChange,
   projectId,
   searchTerm = ''
 }) => {
@@ -46,16 +46,24 @@ const ContextSourceList: React.FC<ContextSourceListProps> = ({
       <ul className="py-2">
         {filteredSources.map((source) => (
           <li key={source.id}>
-            <button
-              onClick={() => onSourceSelect(source.id)}
-              className={`flex items-center justify-between w-full px-4 py-3 text-sm ${selectedSource === source.id
-                ? 'bg-indigo-50 text-indigo-700'
-                : 'text-slate-700 hover:bg-slate-50'
-                }`}
-            >
+            <label className={`flex items-center justify-between w-full px-4 py-3 text-sm cursor-pointer ${selectedSources.includes(source.id)
+              ? 'bg-indigo-50 text-indigo-700'
+              : 'text-slate-700 hover:bg-slate-50'
+              }`}>
               <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-md flex items-center justify-center bg-slate-100 ${selectedSource === source.id ? 'bg-indigo-100' : ''
-                  }`}>
+                <input
+                  type="checkbox"
+                  checked={selectedSources.includes(source.id)}
+                  onChange={e => {
+                    if (e.target.checked) {
+                      onSourcesChange([...selectedSources, source.id]);
+                    } else {
+                      onSourcesChange(selectedSources.filter(id => id !== source.id));
+                    }
+                  }}
+                  className="mr-2 accent-indigo-600"
+                />
+                <div className={`h-8 w-8 rounded-md flex items-center justify-center bg-slate-100 ${selectedSources.includes(source.id) ? 'bg-indigo-100' : ''}`}>
                   <Database size={16} className="text-indigo-600" />
                 </div>
                 <span>{source.collection}</span>
@@ -63,7 +71,7 @@ const ContextSourceList: React.FC<ContextSourceListProps> = ({
               <span className="bg-slate-100 px-2 py-0.5 rounded-full text-xs text-slate-600">
                 {source.itemCount ?? 0}
               </span>
-            </button>
+            </label>
           </li>
         ))}
       </ul>

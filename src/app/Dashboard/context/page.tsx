@@ -166,7 +166,7 @@ export default function ContextPage() {
                 </div>
             )}
             {!loading && !error && projects.length > 0 && dashboardContent}
-            {showModal && isClient && ReactDOM.createPortal(
+            {showModal && typeof window !== 'undefined' && ReactDOM.createPortal(
                 <ProjectModal
                     mode={modalMode}
                     name={modalName}

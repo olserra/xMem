@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../prisma/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/auth';
-import { ContextPreviewRequest, ContextPreviewResult, ContextItem } from '../../dashboard/context/types';
+import { ContextPreviewRequest, ContextPreviewResult, ContextItem } from '../../../types/context';
 import { QdrantAdapter } from '../../../backend/adapters/qdrant';
 import { PineconeAdapter } from '../../../backend/adapters/pinecone';
 import { ChromaDBAdapter } from '../../../backend/adapters/chromadb';

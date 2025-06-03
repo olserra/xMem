@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import ContextManager from '../../ContextManager';
 import { PlusCircle, Edit, Trash2, Check, X } from 'lucide-react';
 import { useSession, signIn } from 'next-auth/react';
-import { Project } from './types';
+import { Project } from '../../../types/context';
 
 export default function ContextPage() {
     const { status } = useSession();

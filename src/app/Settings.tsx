@@ -41,6 +41,7 @@ const Settings: React.FC = () => {
   const [showKeyId, setShowKeyId] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
   // Fetch API keys
   useEffect(() => {
@@ -108,9 +109,13 @@ const Settings: React.FC = () => {
   };
 
   // Copy key to clipboard
-  const handleCopy = async (key: string) => {
+  const handleCopy = async (key: string, id?: string) => {
     try {
       await navigator.clipboard.writeText(key);
+      if (id) {
+        setCopiedKeyId(id);
+        setTimeout(() => setCopiedKeyId(null), 2000);
+      }
     } catch {
       setError('Failed to copy key');
     }
@@ -299,15 +304,34 @@ const Settings: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{new Date(key.createdAt).toLocaleDateString()}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{key.lastUsed ? new Date(key.lastUsed).toLocaleString() : <span className="text-slate-300">Never</span>}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                            <button className="text-indigo-600 hover:text-indigo-900 cursor-pointer" onClick={() => handleShowKey(key.id)}>
-                              {showKeyId === key.id ? <EyeOff size={16} /> : <Eye size={16} />} {showKeyId === key.id ? 'Hide' : 'View'}
-                            </button>
-                            {showKeyId === key.id && (
-                              <span className="font-mono bg-slate-100 px-2 py-1 rounded ml-2 cursor-pointer" onClick={() => handleCopy(key.key)}>{key.key}</span>
-                            )}
-                            <button className="text-slate-600 hover:text-slate-900 cursor-pointer" onClick={() => handleCopy(key.key)}><Copy size={16} /></button>
-                            <button className="text-rose-600 hover:text-rose-900 cursor-pointer" onClick={() => handleRevokeKey(key.id)}><Trash2 size={16} /> Revoke</button>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex flex-wrap gap-2 items-center">
+                              <button
+                                className={`flex items-center gap-1 px-3 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs cursor-pointer transition-colors ${showKeyId === key.id ? 'ring-2 ring-indigo-400' : ''}`}
+                                onClick={() => handleShowKey(key.id)}
+                                aria-label={showKeyId === key.id ? 'Hide Key' : 'View Key'}
+                              >
+                                {showKeyId === key.id ? <EyeOff size={16} /> : <Eye size={16} />} {showKeyId === key.id ? 'Hide' : 'View'}
+                              </button>
+                              {showKeyId === key.id && (
+                                <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs cursor-pointer select-all border border-slate-200" onClick={() => handleCopy(key.key, key.id)}>{key.key}</span>
+                              )}
+                              <button
+                                className="flex items-center gap-1 px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs cursor-pointer transition-colors"
+                                onClick={() => handleCopy(key.key, key.id)}
+                                aria-label="Copy Key"
+                                disabled={copiedKeyId === key.id}
+                              >
+                                <Copy size={16} /> {copiedKeyId === key.id ? 'Copied!' : 'Copy'}
+                              </button>
+                              <button
+                                className="flex items-center gap-1 px-3 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs cursor-pointer transition-colors"
+                                onClick={() => handleRevokeKey(key.id)}
+                                aria-label="Revoke Key"
+                              >
+                                <Trash2 size={16} /> Revoke
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

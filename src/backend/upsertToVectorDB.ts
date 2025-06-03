@@ -13,16 +13,16 @@ export async function upsertToVectorDB(
   const embedding = await embeddingService.embed(text);
   if (source.type === 'qdrant') {
     const adapter = new QdrantAdapter({ url: source.vectorDbUrl, collection: source.collection, apiKey: source.apiKey });
-    await adapter.addEmbedding({ id: metadata.id, embedding, metadata });
+    await adapter.addEmbedding({ id: typeof metadata.id === 'string' || typeof metadata.id === 'number' ? metadata.id : String(metadata.id), embedding, metadata });
   } else if (source.type === 'pinecone') {
     const adapter = new PineconeAdapter({ apiKey: source.apiKey, environment: source.vectorDbUrl, indexName: source.collection });
-    await adapter.addEmbedding({ id: metadata.id, embedding, metadata });
+    await adapter.addEmbedding({ id: String(metadata.id), embedding, metadata });
   } else if (source.type === 'chromadb') {
     const adapter = new ChromaDBAdapter({ url: source.vectorDbUrl, collection: source.collection, apiKey: source.apiKey });
-    await adapter.addEmbedding({ id: metadata.id, embedding, metadata });
+    await adapter.addEmbedding({ id: String(metadata.id), embedding, metadata });
   } else if (source.type === 'mongodb') {
     const adapter = new MongoDBVectorAdapter({ uri: source.vectorDbUrl, dbName: source.metric || 'xmem', collectionName: source.collection });
-    await adapter.addEmbedding({ id: metadata.id, embedding, metadata });
+    await adapter.addEmbedding({ id: String(metadata.id), embedding, metadata });
   } else {
     throw new Error('Unsupported vector DB type: ' + source.type);
   }

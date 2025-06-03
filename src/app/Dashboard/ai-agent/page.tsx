@@ -12,7 +12,7 @@ export interface AIAgentPageProps {
     defaultModelId: string;
 }
 
-export function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
+function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
     const [sources, setSources] = useState<Source[]>([]); // All available sources
     const [selectedSources, setSelectedSources] = useState<string[]>([]); // Selected source IDs
     const [chat, setChat] = useState<{ role: string; content: string }[]>([]);

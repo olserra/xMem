@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // ...existing config
   ignores: [
     'node_modules',
@@ -9,6 +9,8 @@ module.exports = {
     'build',
     '**/*.d.ts',
     '**/*.test.*',
+    'src/generated/prisma/**',
+    'src/generated/prisma/runtime/**',
   ],
   // ...rest of your config
 }; 

@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Zap, Database, MessageSquare, Sparkles, Users, Clock, Cpu, ArrowRight } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
-import Header from './Header';
 import Footer from '../components/layout/Footer';
 import SessionProviderWrapper from '../components/SessionProviderWrapper';
+import LandingHeader from './LandingHeader';
 
 export const handleSignIn = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -49,7 +49,7 @@ const Landing: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
-            <Header />
+            <LandingHeader />
             {/* Hero Section */}
             <div className="container mx-auto px-6 py-20 flex flex-col items-center text-center">
                 <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Memory Orchestrator for LLMs</h1>

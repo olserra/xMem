@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { orchestrator } from '@/backend/orchestrator';
 import type { LLMProvider } from '@/backend/xmem';
 import { OpenAIAdapter } from '@/backend/adapters/openai';
-import { prisma } from '../../../../prisma/prisma';
+import { prisma } from '@prisma/prisma';
 import { QdrantAdapter } from '@/backend/adapters/qdrant';
 import { ChromaDBAdapter } from '@/backend/adapters/chromadb';
 import { PineconeAdapter } from '@/backend/adapters/pinecone';

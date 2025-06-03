@@ -1,4 +1,4 @@
-import { prisma } from '../../../../prisma/prisma';
+import { prisma } from '@prisma/prisma';
 import { NextRequest } from 'next/server';
 
 export async function logAudit({

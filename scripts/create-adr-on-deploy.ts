@@ -23,12 +23,12 @@ const content = `# [ADR-${timestamp}] Automated Deploy Record
 - **Status:** Accepted
 - **Date:** ${dateStr}
 - **Context:**
-  - Automated ADR for deploy on branch \\`${branch}\\` by \\`${actor}\\`, commit \\`${commit}\\`.
+  - Automated ADR for deploy on branch \`${branch}\` by \`${actor}\`, commit \`${commit}\`.
   - [View GitHub Actions Run](${runUrl})
 - **Decision:**
-  - Deployed to branch \\`${branch}\\`.
+  - Deployed to branch \`${branch}\`.
 - **Consequences:**
-  - Production updated with latest changes from commit \\`${commit}\\`.
+  - Production updated with latest changes from commit \`${commit}\`.
 - **Related:**
   - [Commit on GitHub](https://github.com/${repo}/commit/${commit})
 `;

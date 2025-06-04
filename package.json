@@ -42,6 +42,7 @@
     "dotenv": "^16.5.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "markdownlint-cli": "^0.45.0",
     "node-fetch": "2",
     "postcss": "^8.5.3",
     "prisma": "^6.8.2",

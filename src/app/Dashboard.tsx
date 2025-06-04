@@ -23,6 +23,7 @@ interface MemorySource {
   vectorDbUrl: string;
   apiKey: string;
   type: string;
+  projectId?: string;
   [key: string]: unknown;
 }
 

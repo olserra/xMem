@@ -5,6 +5,7 @@ import ContextManager from '../../ContextManager';
 import { PlusCircle, Edit, Trash2, Check, X } from 'lucide-react';
 import { useSession, signIn } from 'next-auth/react';
 import { Project } from '../../../types/context';
+import { Database } from 'lucide-react';
 
 export default function ContextPage() {
     const { status } = useSession();
@@ -19,6 +20,7 @@ export default function ContextPage() {
     const [error, setError] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [isClient, setIsClient] = useState(false);
+    const [sources, setSources] = useState<any[]>([]);
 
     const fetchProjects = useCallback(() => {
         setLoading(true);
@@ -51,6 +53,14 @@ export default function ContextPage() {
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
+
+    useEffect(() => {
+        if (!selectedProject) return setSources([]);
+        fetch(`/api/vector-sources?projectId=${selectedProject}`)
+            .then(res => res.json())
+            .then(data => setSources(data || []))
+            .catch(() => setSources([]));
+    }, [selectedProject]);
 
     useEffect(() => { setIsClient(true); }, []);
 
@@ -92,31 +102,49 @@ export default function ContextPage() {
     // Memoize dashboard content to avoid re-renders from modal state
     const dashboardContent = useMemo(() => (
         <div className="space-y-6">
-            <div className="flex items-center gap-4 p-4">
-                <label className="text-sm font-medium text-slate-700">Project:</label>
-                <select
-                    value={selectedProject || ''}
-                    onChange={e => setSelectedProject(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
-                >
-                    {projects.map((p: Project) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                </select>
-                <button onClick={openCreateModal} className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0"><PlusCircle size={16} /> New</button>
-                {selectedProject && (
-                    <>
-                        <button onClick={() => {
-                            const project = projects.find((p: Project) => p.id === selectedProject);
-                            if (project) openEditModal(project);
-                        }} className="ml-2 px-2 py-1 bg-slate-200 text-slate-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0"><Edit size={16} /> Rename</button>
-                        <button onClick={() => handleDelete(selectedProject)} className="ml-2 px-2 py-1 bg-rose-100 text-rose-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0" disabled={deleting === selectedProject}><Trash2 size={16} /> {deleting === selectedProject ? 'Deleting...' : 'Delete'}</button>
-                    </>
-                )}
+            <div className="flex items-center p-4 w-full">
+                <div className="flex items-center gap-4 flex-shrink-0">
+                    <label className="text-sm font-medium text-slate-700">Project:</label>
+                    <select
+                        value={selectedProject || ''}
+                        onChange={e => setSelectedProject(e.target.value)}
+                        className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-9"
+                    >
+                        {projects.map((p: Project) => (
+                            <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                    </select>
+                    {selectedProject && (
+                        <>
+                            <button onClick={() => {
+                                const project = projects.find((p: Project) => p.id === selectedProject);
+                                if (project) openEditModal(project);
+                            }} className="ml-2 px-2 py-1 bg-slate-200 text-slate-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0"><Edit size={16} /> Rename</button>
+                            <button onClick={() => handleDelete(selectedProject)} className="ml-2 px-2 py-1 bg-rose-100 text-rose-700 rounded flex items-center gap-1 cursor-pointer text-sm h-9 min-w-[80px] flex-shrink-0" disabled={deleting === selectedProject}><Trash2 size={16} /> {deleting === selectedProject ? 'Deleting...' : 'Delete'}</button>
+                        </>
+                    )}
+                </div>
+                <div className="flex-1 flex justify-end">
+                    <button onClick={openCreateModal} className="px-4 py-2 bg-indigo-600 text-white rounded flex items-center gap-2 cursor-pointer text-sm h-9 min-w-[120px]"><PlusCircle size={16} /> Create Project</button>
+                </div>
             </div>
-            {selectedProject && !showModal && <ContextManager projectId={selectedProject} />}
+            {selectedProject && !showModal && (
+                sources.length === 0 ? (
+                    <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full text-center text-slate-400">
+                        No memory sources connected. Please{' '}
+                        <a
+                            href="/dashboard/memory"
+                            className="text-indigo-600 underline hover:text-indigo-800 transition-colors"
+                        >
+                            add a source
+                        </a>{' '}to view dashboard data.
+                    </div>
+                ) : (
+                    <ContextManager projectId={selectedProject} />
+                )
+            )}
         </div>
-    ), [projects, selectedProject, deleting, showModal, handleDelete]);
+    ), [projects, selectedProject, deleting, showModal, handleDelete, sources]);
 
     if (status === 'unauthenticated') {
         return (
@@ -158,9 +186,9 @@ export default function ContextPage() {
             {loading && <div className="p-8 text-center text-slate-500">Loading projects...</div>}
             {error && <div className="p-8 text-center text-red-600">{error}</div>}
             {!loading && !error && !projects.length && (
-                <div className="p-8 text-center text-slate-500">
-                    No projects found.<br />
-                    <button onClick={openCreateModal} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center justify-between p-8 w-full">
+                    <div className="text-slate-500 text-lg">No projects found.</div>
+                    <button onClick={openCreateModal} className="px-4 py-2 bg-indigo-600 text-white rounded flex items-center gap-2 cursor-pointer text-sm h-9 min-w-[120px]">
                         <PlusCircle size={16} /> Create Project
                     </button>
                 </div>

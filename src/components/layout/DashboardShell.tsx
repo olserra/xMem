@@ -23,6 +23,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     else if (pathname.startsWith("/dashboard/context")) currentPage = "context";
     else if (pathname.startsWith("/dashboard/integrationhub")) currentPage = "integrationhub";
     else if (pathname.startsWith("/dashboard/settings")) currentPage = "settings";
+    else if (pathname.startsWith("/dashboard/ai-agent")) currentPage = "ai-agent";
     else if (pathname.startsWith("/dashboard")) currentPage = "dashboard";
 
     return (

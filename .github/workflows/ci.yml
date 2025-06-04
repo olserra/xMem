@@ -75,61 +75,6 @@ jobs:
       # - name: Deploy Docs
       #   run: pnpm docs:deploy # Uncomment and configure if deploying docs
 
-  # Build & Release job (example for npm, Docker, or other artifacts)
-  release:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 10.7.1
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-      # - name: Publish to npm
-      #   run: pnpm publish --access public # Uncomment and configure if publishing
-      # - name: Build & Push Docker Image
-      #   run: echo "Docker build step here" # Uncomment and configure if using Docker
-      - name: Generate ADR for Deploy
-        run: pnpm adr:deploy
-        env:
-          GITHUB_REF: ${{ github.ref }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-      - name: Commit and Push ADR
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/adr/ADR-*.md
-          git commit -m "chore(adr): add automated ADR for deploy [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install PlantUML
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y plantuml
-      - name: Generate SVG from PlantUML
-        run: plantuml -tsvg docs/architecture.puml
-      - name: Commit and Push Architecture SVG
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/architecture.svg
-          git commit -m "chore(arch): update architecture.svg [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   # Preview Deployment (example for Vercel/Netlify/other)
   preview-deploy:
     runs-on: ubuntu-latest

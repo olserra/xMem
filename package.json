@@ -12,8 +12,7 @@
     "sync:version": "pnpm exec tsx scripts/sync-version.ts",
     "prebuild": "pnpm exec tsx scripts/sync-version.ts",
     "adr:deploy": "tsx scripts/create-adr-on-deploy.ts",
-    "arch:puml": "tsx scripts/generate-architecture-puml.ts",
-    "docs:generate": "pnpm adr:deploy && pnpm arch:puml"
+    "docs:generate": "pnpm adr:deploy"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",

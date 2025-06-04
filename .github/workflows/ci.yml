@@ -45,3 +45,160 @@ jobs:
             -X POST \
             -d "{\"content\":\":x: CI failed for ${GITHUB_REPOSITORY} on branch ${GITHUB_REF} by ${GITHUB_ACTOR}. [View run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})\"}" \
             https://discord.com/api/webhooks/1379509677397905408/Ky0S_msUGa9Sd8LynjoFtuYft3IgCq8HiUwSEPu3G65t-8peMYW5ESIcSFK_4LqSt-17
+
+  test:
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run Tests
+        run: pnpm test
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run Coverage
+        run: pnpm coverage # Assumes you have a coverage script
+      # - name: Upload Coverage Report
+      #   uses: codecov/codecov-action@v4 # Uncomment and configure if using Codecov
+
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=moderate
+      # - name: Run osv-scanner (optional)
+      #   run: osv-scanner --lockfile=pnpm-lock.yaml --format=text # Uncomment if using osv-scanner
+
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check Formatting
+        run: pnpm format:check # Assumes you have a format:check script
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run ESLint
+        run: pnpm lint
+      - name: SonarCloud Scan # Replaces Codecov
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
+      # - name: Run SonarQube Scanner (optional)
+      #   run: sonar-scanner # Uncomment and configure if using SonarQube
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check for Outdated Dependencies
+        run: pnpm outdated
+
+  performance-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run Benchmarks
+        run: pnpm benchmark # Assumes you have a benchmark script
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate Docs
+        run: pnpm docs # Assumes you have a docs script
+      # - name: Deploy Docs
+      #   run: pnpm docs:deploy # Uncomment and configure if deploying docs
+
+  # Build & Release job (example for npm, Docker, or other artifacts)
+  release:
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.7.1
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      # - name: Publish to npm
+      #   run: pnpm publish --access public # Uncomment and configure if publishing
+      # - name: Build & Push Docker Image
+      #   run: echo "Docker build step here" # Uncomment and configure if using Docker
+
+  # Preview Deployment (example for Vercel/Netlify/other)
+  preview-deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      # - name: Deploy Preview (Vercel/Netlify/etc)
+      #   run: echo "Preview deploy step here" # Uncomment and configure for your provider
+      #   env:
+      #     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} # Example for Vercel

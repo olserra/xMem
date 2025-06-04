@@ -209,7 +209,13 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {memorySources.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full text-center text-slate-400">
-          No memory sources connected. Please add a source to view dashboard data.
+          No memory sources connected. Please{' '}
+          <a
+            href="/dashboard/memory"
+            className="text-indigo-600 underline hover:text-indigo-800 transition-colors"
+          >
+            add a source
+          </a>{' '}to view dashboard data.
         </div>
       )}
       {/* Collection selector */}

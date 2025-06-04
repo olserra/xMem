@@ -22,6 +22,7 @@ interface MemorySource {
   collection: string;
   metric?: string;
   dimensions?: number;
+  projectId?: string;
 }
 
 interface MemorySettings {
@@ -404,6 +405,17 @@ const MemoryManager: React.FC = () => {
 
   // Fetch memory sources from backend on mount
   useEffect(() => {
+    // Set projectId in localStorage if not already set
+    if (typeof window !== 'undefined' && window.localStorage) {
+      let projectId = window.localStorage.getItem('projectId');
+      if (!projectId && memorySources.length > 0) {
+        // Try to get from the first memory source
+        const firstProjectId = memorySources[0]?.projectId;
+        if (firstProjectId) {
+          window.localStorage.setItem('projectId', firstProjectId);
+        }
+      }
+    }
     const fetchSources = async () => {
       setLoading(true);
       try {
@@ -763,7 +775,11 @@ const MemoryManager: React.FC = () => {
         <div className="px-6 py-4 border-b border-slate-200">
           <h2 className="font-semibold text-lg text-slate-800">Recent Memory Items</h2>
         </div>
-        <MemoryItemList />
+        {memorySources.length === 0 ? (
+          <div className="px-6 py-4 text-slate-400">No memory sources connected. Please add a source to view memory items.</div>
+        ) : (
+          <MemoryItemList />
+        )}
       </div>
       {/* Edit/Add modal */}
       <MemorySettingsModal

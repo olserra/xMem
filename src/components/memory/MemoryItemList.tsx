@@ -45,7 +45,10 @@ const MemoryItemList: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('/api/qdrant-queries');
+        const params = new URLSearchParams();
+        const projectId = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem('projectId') : undefined;
+        if (projectId) params.append('projectId', projectId);
+        const res = await fetch(`/api/qdrant-queries?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to fetch memory items');
         const data = await res.json();
         const allItems = data.queries || [];

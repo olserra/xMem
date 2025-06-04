@@ -55,8 +55,21 @@ const Dashboard: React.FC = () => {
     fetchSources();
   }, []);
 
+  // Set projectId in localStorage if not already set
+  if (typeof window !== 'undefined' && window.localStorage) {
+    let projectId = window.localStorage.getItem('projectId');
+    if (!projectId && memorySources.length > 0) {
+      // Try to get from the first memory source
+      const firstProjectId = memorySources[0]?.projectId;
+      if (firstProjectId) {
+        window.localStorage.setItem('projectId', firstProjectId);
+      }
+    }
+  }
+
   // Fetch all queries and their tags once on dashboard load
   useEffect(() => {
+    if (memorySources.length === 0) return;
     const fetchTagsForAllQueries = async () => {
       try {
         const res = await fetch('/api/qdrant-queries');
@@ -89,9 +102,10 @@ const Dashboard: React.FC = () => {
       } catch { }
     };
     fetchTagsForAllQueries();
-  }, [setBulkTags]);
+  }, [setBulkTags, memorySources]);
 
   useEffect(() => {
+    if (memorySources.length === 0) return;
     // Fetch metrics for the selected collection or all
     const fetchMetrics = async () => {
       setLoadingMetrics(true);
@@ -157,7 +171,7 @@ const Dashboard: React.FC = () => {
       }
       setLoadingMetrics(false);
     };
-    if (memorySources.length > 0) fetchMetrics();
+    fetchMetrics();
   }, [collection, memorySources]);
 
   const metrics: MetricCardProps[] = [
@@ -193,6 +207,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
+      {memorySources.length === 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full text-center text-slate-400">
+          No memory sources connected. Please add a source to view dashboard data.
+        </div>
+      )}
       {/* Collection selector */}
       <div className="flex flex-col sm:flex-row items-center gap-4 p-4 w-full max-w-full">
         <label className="text-sm font-medium text-slate-700">Collection:</label>

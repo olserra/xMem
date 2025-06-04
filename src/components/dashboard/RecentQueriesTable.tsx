@@ -54,7 +54,10 @@ const RecentQueriesTable: React.FC<RecentQueriesTableProps> = ({ collection = 'x
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/qdrant-queries?collection=${encodeURIComponent(collection)}`);
+        const params = new URLSearchParams({ collection: collection || '' });
+        const projectId = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem('projectId') : undefined;
+        if (projectId) params.append('projectId', projectId);
+        const res = await fetch(`/api/qdrant-queries?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setRecentQueries(data.queries || []);

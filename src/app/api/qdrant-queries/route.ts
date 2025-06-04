@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/auth';
+import { prisma } from '@prisma/prisma';
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = session.user.id;
   const { searchParams } = new URL(req.url);
   const relevanceOnly = searchParams.get('relevanceOnly') === 'true';
   const collection = searchParams.get('collection') || process.env.NEXT_PUBLIC_QDRANT_COLLECTION || 'xmem_collection';
@@ -9,6 +17,35 @@ export async function GET(req: NextRequest) {
   const apiKey = searchParams.get('apiKey');
   const type = searchParams.get('type');
   const limit = parseInt(searchParams.get('limit') || '20', 10);
+  const projectId = searchParams.get('projectId');
+
+  // Fetch allowed sources for this user (and project, if provided)
+  let allowedSources = [];
+  if (projectId) {
+    // Project sources + user-level sources
+    const projectSources = await prisma.projectMemorySource.findMany({
+      where: { projectId },
+      include: { memorySource: true },
+    });
+    const globalSources = await prisma.memorySource.findMany({
+      where: { userId, projectId: null },
+      orderBy: { createdAt: 'desc' },
+    });
+    allowedSources = [
+      ...projectSources.map(ps => ps.memorySource),
+      ...globalSources.filter(gs => !projectSources.some(ps => ps.memorySource.id === gs.id)),
+    ];
+  } else {
+    allowedSources = await prisma.memorySource.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+  // Only allow access to collections the user owns
+  const allowedCollections = allowedSources.map(s => s.collection);
+  if (!allowedCollections.includes(collection)) {
+    return NextResponse.json({ queries: [] });
+  }
 
   // Default to Qdrant env vars if not provided
   const baseUrl = vectorDbUrl || process.env.NEXT_PUBLIC_QDRANT_URL;

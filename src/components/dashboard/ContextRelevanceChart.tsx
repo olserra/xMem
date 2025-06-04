@@ -28,6 +28,8 @@ const ContextRelevanceChart: React.FC<ContextRelevanceChartProps> = ({ collectio
         if (vectorDbUrl) params.append('vectorDbUrl', vectorDbUrl);
         if (apiKey) params.append('apiKey', apiKey);
         if (type) params.append('type', type);
+        const projectId = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem('projectId') : undefined;
+        if (projectId) params.append('projectId', projectId);
         const res = await fetch(`/api/qdrant-queries?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();

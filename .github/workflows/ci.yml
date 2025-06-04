@@ -114,8 +114,10 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate PlantUML Architecture Diagram
-        run: pnpm arch:puml
+      - name: Install PlantUML
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y plantuml
       - name: Generate SVG from PlantUML
         run: plantuml -tsvg docs/architecture.puml
       - name: Commit and Push Architecture SVG

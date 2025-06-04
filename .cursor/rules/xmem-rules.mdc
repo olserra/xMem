@@ -6,7 +6,7 @@ alwaysApply: false
 # xmem Cursor Rules
 
 ## 1. Project Philosophy & Architecture
-- xmem is a memory orchestrator for LLMs, combining long-term (vector DB) and short-term (context/session) memory, with advanced RAG (retrieval-augmented generation) logic. All design and code should maximize xmem’s value and future-proof it in the LLM ecosystem.
+- xmem is a memory orchestrator for LLMs, combining long-term (vector DB) and short-term (context/session) memory, with advanced RAG (retrieval-augmented generation) logic. All design and code should maximize xmem's value and future-proof it in the LLM ecosystem.
 - Always prefer open-source solutions and APIs, especially for LLMs (e.g., Llama, Ollama, vLLM, etc.). Avoid proprietary or closed-source dependencies unless absolutely necessary.
 - Decouple logic for reusability and maintainability. Centralize reusable functions, constants, types, and interfaces.
 
@@ -61,6 +61,8 @@ alwaysApply: false
 - Document all public functions, types, and components with JSDoc or TSDoc.
 - Maintain a clear and up-to-date README and CONTRIBUTING guide.
 - Add comments for any non-obvious code, especially workarounds for framework quirks (e.g., hydration issues).
+- All architectural decisions must be recorded as ADRs (Architecture Decision Records) in `/docs/adr` using Markdown. Every deploy (pipeline run) must generate a new ADR file with a timestamp and deploy info.
+- The ADR and SAD (Software Architecture Document) files in the codebase are the source of truth for architectural decisions and system design. Notion or other tools may reference these, but the repo is canonical.
 
 ## 12. General Best Practices
 - Always check for existing solutions before building new ones.

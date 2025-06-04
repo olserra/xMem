@@ -68,7 +68,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Generate Docs
-        run: pnpm docs # Assumes you have a docs script
+        run: pnpm docs:generate
       # - name: Deploy Docs
       #   run: pnpm docs:deploy # Uncomment and configure if deploying docs
 

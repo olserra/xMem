@@ -68,3 +68,4 @@ alwaysApply: false
 - Always check for existing solutions before building new ones.
 - Follow the most common and recommended approaches used by top AI and Next.js engineers.
 - Prioritize code readability, maintainability, and simplicity over cleverness.
+- Always try to fix warnings that appears for us on terminal and logs.

@@ -9,14 +9,40 @@ function getUserId(session: Session | null): string | null {
   return session?.user && session.user.id ? session.user.id : null;
 }
 
-// GET: List all sessions for the user (stub, as session listing may depend on backend)
-export async function GET() {
+// GET: Fetch a session by sessionId query param or list all sessions
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = getUserId(session);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  // If your session store supports listing, implement here. Otherwise, return not implemented.
+  const { searchParams } = new URL(req.url);
+  const sessionId = searchParams.get('sessionId');
+  const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
+  if (sessionId) {
+    const sessionObj = await sessionProvider.getSession(sessionId);
+    if (!sessionObj) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+    // Only return memory fields, not userId
+    const { userId: _userId, ...memoryData } = sessionObj;
+    return NextResponse.json({ memory: memoryData });
+  }
+  // List all sessions for the user
+  if (typeof (sessionProvider as any).listSessions === 'function') {
+    const sessions = await (sessionProvider as any).listSessions();
+    // Only return sessions for this user (if userId is present in memory)
+    const filtered = sessions.filter((s: any) => !s.memory.userId || s.memory.userId === userId);
+    // Return summary (id, createdAt, updatedAt, memory summary)
+    return NextResponse.json({
+      sessions: filtered.map((s: any) => ({
+        sessionId: s.sessionId,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+        memory: s.memory,
+      }))
+    });
+  }
   return NextResponse.json({ error: 'Session listing not implemented' }, { status: 501 });
 }
 
@@ -52,4 +78,4 @@ export async function DELETE(req: NextRequest) {
   const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
   await sessionProvider.deleteSession(sessionId);
   return NextResponse.json({ success: true });
-} 
+}

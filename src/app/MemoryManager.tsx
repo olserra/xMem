@@ -4,6 +4,7 @@ import { Database } from 'lucide-react';
 import MemorySourceCard from '../components/memory/MemorySourceCard';
 import MemoryItemList from '../components/memory/MemoryItemList';
 import SessionMemoryManager from '../components/memory/SessionMemoryManager';
+import SessionMemoryItemList from '../components/memory/SessionMemoryItemList';
 import Image from 'next/image';
 
 interface MemorySource {
@@ -372,6 +373,23 @@ const MemoryManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isAddMode, setIsAddMode] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  // Add refresh state
+  const [sessionMemoryRefresh, setSessionMemoryRefresh] = useState(0);
+
+  // Handle session list actions
+  const handleSelectSession = (id: string) => {
+    setActiveSessionId(id);
+  };
+  const handleDeleteSession = async (id: string) => {
+    await fetch('/api/sessions', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: id }),
+    });
+    setSessionMemoryRefresh(r => r + 1);
+    if (activeSessionId === id) setActiveSessionId(null);
+  };
 
   // Helper to show error for 5 seconds
   const showError = (msg: string) => {
@@ -747,7 +765,10 @@ const MemoryManager: React.FC = () => {
 
       {/* Memory sources grid */}
       {activeTab === 'session' ? (
-        <SessionMemoryManager />
+        <SessionMemoryManager
+          onSessionChange={setActiveSessionId}
+          onSessionMemorySaved={() => setSessionMemoryRefresh(r => r + 1)}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Removed Template Card for new users */}
@@ -775,7 +796,14 @@ const MemoryManager: React.FC = () => {
         <div className="px-6 py-4 border-b border-slate-200">
           <h2 className="font-semibold text-lg text-slate-800">Recent Memory Items</h2>
         </div>
-        {memorySources.length === 0 ? (
+        {activeTab === 'session' ? (
+          <SessionMemoryItemList
+            sessionId={activeSessionId}
+            refresh={sessionMemoryRefresh}
+            onSelectSession={handleSelectSession}
+            onDeleteSession={handleDeleteSession}
+          />
+        ) : memorySources.length === 0 ? (
           <div className="px-6 py-4 text-slate-400">No memory sources connected. Please add a source to view memory items.</div>
         ) : (
           <MemoryItemList />

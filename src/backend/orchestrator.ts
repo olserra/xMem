@@ -52,15 +52,33 @@ orchestrator.setDefaultProvider('vector', 'chromadb');
 
 // Simple in-memory session adapter for dev/demo (no persistence)
 class InMemorySessionAdapter {
-  private store: Record<string, Record<string, unknown>> = {};
+  private store: Record<string, { memory: Record<string, unknown>; createdAt: string; updatedAt: string } & Record<string, unknown>> = {};
   async getSession(sessionId: string) {
     return this.store[sessionId] || null;
   }
   async setSession(sessionId: string, data: Record<string, unknown>) {
-    this.store[sessionId] = data;
+    const now = new Date().toISOString();
+    if (!this.store[sessionId]) {
+      this.store[sessionId] = { memory: data, createdAt: now, updatedAt: now };
+    } else {
+      this.store[sessionId] = {
+        ...this.store[sessionId],
+        memory: data,
+        updatedAt: now
+      };
+    }
   }
   async deleteSession(sessionId: string) {
     delete this.store[sessionId];
+  }
+  async listSessions() {
+    // Return array of { sessionId, createdAt, updatedAt, memory }
+    return Object.entries(this.store).map(([id, value]) => ({
+      sessionId: id,
+      createdAt: value.createdAt,
+      updatedAt: value.updatedAt,
+      memory: value.memory
+    }));
   }
 }
 
@@ -89,4 +107,4 @@ if (!process.env.CHROMA_URL) {
   orchestrator.setDefaultProvider('vector', 'memory');
 }
 
-// TODO: Register vector and llm providers as needed 
+// TODO: Register vector and llm providers as needed

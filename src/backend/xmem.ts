@@ -61,12 +61,16 @@ export class XmemOrchestrator {
 
   async addMemory(memory: { id: string; text: string; metadata?: Record<string, unknown>; sessionId?: string; vectorProvider?: string; sessionProvider?: string; llmProvider?: string; embeddingModel?: string; collection?: string }) {
     const vectorStore = this.getProvider<VectorStore>('vector', memory.vectorProvider);
-    const sessionStore = this.getProvider<SessionStore>('session', memory.sessionProvider);
     const llmProvider = this.getProvider<LLMProvider>('llm', memory.llmProvider);
-
+    let sessionStore: SessionStore | undefined;
+    try {
+      sessionStore = this.getProvider<SessionStore>('session', memory.sessionProvider);
+    } catch {
+      sessionStore = undefined;
+    }
     const embedding = await llmProvider.embed(memory.text, memory.embeddingModel);
     await vectorStore.addEmbedding({ id: memory.id, embedding, metadata: memory.metadata, collection: memory.collection });
-    if (memory.sessionId) await sessionStore.setSession(memory.sessionId, memory as Record<string, unknown>);
+    if (memory.sessionId && sessionStore) await sessionStore.setSession(memory.sessionId, memory as Record<string, unknown>);
   }
 
   async getMemoryByEmbedding(query: string, opts?: { topK?: number; vectorProvider?: string; llmProvider?: string; embeddingModel?: string; collection?: string }) {
@@ -79,8 +83,13 @@ export class XmemOrchestrator {
   async deleteMemory(id: string, opts?: { sessionId?: string; vectorProvider?: string; sessionProvider?: string; collection?: string }) {
     const vectorStore = this.getProvider<VectorStore>('vector', opts?.vectorProvider);
     await vectorStore.deleteEmbedding(id, opts?.collection);
-    if (opts?.sessionId) {
-      const sessionStore = this.getProvider<SessionStore>('session', opts.sessionProvider);
+    let sessionStore: SessionStore | undefined;
+    try {
+      sessionStore = this.getProvider<SessionStore>('session', opts?.sessionProvider);
+    } catch {
+      sessionStore = undefined;
+    }
+    if (opts?.sessionId && sessionStore) {
       await sessionStore.deleteSession(opts.sessionId);
     }
   }

@@ -54,6 +54,7 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
                 setSuccess('Session memory saved.');
                 setLoadedSessionId(null); // Show the list after save
                 if (onSessionMemorySaved) onSessionMemorySaved();
+                setTimeout(() => setSuccess(null), 2000);
             } else {
                 setError('Failed to save session memory.');
                 if (onSessionMemorySaved) onSessionMemorySaved();

@@ -72,6 +72,17 @@ const DashboardHeader: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        if (!dropdownOpen) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [dropdownOpen]);
+
     const handleClick = () => {
         router.push('/');
     };
@@ -149,9 +160,14 @@ const DashboardHeader: React.FC = () => {
                             </button>
                             {dropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-40 bg-white text-slate-800 rounded-md shadow-lg z-20">
-                                    <div className="px-4 py-2 border-b border-slate-200 font-semibold">{user.name || user.email}</div>
+                                    <div className="px-4 py-2 border-b border-slate-200 font-semibold">
+                                        {user.name || user.email}
+                                        {user.email && user.name && (
+                                            <div className="text-xs text-slate-500 mt-1">{user.email}</div>
+                                        )}
+                                    </div>
                                     <button
-                                        className="w-full text-left px-4 py-2 hover:bg-slate-100"
+                                        className="w-full text-left px-4 py-2 text-xs font-bold text-rose-700 hover:bg-slate-100 cursor-pointer"
                                         onClick={async () => {
                                             await signOut({ callbackUrl: '/', redirect: false });
                                             window.location.href = '/';

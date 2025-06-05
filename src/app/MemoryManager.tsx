@@ -767,7 +767,10 @@ const MemoryManager: React.FC = () => {
       {activeTab === 'session' ? (
         <SessionMemoryManager
           onSessionChange={setActiveSessionId}
-          onSessionMemorySaved={() => setSessionMemoryRefresh(r => r + 1)}
+          onSessionMemorySaved={() => {
+            setActiveSessionId(null);
+            setSessionMemoryRefresh(r => r + 1);
+          }}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

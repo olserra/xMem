@@ -56,9 +56,11 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
                 if (onSessionMemorySaved) onSessionMemorySaved();
             } else {
                 setError('Failed to save session memory.');
+                if (onSessionMemorySaved) onSessionMemorySaved();
             }
         } catch {
             setError('Error saving session memory.');
+            if (onSessionMemorySaved) onSessionMemorySaved();
         } finally {
             setLoading(false);
         }

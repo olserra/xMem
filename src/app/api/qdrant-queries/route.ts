@@ -69,6 +69,18 @@ export async function GET(req: NextRequest) {
       with_vector: false,
     });
     try {
+      // Debug logging
+      console.log('[Qdrant-Queries] Fetching Qdrant points', {
+        url,
+        headers,
+        body,
+        baseUrl,
+        collection,
+        key,
+        dbType,
+        userId,
+        allowedCollections,
+      });
       const res = await fetch(url, { method: 'POST', headers, body });
       const text = await res.text();
       if (res.ok) {
@@ -105,9 +117,31 @@ export async function GET(req: NextRequest) {
         }));
         return NextResponse.json({ queries });
       }
-      return NextResponse.json({ queries: [] }, { status: 404 });
-    } catch {
-      return NextResponse.json({ error: 'Failed to fetch Qdrant queries' }, { status: 500 });
+      // Log error details if not ok
+      console.error('[Qdrant-Queries] Qdrant API error', {
+        status: res.status,
+        statusText: res.statusText,
+        response: text,
+        url,
+        headers,
+        body,
+      });
+      return NextResponse.json({ queries: [], error: 'Qdrant API error', status: res.status, statusText: res.statusText, response: text }, { status: 404 });
+    } catch (err) {
+      // Log fetch error
+      console.error('[Qdrant-Queries] Failed to fetch Qdrant queries', {
+        error: err,
+        url,
+        headers,
+        body,
+        baseUrl,
+        collection,
+        key,
+        dbType,
+        userId,
+        allowedCollections,
+      });
+      return NextResponse.json({ error: 'Failed to fetch Qdrant queries', details: String(err) }, { status: 500 });
     }
   } else if (dbType === 'pinecone' || baseUrl.toLowerCase().includes('pinecone')) {
     // Pinecone: fetch recent vectors (mock relevance scores from metadata.score)

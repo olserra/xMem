@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import type { Session } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/auth';
 import { prisma } from '../../../../prisma/prisma';
+import { orchestrator } from '@/backend/orchestrator';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {

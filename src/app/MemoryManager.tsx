@@ -378,7 +378,7 @@ const MemoryManager: React.FC = () => {
   const [sessionMemoryRefresh, setSessionMemoryRefresh] = useState(0);
 
   // Handle session list actions
-  const handleSelectSession = (id: string) => {
+  const handleSelectSession = (id: string | null) => {
     setActiveSessionId(id);
   };
   const handleDeleteSession = async (id: string) => {

@@ -8,6 +8,8 @@ import { ChromaDBAdapter } from '@/backend/adapters/chromadb';
 import { PineconeAdapter } from '@/backend/adapters/pinecone';
 import { MongoDBVectorAdapter } from '@/backend/adapters/mongodb';
 import { HuggingFaceEmbeddingService } from '@/backend/embeddingService';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/auth';
 
 interface AgentChatRequest {
   model: string;
@@ -16,6 +18,9 @@ interface AgentChatRequest {
   user_input: string;
   chatMemoryVectorProvider?: string;
   collection?: string;
+  userGoal?: string;
+  preferences?: Record<string, unknown>;
+  lastAction?: string;
 }
 
 interface AgentChatResponse {
@@ -42,15 +47,46 @@ if (
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    let userId = session?.user?.id || 'demo-user'; // fallback for demo
     const body = (await req.json()) as AgentChatRequest;
+    // Use a sessionId from the request or fallback
+    const sessionId = body.collection || 'agent-session';
+
+    // --- Load session memory ---
+    let sessionMemory = await prisma.sessionMemory.findUnique({
+      where: { userId_sessionId: { userId, sessionId } },
+    });
+    let memoryObj: any = sessionMemory?.memory || {
+      messages: [],
+      userGoal: '',
+      preferences: {},
+      lastAction: '',
+    };
+
+    // --- Update session memory with new user message ---
+    memoryObj.messages = memoryObj.messages || [];
+    memoryObj.messages.push({ role: 'user', content: body.user_input });
+    // Optionally update userGoal, preferences, lastAction if provided in body
+    if (body.userGoal) memoryObj.userGoal = body.userGoal;
+    if (body.preferences) memoryObj.preferences = body.preferences;
+    if (body.lastAction) memoryObj.lastAction = body.lastAction;
+
+    // --- Build context for LLM ---
+    const contextText = `Session Memory: ${JSON.stringify(memoryObj)}`;
+    const prompt = [
+      SYSTEM_PROMPT,
+      contextText,
+      `\nUser: ${body.user_input}`,
+      'Agent:'
+    ].join('\n');
+
     // Look up all selected sources
     const sourceIds = body.sources || [];
     const memorySources = sourceIds.length > 0
       ? await prisma.memorySource.findMany({ where: { id: { in: sourceIds } } })
       : [];
     console.log('Selected memorySources:', memorySources);
-    // Optionally, use a sessionId (could be user/session based, here just a static string for demo)
-    const sessionId = 'agent-session';
     // Retrieve relevant context from all selected sources
     let contextResults: any[] = [];
     const embeddingService = new HuggingFaceEmbeddingService();
@@ -117,18 +153,19 @@ export async function POST(req: NextRequest) {
       contextResults = [];
     }
     // Build a context string from the retrieved results
-    const contextText = contextResults.length > 0
+    const contextTextFromResults = contextResults.length > 0
       ? contextResults.map((item, i) => `Context ${i + 1}: ${typeof item === 'string' ? item : JSON.stringify(item)}`).join('\n')
       : '';
-    console.log('Final contextText for LLM:', contextText);
+    console.log('Final contextText for LLM:', contextTextFromResults);
     // Compose the prompt for the LLM
-    const prompt = [
+    const finalContextText = contextTextFromResults ? `\nContext:\n${contextTextFromResults}` : '';
+    const finalPrompt = [
       SYSTEM_PROMPT,
-      contextText ? `\nContext:\n${contextText}` : '',
+      finalContextText,
       `\nUser: ${body.user_input}`,
       'Agent:'
     ].join('\n');
-    console.log('Final prompt sent to LLM:', prompt);
+    console.log('Final prompt sent to LLM:', finalPrompt);
     // Use the orchestrator's LLM provider (Ollama, Llama, etc.)
     // Map frontend model to backend provider name
     let llmProvider: string | undefined = undefined;
@@ -140,10 +177,27 @@ export async function POST(req: NextRequest) {
       llmProvider = 'ollama'; // Default fallback
     }
     const llm = orchestrator.getProvider<LLMProvider>('llm', llmProvider);
-    const reply = await llm.generateResponse(prompt);
+    const reply = await llm.generateResponse(finalPrompt);
+
+    // --- Update session memory with agent reply ---
+    memoryObj.messages.push({ role: 'assistant', content: reply });
+    memoryObj.lastAction = 'agent_replied';
+
+    // --- Persist session memory ---
+    if (sessionMemory) {
+      await prisma.sessionMemory.update({
+        where: { userId_sessionId: { userId, sessionId } },
+        data: { memory: memoryObj },
+      });
+    } else {
+      await prisma.sessionMemory.create({
+        data: { userId, sessionId, memory: memoryObj },
+      });
+    }
+
     const response: AgentChatResponse = {
       reply,
-      metadata: { model: llmProvider, sources: sourceIds, contextCount: contextResults.length },
+      metadata: { model: llmProvider, sessionMemory: memoryObj },
     };
     return NextResponse.json(response);
   } catch (e: unknown) {

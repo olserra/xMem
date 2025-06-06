@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, X, Copy, Trash } from 'lucide-react';
+import { ExternalLink, X, Copy, Trash, Edit } from 'lucide-react';
 
 interface SessionSummary {
     sessionId: string;
@@ -33,6 +33,10 @@ const SessionMemoryItemList: React.FC<{
     const [copied, setCopied] = useState(false);
     const [deleted, setDeleted] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [editValue, setEditValue] = useState<string>('');
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
         setError(null);
@@ -86,6 +90,48 @@ const SessionMemoryItemList: React.FC<{
         setActionLoading(false);
     };
 
+    const handleEdit = (session: SessionSummary) => {
+        setEditing(true);
+        setEditValue(JSON.stringify(session.memory, null, 2));
+        setSaveError(null);
+    };
+
+    const handleCancelEdit = () => {
+        setEditing(false);
+        setEditValue('');
+        setSaveError(null);
+    };
+
+    const handleSaveEdit = async () => {
+        if (!selectedSession) return;
+        setSaveLoading(true);
+        setSaveError(null);
+        try {
+            const parsed = JSON.parse(editValue);
+            const res = await fetch('/api/sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: selectedSession.sessionId, memory: parsed }),
+            });
+            if (res.ok) {
+                setEditing(false);
+                setEditValue('');
+                setModalOpen(false);
+                if (refresh !== undefined) window.location.reload(); // fallback refresh
+            } else {
+                setSaveError('Failed to save changes.');
+            }
+        } catch (e) {
+            setSaveError('Invalid JSON or failed to save.');
+        }
+        setSaveLoading(false);
+    };
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+        if (editing) handleCancelEdit();
+    };
+
     // Modal component
     const Modal: React.FC<{ open: boolean; onClose: () => void; children: React.ReactNode }> = ({ open, onClose, children }) => {
         if (!open) return null;
@@ -113,7 +159,7 @@ const SessionMemoryItemList: React.FC<{
         // Table for md+ screens
         return (
             <div className="w-full">
-                <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+                <Modal open={modalOpen} onClose={handleModalClose}>
                     {selectedSession && (
                         <div>
                             <h2 className="text-lg font-semibold mb-2">Session Details</h2>
@@ -127,6 +173,14 @@ const SessionMemoryItemList: React.FC<{
                                     <Copy size={16} /> {copied ? 'Copied!' : 'Copy'}
                                 </button>
                                 <button
+                                    className="flex items-center gap-1 px-3 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-sm cursor-pointer"
+                                    onClick={() => handleEdit(selectedSession)}
+                                    disabled={editing}
+                                    title="Edit Session Memory"
+                                >
+                                    <Edit size={16} /> Edit
+                                </button>
+                                <button
                                     className="flex items-center gap-1 px-3 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-700 text-sm cursor-pointer"
                                     onClick={() => handleDelete(selectedSession)}
                                     disabled={actionLoading || deleted}
@@ -135,13 +189,38 @@ const SessionMemoryItemList: React.FC<{
                                     <Trash size={16} /> {deleted ? 'Deleted!' : 'Delete'}
                                 </button>
                             </div>
-                            <div className="mb-2"><span className="font-medium text-slate-700">Session ID:</span> {selectedSession.sessionId}</div>
-                            <div className="mb-2"><span className="font-medium text-slate-700">Created:</span> {new Date(selectedSession.createdAt).toLocaleString()}</div>
-                            <div className="mb-2"><span className="font-medium text-slate-700">Updated:</span> {new Date(selectedSession.updatedAt).toLocaleString()}</div>
-                            <div className="mb-2"><span className="font-medium text-slate-700">Summary:</span> {JSON.stringify(selectedSession.memory).slice(0, 60)}{JSON.stringify(selectedSession.memory).length > 60 ? '…' : ''}</div>
-                            <div className="mt-4 bg-slate-50 rounded p-3 text-xs text-slate-700">
-                                <pre className="whitespace-pre-wrap break-all">{JSON.stringify(selectedSession.memory, null, 2)}</pre>
-                            </div>
+                            {editing ? (
+                                <div className="mt-4">
+                                    <label className="block text-sm font-medium mb-1">Edit Session Memory (JSON)</label>
+                                    <textarea
+                                        className="w-full h-40 px-3 py-2 border border-slate-300 rounded font-mono text-xs"
+                                        value={editValue}
+                                        onChange={e => setEditValue(e.target.value)}
+                                        disabled={saveLoading}
+                                    />
+                                    {saveError && <div className="text-red-600 text-xs mt-1">{saveError}</div>}
+                                    <div className="flex gap-2 mt-2">
+                                        <button
+                                            className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm disabled:opacity-50 cursor-pointer"
+                                            onClick={handleSaveEdit}
+                                            disabled={saveLoading}
+                                        >
+                                            {saveLoading ? 'Saving...' : 'Save'}
+                                        </button>
+                                        <button
+                                            className="px-4 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 text-sm cursor-pointer"
+                                            onClick={handleCancelEdit}
+                                            disabled={saveLoading}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-4 bg-slate-50 rounded p-3 text-xs text-slate-700">
+                                    <pre className="whitespace-pre-wrap break-all">{JSON.stringify(selectedSession.memory, null, 2)}</pre>
+                                </div>
+                            )}
                         </div>
                     )}
                 </Modal>

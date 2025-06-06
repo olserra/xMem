@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Database, MessageCircle } from "lucide-react";
+import { Database, MessageCircle, UserCircle2 } from "lucide-react";
 import { Suspense } from 'react';
 
 // Use environment variable for default model (client-safe)
@@ -14,7 +14,9 @@ export interface AIAgentPageProps {
 
 function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
     const [sources, setSources] = useState<Source[]>([]); // All available sources
+    const [sessions, setSessions] = useState<any[]>([]); // All available sessions
     const [selectedSources, setSelectedSources] = useState<string[]>([]); // Selected source IDs
+    const [selectedSessions, setSelectedSessions] = useState<string[]>([]); // Selected session IDs
     const [chat, setChat] = useState<{ role: string; content: string }[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -28,6 +30,17 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
             .then((res) => res.json())
             .then((data) => {
                 setSources(data || []);
+            });
+        // Fetch available sessions from API
+        fetch("/api/sessions")
+            .then((res) => res.json())
+            .then((data) => {
+                setSessions((data.sessions || []).map((s: any) => ({
+                    id: s.sessionId,
+                    createdAt: s.createdAt,
+                    updatedAt: s.updatedAt,
+                    summary: s.summary ? String(s.summary).slice(0, 60) + (s.summary.length > 60 ? '…' : '') : '',
+                })));
             });
     }, []);
 
@@ -45,6 +58,7 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
                 body: JSON.stringify({
                     model: defaultModel,
                     sources: selectedSources,
+                    sessions: selectedSessions,
                     history,
                     user_input: input,
                     chatMemoryVectorProvider,
@@ -62,18 +76,20 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
 
     const handleSelectAll = () => setSelectedSources(sources.map((s) => s.id));
     const handleDeselectAll = () => setSelectedSources([]);
+    const handleSelectAllSessions = () => setSelectedSessions(sessions.map((s) => s.id));
+    const handleDeselectAllSessions = () => setSelectedSessions([]);
 
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden">
-            {sources.length === 0 ? (
+            {sources.length === 0 && sessions.length === 0 ? (
                 <div className="bg-white rounded-lg shadow-sm p-6 w-full max-w-full text-center text-slate-400">
-                    No memory sources connected. Please{' '}
+                    No memory sources or sessions connected. Please{' '}
                     <a
                         href="/dashboard/memory"
                         className="text-indigo-600 underline hover:text-indigo-800 transition-colors"
                     >
                         add a source
-                    </a>{' '}to view dashboard data.
+                    </a>{' '}or create a session to view dashboard data.
                 </div>
             ) : (
                 <>
@@ -83,7 +99,7 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
                     <div className="bg-white rounded-lg shadow-sm p-6 w-full h-[calc(100vh-8rem)] flex flex-col space-y-6">
                         {/* Source Selector */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Sources</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Vector DB Sources</label>
                             <div className="flex gap-2 mb-2">
                                 <button
                                     className="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs"
@@ -96,7 +112,7 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
                                     type="button"
                                 >Deselect All</button>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                                 {sources.map((source) => (
                                     <label key={source.id} className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 rounded px-2 py-1">
                                         <input
@@ -112,6 +128,39 @@ function AIAgentPage({ defaultModelId }: AIAgentPageProps) {
                                         />
                                         <Database size={16} className="text-slate-400" />
                                         <span className="text-sm">{source.name || source.collection}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1 mt-4">Sessions</label>
+                            <div className="flex gap-2 mb-2">
+                                <button
+                                    className="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs"
+                                    onClick={handleSelectAllSessions}
+                                    type="button"
+                                >Select All</button>
+                                <button
+                                    className="px-2 py-1 bg-slate-200 text-slate-700 rounded text-xs"
+                                    onClick={handleDeselectAllSessions}
+                                    type="button"
+                                >Deselect All</button>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {sessions.map((session) => (
+                                    <label key={session.id} className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedSessions.includes(session.id)}
+                                            onChange={e => {
+                                                setSelectedSessions(sel =>
+                                                    e.target.checked
+                                                        ? [...sel, session.id]
+                                                        : sel.filter(id => id !== session.id)
+                                                );
+                                            }}
+                                        />
+                                        <UserCircle2 size={16} className="text-slate-400" />
+                                        <span className="text-sm">{session.id}</span>
+                                        <span className="text-xs text-slate-400">{session.summary}</span>
                                     </label>
                                 ))}
                             </div>

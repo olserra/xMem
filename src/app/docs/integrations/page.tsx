@@ -30,12 +30,9 @@ orchestrator.registerProvider('llm', 'llama', new LlamaCppAdapter({ apiUrl: 'htt
 orchestrator.registerProvider('vector', 'chromadb', new ChromaDBAdapter({ url: 'http://localhost:8000', collection: 'my_collection' }));`} language="js" />
             <h2 className="text-xl font-semibold text-white mb-2">Session Store Integrations</h2>
             <ul className="list-disc list-inside text-slate-200 mb-4">
-                <li>Redis</li>
                 <li>PostgreSQL</li>
                 <li>MongoDB</li>
             </ul>
-            <SimpleCodeBlock code={`import { RedisAdapter } from './adapters/redis';
-orchestrator.registerProvider('session', 'redis', new RedisAdapter('redis://localhost:6379'));`} language="js" />
             <p className="text-slate-400 mt-4">
                 <b>Tip:</b> You can register multiple providers of each type and select which to use per operation.
             </p>

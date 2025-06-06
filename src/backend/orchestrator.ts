@@ -45,11 +45,6 @@ orchestrator.setDefaultProvider('llm', 'ollama');
 // Set default vector provider
 orchestrator.setDefaultProvider('vector', 'chromadb');
 
-// Register session provider (Redis)
-// const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-// orchestrator.registerProvider('session', 'redis', new RedisAdapter(redisUrl));
-// orchestrator.setDefaultProvider('session', 'redis');
-
 // Simple in-memory session adapter for dev/demo (no persistence)
 class InMemorySessionAdapter {
   private store: Record<string, { memory: Record<string, unknown>; createdAt: string; updatedAt: string } & Record<string, unknown>> = {};

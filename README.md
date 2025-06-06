@@ -22,7 +22,7 @@ Hybrid memory orchestrator for LLMs: combines long-term, session, and real-time 
 ```js
 const orchestrator = new xmem({
   vectorStore: chromadb,
-  sessionStore: redis,
+  sessionStore: inMemory,
   llmProvider: mistral,
 });
 const response = await orchestrator.query({
@@ -40,7 +40,7 @@ const response = await orchestrator.query({
 | Open-Source First      | Works with any open-source LLM (Llama, Mistral, etc.) and vector DB              |
 | Effortless Integration | Simple API and dashboard for seamless integration and monitoring                 |
 | Vector DB Support      | Qdrant, ChromaDB, Pinecone, and more                                             |
-| Session Store          | Redis, MongoDB, and others                                                       |
+| Session Store          | In-memory, MongoDB, and others                                                   |
 | LLM Provider Agnostic  | Llama.cpp, Ollama, and more (OpenAI supported, but open-source preferred)        |
 | Public ML Service      | [Hugging Face Spaces: Olserra/xmem](https://huggingface.co/spaces/Olserra/xmem/) |
 

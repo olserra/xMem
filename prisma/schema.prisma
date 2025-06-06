@@ -153,15 +153,35 @@ model AuditLog {
   timestamp      DateTime @default(now())
 }
 
-model SessionMemory {
-  id        String   @id @default(uuid())
-  userId    String
+model SessionMessage {
+  id        String        @id @default(cuid())
   sessionId String
-  memory    Json
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  userId    String
+  role      String // 'user' or 'assistant'
+  content   String
+  embedding Float[] // Vector embedding
+  pinned    Boolean       @default(false)
+  deleted   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+  session   SessionMemory @relation(fields: [sessionId], references: [sessionId])
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model SessionMemory {
+  sessionId String           @id
+  userId    String
+  summary   String? // Optional: running summary
+  updatedAt DateTime         @updatedAt
+  messages  SessionMessage[]
+  User      User             @relation(fields: [userId], references: [id])
+}
 
-  @@unique([userId, sessionId])
+model ContextInjectionLog {
+  id                String   @id @default(cuid())
+  userId            String
+  sessionId         String
+  query             String
+  injectedMsgIds    String // Comma-separated or as a relation
+  injectedSummary   String?
+  injectedVectorIds String?
+  createdAt         DateTime @default(now())
 }

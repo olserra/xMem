@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface SessionMemoryManagerProps {
     onSessionChange?: (sessionId: string | null) => void;
     onSessionMemorySaved?: () => void;
 }
 
+const messageExample = "Always call me 'John'.";
+
 const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionChange, onSessionMemorySaved }) => {
     const [sessionId, setSessionId] = useState('');
-    const [memory, setMemory] = useState('');
+    const [jsonValue, setJsonValue] = useState('');
     const [loadedSessionId, setLoadedSessionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,21 +20,10 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
         setError(null);
         setSuccess(null);
         try {
-            // Always send a memory field (empty object) to satisfy backend
-            const res = await fetch('/api/sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId, memory: {} }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setMemory(JSON.stringify(data.memory || {}, null, 2));
-                setLoadedSessionId(sessionId);
-                setSuccess('Session loaded.');
-                if (onSessionChange) onSessionChange(sessionId);
-            } else {
-                setError('Failed to load session.');
-            }
+            setLoadedSessionId(sessionId);
+            setSuccess('Session loaded.');
+            setTimeout(() => setSuccess(null), 3000);
+            if (onSessionChange) onSessionChange(sessionId);
         } catch {
             setError('Error loading session.');
         } finally {
@@ -45,48 +36,43 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
         setError(null);
         setSuccess(null);
         try {
-            const res = await fetch('/api/sessions', {
+            const message = jsonValue.trim();
+            if (!message) throw new Error('Message cannot be empty');
+            await fetch('/api/session-memory', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: loadedSessionId, memory: JSON.parse(memory) }),
+                body: JSON.stringify({ sessionId: loadedSessionId, content: message, role: 'user', messageExampleContent: messageExample }),
             });
-            if (res.ok) {
-                setSuccess('Session memory saved.');
-                setLoadedSessionId(null); // Show the list after save
-                if (onSessionMemorySaved) onSessionMemorySaved();
-                setTimeout(() => setSuccess(null), 2000);
-            } else {
-                setError('Failed to save session memory.');
-                if (onSessionMemorySaved) onSessionMemorySaved();
-            }
-        } catch {
-            setError('Error saving session memory.');
+            setSuccess('Session memory saved.');
             if (onSessionMemorySaved) onSessionMemorySaved();
+            setTimeout(() => setSuccess(null), 3000);
+            setLoadedSessionId(null);
+            setJsonValue('');
+            setSessionId('');
+        } catch (e) {
+            setError('Message cannot be empty or failed to save.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async () => {
+    const handleDeleteSession = async () => {
         if (!loadedSessionId) return;
         setLoading(true);
         setError(null);
         setSuccess(null);
         try {
-            const res = await fetch('/api/sessions', {
+            await fetch('/api/session-memory', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId: loadedSessionId }),
             });
-            if (res.ok) {
-                setSuccess('Session deleted.');
-                setLoadedSessionId(null);
-                setMemory('');
-                setSessionId('');
-                if (onSessionChange) onSessionChange(null);
-            } else {
-                setError('Failed to delete session.');
-            }
+            setSuccess('Session deleted.');
+            setTimeout(() => setSuccess(null), 3000);
+            setLoadedSessionId(null);
+            setJsonValue('');
+            setSessionId('');
+            if (onSessionChange) onSessionChange(null);
         } catch {
             setError('Error deleting session.');
         } finally {
@@ -119,7 +105,7 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
                 {loadedSessionId && (
                     <button
                         className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-                        onClick={handleDelete}
+                        onClick={handleDeleteSession}
                         disabled={loading}
                     >
                         Delete Session
@@ -128,13 +114,17 @@ const SessionMemoryManager: React.FC<SessionMemoryManagerProps> = ({ onSessionCh
             </div>
             {loadedSessionId && (
                 <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Session Memory (JSON)</label>
+                    <label className="block text-sm font-medium mb-1">Message</label>
                     <textarea
                         className="w-full h-40 px-3 py-2 border border-slate-300 rounded font-mono text-sm"
-                        value={memory}
-                        onChange={e => setMemory(e.target.value)}
+                        value={jsonValue}
+                        onChange={e => setJsonValue(e.target.value)}
                         disabled={loading}
+                        placeholder={messageExample}
                     />
+                    <div className="text-xs text-slate-500 mt-1">
+                        Enter a message (e.g., <code>Always call me John.</code>) for this session.
+                    </div>
                     <button
                         className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 cursor-pointer"
                         onClick={handleSave}

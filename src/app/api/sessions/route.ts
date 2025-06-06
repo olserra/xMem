@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import type { Session } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/auth';
-import { orchestrator } from '../../../backend/orchestrator';
+import { prisma } from '../../../../prisma/prisma';
 
 // Helper to extract userId from session
 function getUserId(session: Session | null): string | null {
@@ -18,32 +18,29 @@ export async function GET(req: NextRequest) {
   }
   const { searchParams } = new URL(req.url);
   const sessionId = searchParams.get('sessionId');
-  const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
   if (sessionId) {
-    const sessionObj = await sessionProvider.getSession(sessionId);
-    if (!sessionObj) {
+    const sessionMemory = await prisma.sessionMemory.findUnique({ where: { sessionId } });
+    if (!sessionMemory) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
-    // Only return memory fields, not userId
-    const { userId: _userId, ...memoryData } = sessionObj;
-    return NextResponse.json({ memory: memoryData });
-  }
-  // List all sessions for the user
-  if (typeof (sessionProvider as any).listSessions === 'function') {
-    const sessions = await (sessionProvider as any).listSessions();
-    // Only return sessions for this user (if userId is present in memory)
-    const filtered = sessions.filter((s: any) => !s.memory.userId || s.memory.userId === userId);
-    // Return summary (id, createdAt, updatedAt, memory summary)
+    const messages = await prisma.sessionMessage.findMany({
+      where: { sessionId, deleted: false },
+      orderBy: { createdAt: 'asc' },
+    });
     return NextResponse.json({
-      sessions: filtered.map((s: any) => ({
-        sessionId: s.sessionId,
-        createdAt: s.createdAt,
-        updatedAt: s.updatedAt,
-        memory: s.memory,
-      }))
+      sessionId,
+      summary: sessionMemory.summary,
+      updatedAt: sessionMemory.updatedAt,
+      messages,
     });
   }
-  return NextResponse.json({ error: 'Session listing not implemented' }, { status: 501 });
+  // List all sessions for the user
+  const sessions = await prisma.sessionMemory.findMany({
+    where: { userId },
+    orderBy: { updatedAt: 'desc' },
+    select: { sessionId: true, summary: true, updatedAt: true },
+  });
+  return NextResponse.json({ sessions });
 }
 
 // POST: Create or update a session memory
@@ -74,8 +71,8 @@ export async function DELETE(req: NextRequest) {
   if (!sessionId) {
     return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
   }
-  // Optionally, check if session belongs to user
-  const sessionProvider = orchestrator.getProvider<import('../../../backend/xmem').SessionStore>('session');
-  await sessionProvider.deleteSession(sessionId);
+  // Delete all messages and session
+  await prisma.sessionMessage.deleteMany({ where: { sessionId } });
+  await prisma.sessionMemory.delete({ where: { sessionId } });
   return NextResponse.json({ success: true });
 }

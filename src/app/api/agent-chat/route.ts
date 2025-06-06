@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { orchestrator } from '@/backend/orchestrator';
 import type { LLMProvider } from '@/backend/xmem';
 import { OpenAIAdapter } from '@/backend/adapters/openai';
-import { prisma } from '@prisma/prisma';
+import { prisma } from '../../../../prisma/prisma';
 import { QdrantAdapter } from '@/backend/adapters/qdrant';
 import { ChromaDBAdapter } from '@/backend/adapters/chromadb';
 import { PineconeAdapter } from '@/backend/adapters/pinecone';
@@ -21,6 +21,7 @@ interface AgentChatRequest {
   userGoal?: string;
   preferences?: Record<string, unknown>;
   lastAction?: string;
+  sessions?: string[];
 }
 
 interface AgentChatResponse {
@@ -48,38 +49,70 @@ if (
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    let userId = session?.user?.id || 'demo-user'; // fallback for demo
+    let userId = session?.user?.id || 'demo-user';
     const body = (await req.json()) as AgentChatRequest;
     // Use a sessionId from the request or fallback
-    const sessionId = body.collection || 'agent-session';
+    const sessionId = body.collection || null;
 
-    // --- Load session memory ---
-    let sessionMemory = await prisma.sessionMemory.findUnique({
-      where: { userId_sessionId: { userId, sessionId } },
-    });
-    let memoryObj: any = sessionMemory?.memory || {
-      messages: [],
-      userGoal: '',
-      preferences: {},
-      lastAction: '',
-    };
+    // --- Load selected session messages (for context) ---
+    let sessionsContext = '';
+    let injectedMsgIds: string[] = [];
+    let injectedSummary = '';
+    if (body.sessions && Array.isArray(body.sessions) && body.sessions.length > 0) {
+      const embeddingService = new HuggingFaceEmbeddingService();
+      const userEmbedding = await embeddingService.embed(body.user_input);
+      for (const sid of body.sessions) {
+        // Fetch summary
+        const sessionMemory = await prisma.sessionMemory.findUnique({ where: { sessionId: sid } });
+        if (sessionMemory?.summary) {
+          sessionsContext += `Session ${sid} Summary:\n${sessionMemory.summary}\n`;
+          injectedSummary += sessionMemory.summary + '\n';
+        }
+        // Fetch pinned messages
+        const pinned = await prisma.sessionMessage.findMany({
+          where: { sessionId: sid, pinned: true, deleted: false },
+          orderBy: { createdAt: 'asc' },
+        });
+        // Semantic search over messages
+        const allMessages = await prisma.sessionMessage.findMany({
+          where: { sessionId: sid, deleted: false },
+        });
+        // Compute similarity for each message
+        const scored = await Promise.all(allMessages.map(async (msg) => {
+          if (!msg.embedding || msg.embedding.length === 0) return { msg, score: -Infinity };
+          // Cosine similarity
+          const dot = msg.embedding.reduce((acc, v, i) => acc + v * userEmbedding[i], 0);
+          const normA = Math.sqrt(msg.embedding.reduce((acc, v) => acc + v * v, 0));
+          const normB = Math.sqrt(userEmbedding.reduce((acc, v) => acc + v * v, 0));
+          const score = dot / (normA * normB);
+          return { msg, score };
+        }));
+        const topRelevant = scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 5).map(s => s.msg);
+        // Inject pinned and top relevant messages
+        const injected = [...pinned, ...topRelevant.filter(m => !pinned.find(p => p.id === m.id))];
+        injectedMsgIds.push(...injected.map(m => m.id));
+        sessionsContext += injected.map(m => `[${m.role}] ${m.content}`).join('\n');
+      }
+    }
 
-    // --- Update session memory with new user message ---
-    memoryObj.messages = memoryObj.messages || [];
-    memoryObj.messages.push({ role: 'user', content: body.user_input });
-    // Optionally update userGoal, preferences, lastAction if provided in body
-    if (body.userGoal) memoryObj.userGoal = body.userGoal;
-    if (body.preferences) memoryObj.preferences = body.preferences;
-    if (body.lastAction) memoryObj.lastAction = body.lastAction;
+    // --- Log context injection ---
+    if (body.sessions && body.sessions.length > 0) {
+      await prisma.contextInjectionLog.create({
+        data: {
+          userId,
+          sessionId: sessionId,
+          query: body.user_input,
+          injectedMsgIds: injectedMsgIds.join(','),
+          injectedSummary,
+          injectedVectorIds: (body.sources || []).join(','),
+        },
+      });
+    }
 
     // --- Build context for LLM ---
-    const contextText = `Session Memory: ${JSON.stringify(memoryObj)}`;
-    const prompt = [
-      SYSTEM_PROMPT,
-      contextText,
-      `\nUser: ${body.user_input}`,
-      'Agent:'
-    ].join('\n');
+    const contextText =
+      (sessionsContext ? `Relevant Sessions:\n${sessionsContext}\n\n` : '') +
+      `User: ${body.user_input}`;
 
     // Look up all selected sources
     const sourceIds = body.sources || [];
@@ -158,11 +191,11 @@ export async function POST(req: NextRequest) {
       : '';
     console.log('Final contextText for LLM:', contextTextFromResults);
     // Compose the prompt for the LLM
-    const finalContextText = contextTextFromResults ? `\nContext:\n${contextTextFromResults}` : '';
     const finalPrompt = [
       SYSTEM_PROMPT,
-      finalContextText,
-      `\nUser: ${body.user_input}`,
+      sessionsContext ? `Relevant Sessions:\n${sessionsContext}\n` : '',
+      contextTextFromResults ? `Context:\n${contextTextFromResults}\n` : '',
+      `User: ${body.user_input}`,
       'Agent:'
     ].join('\n');
     console.log('Final prompt sent to LLM:', finalPrompt);
@@ -180,24 +213,29 @@ export async function POST(req: NextRequest) {
     const reply = await llm.generateResponse(finalPrompt);
 
     // --- Update session memory with agent reply ---
-    memoryObj.messages.push({ role: 'assistant', content: reply });
-    memoryObj.lastAction = 'agent_replied';
-
-    // --- Persist session memory ---
-    if (sessionMemory) {
-      await prisma.sessionMemory.update({
-        where: { userId_sessionId: { userId, sessionId } },
-        data: { memory: memoryObj },
-      });
-    } else {
-      await prisma.sessionMemory.create({
-        data: { userId, sessionId, memory: memoryObj },
-      });
+    if (sessionId) {
+      const sessionMemory = await prisma.sessionMemory.findUnique({ where: { sessionId } });
+      if (sessionMemory) {
+        await prisma.sessionMemory.update({
+          where: { sessionId },
+          data: {
+            summary: reply,
+          },
+        });
+      } else {
+        await prisma.sessionMemory.create({
+          data: {
+            userId,
+            sessionId,
+            summary: reply,
+          },
+        });
+      }
     }
 
     const response: AgentChatResponse = {
       reply,
-      metadata: { model: llmProvider, sessionMemory: memoryObj },
+      metadata: { model: llmProvider, sessionMemory: { summary: reply } },
     };
     return NextResponse.json(response);
   } catch (e: unknown) {

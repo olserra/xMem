@@ -425,7 +425,7 @@ const Landing: React.FC = () => {
                         <div className="text-slate-300">,</div>
                         <div className="pl-4 text-slate-300">
                             sessionStore: </div>
-                        <div className="text-purple-300">redis</div>
+                        <div className="text-purple-300">in-memory</div>
                         <div className="text-slate-300">,</div>
                         <div className="pl-4 text-slate-300">
                             llmProvider: </div>
@@ -464,7 +464,7 @@ const CIRCLE_NODES = [
         id: 'session',
         label: 'Session Store',
         icon: <Database size={36} className="text-purple-400" />,
-        desc: 'Redis, MongoDB',
+        desc: 'In-memory, MongoDB',
         color: 'from-purple-400 to-indigo-400',
     },
     {

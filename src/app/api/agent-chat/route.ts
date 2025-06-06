@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       await prisma.contextInjectionLog.create({
         data: {
           userId,
-          sessionId: sessionId,
+          sessionId: sessionId || '',
           query: body.user_input,
           injectedMsgIds: injectedMsgIds.join(','),
           injectedSummary,
